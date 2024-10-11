@@ -11,8 +11,8 @@ namespace Scrumalyze.Classes
         public List<string> PathologicalBehaviors { get; set; } = new List<string>();
         public string TeamName { get; set; }
         public int ScorePercentage { get; private set; } = 0;
-        private int Total { get; set; } = 0;
-        private int Count { get; set; } = 0;
+        public int Total { get; set; } = 0;
+        public int Count { get; set; } = 0;
 
         public ScrumEvaluationResult(string name)
         {
