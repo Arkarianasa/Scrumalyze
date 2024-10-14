@@ -5,11 +5,11 @@ namespace Scrumalyze.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GlobalContextController : ControllerBase
+    public class GlobalController : ControllerBase
     {
-        private readonly GlobalContextService _globalContextService; // Inject your service for data access
+        private readonly GlobalService _globalContextService; // Inject your service for data access
 
-        public GlobalContextController(GlobalContextService globalContextService)
+        public GlobalController(GlobalService globalContextService)
         {
             _globalContextService = globalContextService;
         }

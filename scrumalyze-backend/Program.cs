@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Scrumalyze.Data;
 using Scrumalyze.Services;
+using System.Text.Json.Serialization;
 
 public static class Program
 {
@@ -25,11 +26,12 @@ public static class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("ScrumalyzeDatabase"))
         );
 
-        builder.Services.AddControllers();  // Assuming you're exposing API controllers
-        
+        builder.Services.AddControllers().AddJsonOptions(x =>
+            x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
         builder.Services.AddScoped<ScrumEvaluationService>();
-        builder.Services.AddScoped<GlobalContextService>();
-        builder.Services.AddScoped<TeamContextService>();
+        builder.Services.AddScoped<GlobalService>();
+        builder.Services.AddScoped<TeamService>();
 
         var app = builder.Build();
 

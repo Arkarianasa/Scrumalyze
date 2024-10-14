@@ -22,25 +22,25 @@ export const TeamProvider = ({ children }) => {
         sprintGoals: [],
         processSteps: [],
         increments: [],
-        evaulation: null
+        evaluation: null,
     });
     const [loading, setLoading] = useState(true);
 
     const fetchTeamData = async (teamId) => {
         try {
             const responses = await Promise.all([
-                fetch(`https://localhost:52765/api/teamcontext/persons/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/productgoal/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/dod/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/acceptancecriteria/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/timeboxes/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/productbacklog/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/workitems/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/sprints/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/sprintbacklogs/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/sprintgoals/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/processsteps/${teamId}`),
-                fetch(`https://localhost:52765/api/teamcontext/increments/${teamId}`),
+                fetch(`https://localhost:52765/api/team/persons/${teamId}`),
+                fetch(`https://localhost:52765/api/team/productgoal/${teamId}`),
+                fetch(`https://localhost:52765/api/team/dod/${teamId}`),
+                fetch(`https://localhost:52765/api/team/acceptancecriteria/${teamId}`),
+                fetch(`https://localhost:52765/api/team/timeboxes/${teamId}`),
+                fetch(`https://localhost:52765/api/team/productbacklog/${teamId}`),
+                fetch(`https://localhost:52765/api/team/workitems/${teamId}`),
+                fetch(`https://localhost:52765/api/team/sprints/${teamId}`),
+                fetch(`https://localhost:52765/api/team/sprintbacklogs/${teamId}`),
+                fetch(`https://localhost:52765/api/team/sprintgoals/${teamId}`),
+                fetch(`https://localhost:52765/api/team/processsteps/${teamId}`),
+                fetch(`https://localhost:52765/api/team/increments/${teamId}`),
                 fetch(`https://localhost:52765/api/evaluation/${teamId}`),
             ]);
 
@@ -57,7 +57,7 @@ export const TeamProvider = ({ children }) => {
                 sprintGoals,
                 processSteps,
                 increments,
-                evaulation,
+                evaluation,
             ] = await Promise.all(responses.map((res) => res.json()));
 
             setTeamData({
@@ -73,7 +73,7 @@ export const TeamProvider = ({ children }) => {
                 sprintGoals,
                 processSteps,
                 increments,
-                evaulation,
+                evaluation,
             });
         } catch (error) {
             console.error('Failed to fetch team data:', error);
@@ -95,3 +95,4 @@ export const TeamProvider = ({ children }) => {
         </TeamContext.Provider>
     );
 };
+

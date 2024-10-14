@@ -4,22 +4,25 @@ using Scrumalyze.Models;
 
 namespace Scrumalyze.Services
 {
-    public class TeamContextService
+    public class TeamService
     {
         private readonly ScrumalyzeContext _context;
 
-        public TeamContextService(ScrumalyzeContext context)
+        public TeamService(ScrumalyzeContext context)
         {
             _context = context;
         }
 
         public List<Person> GetPersonList(int teamID)
-        {
-            return _context.Person.Where(p => p.ScrumTeamID == teamID).ToList();
+        {  
+            return _context.Person
+                .Include(p => p.Role)
+                .Where(p => p.ScrumTeamID == teamID)
+                .ToList();
         }
         public ProductGoal? GetProductGoal(int teamID)
         {
-            return _context.ProductGoal.FirstOrDefault(pg => pg.ScrumTeamID == teamID);
+            return _context.ProductGoal.Include(pg => pg.CreatedByPerson).FirstOrDefault(pg => pg.ScrumTeamID == teamID);
         }
         public List<DefinitionOfDone> GetDoDList(int teamID)
         {

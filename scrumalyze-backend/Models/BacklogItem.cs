@@ -16,7 +16,7 @@ namespace Scrumalyze.Models
         public bool Active { get; set; }
         public int? ItemPriority { get; set; }
 
-        public virtual required ProductBacklog ProductBacklog { get; set; }
-        public virtual SprintBacklog? SprintBacklog { get; set; }
+        public required ProductBacklog ProductBacklog { get; set; }
+        public SprintBacklog? SprintBacklog { get; set; }
     }
 }

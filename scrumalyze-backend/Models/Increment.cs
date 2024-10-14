@@ -16,9 +16,9 @@ namespace Scrumalyze.Models
         public int? ReceivedByID { get; set; }
         public string IncrementDescription { get; set; } = string.Empty;
 
-        public virtual required Sprint Sprint { get; set; }
-        public virtual SprintGoal? SprintGoal { get; set; }
-        public virtual ProductGoal? ProductGoal { get; set; }
-        public virtual Person? ReceivedBy { get; set; }
+        public required Sprint Sprint { get; set; }
+        public SprintGoal? SprintGoal { get; set; }
+        public ProductGoal? ProductGoal { get; set; }
+        public Person? ReceivedBy { get; set; }
     }
 }

@@ -6,11 +6,11 @@ namespace Scrumalyze.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamContextController : ControllerBase
+    public class TeamController : ControllerBase
     {
-        private readonly TeamContextService _teamContextService;
+        private readonly TeamService _teamContextService;
 
-        public TeamContextController(TeamContextService teamContextService)
+        public TeamController(TeamService teamContextService)
         {
             _teamContextService = teamContextService;
         }

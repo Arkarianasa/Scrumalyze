@@ -13,7 +13,7 @@ namespace Scrumalyze.Models
         public int RoleID { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public virtual required ScrumRole Role { get; set; }
-        public virtual ICollection<WorkItem> WorkItems { get; set; }
+        public required ScrumRole Role { get; set; }
+        public ICollection<PersonWorkItem>? PersonWorkItems { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace Scrumalyze.Models
         public int TargetPersonID { get; set; }
         public string CommunicationDescription { get; set; } = string.Empty;
 
-        public virtual required Person SourcePerson { get; set; }
-        public virtual required Person TargetPerson { get; set; }
+        public required Person SourcePerson { get; set; }
+        public required Person TargetPerson { get; set; }
     }
 }

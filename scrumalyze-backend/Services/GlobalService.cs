@@ -3,11 +3,11 @@ using Scrumalyze.Models;
 
 namespace Scrumalyze.Services
 {
-    public class GlobalContextService
+    public class GlobalService
     {
         private readonly ScrumalyzeContext _context;
 
-        public GlobalContextService(ScrumalyzeContext context)
+        public GlobalService(ScrumalyzeContext context)
         {
             _context = context;
         }

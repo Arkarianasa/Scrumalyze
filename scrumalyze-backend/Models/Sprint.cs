@@ -14,8 +14,8 @@ namespace Scrumalyze.Models
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int? TimeboxID { get; set; }
-        public virtual required SprintGoal SprintGoal { get; set; }
-        public virtual required ProductGoal ProductGoal { get; set; }
-        public virtual Timebox? Timebox { get; set; }
+        public required SprintGoal SprintGoal { get; set; }
+        public required ProductGoal ProductGoal { get; set; }
+        public Timebox? Timebox { get; set; }
     }
 }

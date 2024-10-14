@@ -41,22 +41,28 @@ const TeamDashboardPage = () => {
                             <Typography variant="h5" gutterBottom>
                                 Team Members
                             </Typography>
-                            <List>
-                                {teamData.persons.map((person) => (
-                                    <ListItem key={person.personID}>
-                                        <ListItemAvatar>
-                                            <Avatar>
-                                                {person.firstName.charAt(0)}
-                                                {person.lastName.charAt(0)}
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={`${person.firstName} ${person.lastName}`}
-                                            secondary={person.role ? person.role.roleName : 'No role assigned'}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
+                            {Array.isArray(teamData.persons) && teamData.persons.length > 0 ? (
+                                <List>
+                                    {teamData.persons.map((person) => (
+                                        <ListItem key={person.personID}>
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    {person.firstName.charAt(0)}
+                                                    {person.lastName.charAt(0)}
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={`${person.firstName} ${person.lastName}`}
+                                                secondary={person.role ? person.role.roleName : 'No role assigned'}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            ) : (
+                                <Typography variant="body2">
+                                    No team members found.
+                                </Typography>
+                            )}
                         </CardContent>
                     </Card>
                 </Grid>
@@ -68,16 +74,24 @@ const TeamDashboardPage = () => {
                             <Typography variant="h5" gutterBottom>
                                 Product Goal
                             </Typography>
-                            <Typography variant="body1">
-                                {teamData.productGoal.description}
-                            </Typography>
-                            <Divider style={{ margin: '10px 0' }} />
-                            <Typography variant="body2">
-                                Created on: {new Date(teamData.productGoal.createdDate).toLocaleDateString()}
-                            </Typography>
-                            <Typography variant="body2">
-                                Created by: {teamData.productGoal.createdByPerson.firstName + " " + teamData.productGoal.createdByPerson.lastName}
-                            </Typography>
+                            {teamData.productGoal ? (
+                                <>
+                                    <Typography variant="body1">
+                                        {teamData.productGoal.description}
+                                    </Typography>
+                                    <Divider style={{ margin: '10px 0' }} />
+                                    <Typography variant="body2">
+                                        Created on: {new Date(teamData.productGoal.createdDate).toLocaleDateString()}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Created by: {`${teamData.productGoal.createdByPerson.firstName} ${teamData.productGoal.createdByPerson.lastName}`}
+                                    </Typography>
+                                </>
+                            ) : (
+                                <Typography variant="body2">
+                                    No product goal found.
+                                </Typography>
+                            )}
                         </CardContent>
                     </Card>
                 </Grid>
