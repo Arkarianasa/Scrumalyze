@@ -16,8 +16,8 @@ namespace Scrumalyze.Models
         public int? TimeboxID { get; set; }
         public int? GuidedByPersonID { get; set; }
 
-        public required BacklogItem Sprint { get; set; }
-        public Timebox? Timebox { get; set; }
-        public Person? GuidedByPerson { get; set; }
+        public virtual required Sprint Sprint { get; set; }
+        public virtual Timebox? Timebox { get; set; }
+        public virtual Person? GuidedByPerson { get; set; }
     }
 }

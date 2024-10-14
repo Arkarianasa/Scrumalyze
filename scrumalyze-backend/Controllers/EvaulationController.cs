@@ -14,19 +14,19 @@ namespace Scrumalyze.Controllers
             _evaluationService = evaluationService;
         }
 
-        [HttpGet("{teamname}")]
-        public IActionResult GetEvaluationResult(string teamname)
+        [HttpGet("{teamID}")]
+        public IActionResult GetEvaluationResult(int teamID)
         {
-            var evaluationResult = _evaluationService.EvaluateScrumImplementation(teamname);
+            var evaluationResult = _evaluationService.EvaluateScrumImplementation(teamID);
 
             if (evaluationResult == null)
             {
-                return NotFound($"No evaluation found for team '{teamname}'.");
+                return NotFound($"No evaluation found for team '{teamID}'.");
             }
 
             return Ok(new
             {
-                TeamName = teamname,
+                TeamID = teamID,
                 Result = evaluationResult
             });
         }

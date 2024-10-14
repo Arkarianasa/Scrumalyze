@@ -28,6 +28,8 @@ public static class Program
         builder.Services.AddControllers();  // Assuming you're exposing API controllers
         
         builder.Services.AddScoped<ScrumEvaluationService>();
+        builder.Services.AddScoped<GlobalContextService>();
+        builder.Services.AddScoped<TeamContextService>();
 
         var app = builder.Build();
 
@@ -42,17 +44,17 @@ public static class Program
             var context = scope.ServiceProvider.GetRequiredService<ScrumalyzeContext>();
             var evaluationService = new ScrumEvaluationService(context);
 
-            var evaluationResult = evaluationService.EvaluateScrumImplementation("Atomic");
+            var evaluationResult = evaluationService.EvaluateScrumImplementation(1);
             evaluationResult.PrettyPrint();
 
             evaluationResult.NullResult();
 
-            evaluationResult = evaluationService.EvaluateScrumImplementation("Bionic");
+            evaluationResult = evaluationService.EvaluateScrumImplementation(2);
             evaluationResult.PrettyPrint();
 
             evaluationResult.NullResult();
 
-            evaluationResult = evaluationService.EvaluateScrumImplementation("Cosmic");
+            evaluationResult = evaluationService.EvaluateScrumImplementation(3);
             evaluationResult.PrettyPrint();
         }
 

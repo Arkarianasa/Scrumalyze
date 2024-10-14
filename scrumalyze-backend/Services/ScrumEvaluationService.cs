@@ -18,18 +18,20 @@ namespace Scrumalyze.Services
             _context = context;
         }
 
-        public ScrumEvaluationResult EvaluateScrumImplementation(string teamName)
+        public ScrumEvaluationResult EvaluateScrumImplementation(int teamID)
         {
-            var result = new ScrumEvaluationResult(teamName);
+            var result = new ScrumEvaluationResult(teamID);
 
             // Get the Scrum team by team name
-            var team = _context.ScrumTeam.FirstOrDefault(t => t.TeamName == teamName);
+            var team = _context.ScrumTeam.FirstOrDefault(t => t.ScrumTeamID == teamID);
 
             if (team == null)
             {
-                result.PathologicalBehaviors.Add($"Team '{teamName}' not found.");
+                result.PathologicalBehaviors.Add($"Team '{teamID}' not found.");
                 return result;
             }
+
+            result.AddName(team.TeamName);
 
             // Pass the team ID to each evaluation method
             EvaluateDefinitionOfDone(result, team.ScrumTeamID);
@@ -129,7 +131,7 @@ namespace Scrumalyze.Services
         {
             // Check if Product Goals are created by the Product Owner in the given team
             var productGoalsNotByProductOwner = _context.ProductGoal
-                .Where(pg => pg.CreatedByPerson.ScrumTeamID == scrumTeamId &&
+                .Where(pg => pg.ScrumTeamID == scrumTeamId &&
                              pg.CreatedByPerson.Role.RoleName != "Product Owner")
                 .ToList();
 
@@ -363,8 +365,7 @@ namespace Scrumalyze.Services
             var unboundIncrements = _context.Increment
                 .Where(i => _context.Sprint.Any(s => s.SprintID == i.SprintID &&
                                                      _context.SprintGoal.Any(sg => sg.SprintGoalID == s.SprintGoalID &&
-                                                     sg.CreatedByPerson.ScrumTeamID == scrumTeamId)) &&
-                            i.SprintID == null)
+                                                     sg.CreatedByPerson.ScrumTeamID == scrumTeamId)))
                 .ToList();
 
             if (unboundIncrements.Any())

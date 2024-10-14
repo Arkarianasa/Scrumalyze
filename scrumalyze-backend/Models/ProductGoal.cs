@@ -12,7 +12,7 @@ namespace Scrumalyze.Models
         public string Description { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public int CreatedByPersonID { get; set; }
-
-        public required Person CreatedByPerson { get; set; }
+        public int ScrumTeamID { get; set; }
+        public virtual required Person CreatedByPerson { get; set; }
     }
 }

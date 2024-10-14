@@ -14,7 +14,7 @@ namespace Scrumalyze.Data
         protected readonly IConfiguration Configuration;
         public DbSet<Timebox> Timebox { get; set; }
         public DbSet<AcceptanceCriteria> AcceptanceCriteria { get; set; }
-        public DbSet<DefinitionOfDone> DefinitionsOfDone { get; set; }
+        public DbSet<DefinitionOfDone> DefinitionOfDone { get; set; }
         public DbSet<ScrumTeam> ScrumTeam { get; set; }
         public DbSet<ScrumRole> ScrumRole { get; set; }
         public DbSet<Person> Person { get; set; }
@@ -26,7 +26,7 @@ namespace Scrumalyze.Data
         public DbSet<SprintBacklog> SprintBacklog { get; set; }
         public DbSet<BacklogItem> BacklogItem { get; set; }
         public DbSet<ProcessStep> ProcessStep { get; set; }
-        public DbSet<WorkItemType> WorkItemTypes { get; set; }
+        public DbSet<WorkItemType> WorkItemType { get; set; }
         public DbSet<WorkItem> WorkItem { get; set; }
         public DbSet<Communication> Communication { get; set; }
 
@@ -41,7 +41,9 @@ namespace Scrumalyze.Data
             {
                 // Using the connection string from appsettings.json
                 var connectionString = Configuration.GetConnectionString("ScrumalyzeDatabase");
-                optionsBuilder.UseSqlServer(connectionString);
+                optionsBuilder
+                    .UseLazyLoadingProxies()  // Enable lazy loading proxies
+                    .UseSqlServer(connectionString);
             }
         }
 
@@ -51,13 +53,21 @@ namespace Scrumalyze.Data
             modelBuilder.Entity<Person>()
             .HasMany(p => p.WorkItems)
             .WithMany(w => w.Persons)
-            .UsingEntity(j => j.ToTable("PersonWorkItems"));
+            .UsingEntity(j => j.ToTable("PersonWorkItem"));
 
             // Configure the relationship between Person and ScrumRole
             modelBuilder.Entity<Person>()
                 .HasOne(p => p.Role)
-                .WithMany(r => r.Persons)
-                .HasForeignKey(p => p.RoleID);
+                .WithMany()
+                .HasForeignKey(p => p.RoleID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure the relationship between ProductGoal and Person
+            modelBuilder.Entity<ProductGoal>()
+                        .HasOne(pg => pg.CreatedByPerson) // Each ProductGoal is created by one Person
+                        .WithMany()
+                        .HasForeignKey(pg => pg.ProductGoalID) // Specify the foreign key
+                        .OnDelete(DeleteBehavior.Restrict); // Specify delete behavior, adjust as necessary
 
             // ScrumRole Primary Key
             modelBuilder.Entity<ScrumRole>()

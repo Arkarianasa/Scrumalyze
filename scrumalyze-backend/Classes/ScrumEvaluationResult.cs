@@ -9,12 +9,18 @@ namespace Scrumalyze.Classes
     public class ScrumEvaluationResult
     {
         public List<string> PathologicalBehaviors { get; set; } = new List<string>();
+        public int TeamID { get; set; }
         public string TeamName { get; set; }
         public int ScorePercentage { get; private set; } = 0;
         public int Total { get; set; } = 0;
         public int Count { get; set; } = 0;
 
-        public ScrumEvaluationResult(string name)
+        public ScrumEvaluationResult(int teamID)
+        {
+            TeamID = teamID;
+        }
+
+        public void AddName(string name)
         {
             TeamName = name;
         }
@@ -56,7 +62,7 @@ namespace Scrumalyze.Classes
         {
             var result = new StringBuilder();
 
-            result.AppendLine($"===== Scrum Team {TeamName} Evaluation Report =====");
+            result.AppendLine($"===== Scrum Team {TeamName} (ID {TeamID}) Evaluation Report =====");
             result.AppendLine($"Score Percentage: {ScorePercentage}%");
             result.AppendLine($"Total Evaluated: {Total}");
             result.AppendLine($"Success Count: {Count}");

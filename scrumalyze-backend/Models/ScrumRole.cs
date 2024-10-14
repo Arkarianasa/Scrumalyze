@@ -11,7 +11,5 @@ namespace Scrumalyze.Models
         public int RoleID { get; set; }
         public string RoleName { get; set; } = string.Empty;
         public string RoleDescription { get; set; } = string.Empty;
-
-        public ICollection<Person>? Persons { get; set; }
     }
 }

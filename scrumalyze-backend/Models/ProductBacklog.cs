@@ -10,8 +10,7 @@ namespace Scrumalyze.Models
     {
         public int ProductBacklogID { get; set; }
         public int ProductGoalID { get; set; }
-
-        public required ProductGoal ProductGoal { get; set; }
-        public ICollection<BacklogItem> BacklogItems { get; set; } = new List<BacklogItem>();
+        public virtual required ProductGoal ProductGoal { get; set; }
+        public virtual ICollection<BacklogItem> BacklogItems { get; set; }
     }
 }
