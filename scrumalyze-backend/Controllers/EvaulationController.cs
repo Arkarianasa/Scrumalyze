@@ -24,11 +24,7 @@ namespace Scrumalyze.Controllers
                 return NotFound($"No evaluation found for team '{teamID}'.");
             }
 
-            return Ok(new
-            {
-                TeamID = teamID,
-                Result = evaluationResult
-            });
+            return Ok(evaluationResult);
         }
     }
 }

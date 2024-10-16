@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scrumalyze.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,46 +7,62 @@ using System.Threading.Tasks;
 
 namespace Scrumalyze.Classes
 {
+    public enum SeverityLevel
+    {
+        None,      // For passing tests
+        Minor,
+        Major,
+        Critical
+    }
+
+    public class Test
+    {
+        public string Description { get; set; }
+        public string ProblemDetails { get; set; }
+        public bool Passed { get; set; }
+        public SeverityLevel SeverityLevel { get; set; }
+
+        public Test(string description, string details, bool passed, SeverityLevel severityLevel)
+        {
+            Description = description;
+            ProblemDetails = details;
+            Passed = passed;
+            SeverityLevel = severityLevel;
+        }
+    }
+
     public class ScrumEvaluationResult
     {
-        public List<string> PathologicalBehaviors { get; set; } = new List<string>();
         public int TeamID { get; set; }
         public string TeamName { get; set; }
-        public int ScorePercentage { get; private set; } = 0;
-        public int Total { get; set; } = 0;
-        public int Count { get; set; } = 0;
+        public List<Test> Tests { get; set; } = new List<Test>();
+        public int ScorePercentage { get; set; }
 
-        public ScrumEvaluationResult(int teamID)
+        public ScrumEvaluationResult(int teamID, string name)
         {
             TeamID = teamID;
-        }
-
-        public void AddName(string name)
-        {
             TeamName = name;
         }
 
-        public int IncreaseScore()
+        public bool AddTest(string description, string details, bool passed, SeverityLevel severityLevel)
         {
-            Total++;
-            Count++;
+            if (Tests.Any(test => test.Description == description))
+            {
+                return false;
+            }
 
+            Tests.Add(new Test(description, details, passed, severityLevel));
             CalculateScore();
-
-            return ScorePercentage;
-        }
-        public int DecreaseScore()
-        {
-            Total++;
-
-            CalculateScore();
-
-            return ScorePercentage;
+            return true;
         }
 
-        private int CalculateScore()
+        // Calculate score based on passed tests
+        public int CalculateScore()
         {
-            ScorePercentage = (Count * 200 + Total) / (Total * 2);
+            if (Tests.Count == 0) return 0;
+
+            int passedTests = Tests.Count(test => test.Passed);
+            ScorePercentage = (passedTests * 100) / Tests.Count;
 
             return ScorePercentage;
         }
@@ -53,9 +70,7 @@ namespace Scrumalyze.Classes
         public void NullResult()
         {
             ScorePercentage = 0;
-            Total = 0;
-            Count = 0;
-            PathologicalBehaviors.Clear();
+            Tests = new List<Test>();
         }
 
         public string PrettyPrint()
@@ -64,16 +79,19 @@ namespace Scrumalyze.Classes
 
             result.AppendLine($"===== Scrum Team {TeamName} (ID {TeamID}) Evaluation Report =====");
             result.AppendLine($"Score Percentage: {ScorePercentage}%");
-            result.AppendLine($"Total Evaluated: {Total}");
-            result.AppendLine($"Success Count: {Count}");
+            result.AppendLine($"Total Evaluated: {Tests.Count}");
+            result.AppendLine($"Success Count: {Tests.Count(t => t.Passed)}");
             result.AppendLine("-----------------------------------------------");
 
-            if (PathologicalBehaviors.Count > 0)
+            if (Tests.Count > 0)
             {
                 result.AppendLine("Detected Pathological Behavior Markers:");
-                for (int i = 0; i < PathologicalBehaviors.Count; i++)
+                for (int i = 0; i < Tests.Count; i++)
                 {
-                    result.AppendLine($"{i + 1}. {PathologicalBehaviors[i]}");
+                    if (!Tests[i].Passed)
+                    {
+                        result.AppendLine($"{i + 1}. {Tests[i].Description} - Severity: {Tests[i].SeverityLevel}");
+                    }
                 }
             }
             else
@@ -88,3 +106,4 @@ namespace Scrumalyze.Classes
         }
     }
 }
+

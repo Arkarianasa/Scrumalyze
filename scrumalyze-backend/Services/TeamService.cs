@@ -38,7 +38,10 @@ namespace Scrumalyze.Services
         }
         public ProductBacklog? GetProductBacklog(int teamID)
         {
-            return _context.ProductBacklog.FirstOrDefault(pb => pb.ProductGoal.ScrumTeamID == teamID);
+            return _context.ProductBacklog
+                .Include(pg => pg.BacklogItems)
+                .FirstOrDefault(pb => pb.ProductGoal.ScrumTeamID == teamID);
+
         }
         public List<WorkItem> GetWorkItemList(int teamID)
         {
@@ -46,7 +49,10 @@ namespace Scrumalyze.Services
         }
         public List<Sprint> GetSprintList(int teamID)
         {
-            return _context.Sprint.Where(s => s.ProductGoal.ScrumTeamID == teamID).ToList();
+            return _context.Sprint
+                .Include(s => s.SprintGoal)
+                .Where(s => s.ProductGoal.ScrumTeamID == teamID)
+                .ToList();
         }
         public List<SprintBacklog> GetSprintBacklogList(int teamID)
         {
