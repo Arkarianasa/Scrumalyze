@@ -70,5 +70,10 @@ namespace Scrumalyze.Services
         {
             return _context.Increment.Where(i => i.Sprint.ProductGoal.ScrumTeamID == teamID).ToList();
         }
+
+        public Boolean CreateTeamAsync(ScrumTeam team)
+        {
+            return true;
+        }
     }
 }

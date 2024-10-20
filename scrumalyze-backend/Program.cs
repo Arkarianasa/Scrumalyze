@@ -33,6 +33,9 @@ public static class Program
         builder.Services.AddScoped<GlobalService>();
         builder.Services.AddScoped<TeamService>();
 
+        // Register AutoMapper
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
         var app = builder.Build();
 
         // Enable CORS

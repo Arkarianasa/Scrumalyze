@@ -34,11 +34,6 @@ const TeamDashboardPage = () => {
 
     return (
         <Box style={{ padding: '20px' }}>
-            {/* Logo */}
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <img src={logo} alt="Team Logo" style={{ maxWidth: '150px' }} />
-            </div>
-
             <Typography variant="h4" gutterBottom>
                 Team {selectedTeam} Dashboard
             </Typography>
@@ -123,6 +118,7 @@ const TeamDashboardPage = () => {
                                             ],
                                             highlightScope: { fade: 'global', highlight: 'item' },
                                             faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+
                                         },
                                     ]}
                                     height={130}
@@ -144,8 +140,8 @@ const TeamDashboardPage = () => {
                                     {teamData.productBacklog.backlogItems
                                         .sort((a, b) => {
                                             // First, prioritize active items over inactive ones
-                                            if (a.active && !b.active) return -1;
-                                            if (!a.active && b.active) return 1;
+                                            if (a.done && !b.done) return 1;
+                                            if (!a.done && b.done) return -1;
                                             // Then, sort by itemPriority (null values go last)
                                             if (a.itemPriority === null) return 1;
                                             if (b.itemPriority === null) return -1;
@@ -170,9 +166,9 @@ const TeamDashboardPage = () => {
                                                 <ListItemSecondaryAction>
                                                     <Typography
                                                         variant="body2"
-                                                        color={item.active ? 'green' : 'textSecondary'}
+                                                        color={!item.done ? 'green' : 'textSecondary'}
                                                     >
-                                                        {item.active ? 'Active' : 'Done'}
+                                                        {!item.done ? 'Active' : 'Done'}
                                                     </Typography>
                                                 </ListItemSecondaryAction>
                                             </ListItem>

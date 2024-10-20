@@ -13,7 +13,7 @@ namespace Scrumalyze.Models
         public required string ItemDescription { get; set; }
         public int ProductBacklogID { get; set; }
         public int? SprintBacklogID { get; set; }
-        public bool Active { get; set; }
+        public bool Done { get; set; }
         public int? ItemPriority { get; set; }
 
         public required ProductBacklog ProductBacklog { get; set; }

@@ -14,7 +14,7 @@ namespace Scrumalyze.Models
         public int? ProductGoalID { get; set; }
         public DateTime? Deadline { get; set; }
         public int? ReceivedByID { get; set; }
-        public string IncrementDescription { get; set; } = string.Empty;
+        public required string Description { get; set; }
 
         public required Sprint Sprint { get; set; }
         public SprintGoal? SprintGoal { get; set; }

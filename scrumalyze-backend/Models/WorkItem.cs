@@ -9,6 +9,7 @@ namespace Scrumalyze.Models
     public class WorkItem
     {
         public int WorkItemID { get; set; }
+        public required string Description { get; set; }
         public int? BacklogItemID { get; set; }
         public int? AcceptanceCriteriaID { get; set; }
         public int? DefinitionOfDoneID { get; set; }
