@@ -10,5 +10,6 @@ namespace Scrumalyze.Models
     {
         public int ScrumTeamID { get; set; }
         public string TeamName { get; set; } = string.Empty;
+        public List<Person>? Persons { get; set; }
     }
 }

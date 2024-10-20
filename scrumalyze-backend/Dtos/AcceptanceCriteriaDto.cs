@@ -2,6 +2,6 @@
 {
     public class AcceptanceCriteriaDto
     {
-        public required string Description { get; set; }
+        public required string ConstraintDescription { get; set; }
     }
 }

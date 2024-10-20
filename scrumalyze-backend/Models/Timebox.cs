@@ -12,5 +12,6 @@ namespace Scrumalyze.Models
         public double Duration { get; set; }
         public string TimeboxDescription { get; set; } = string.Empty;
         public int ScrumTeamID { get; set; }
+        public ScrumTeam? ScrumTeam { get; set; }
     }
 }

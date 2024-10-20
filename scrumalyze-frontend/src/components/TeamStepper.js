@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, toISOString } from 'react';
 import { Button, Stepper, Step, StepLabel, TextField, MenuItem, Typography, Grid, Checkbox, FormControlLabel, Box, Autocomplete } from '@mui/material';
 import { GlobalContext } from '../context/GlobalContext'; // Assuming you have GlobalContext setup for roles, work item types
 
@@ -9,18 +9,38 @@ const AddTeamStepper = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [formValues, setFormValues] = useState({
         teamName: '',
-        persons: [{ firstName: '', lastName: '', roleID: '' }],
-        productGoal: { productGoalDescription: '', responsiblePersonID: '' },
-        backlogItems: [{ itemName: '', itemDescription: '', itemPriority: '', productBacklogID: 0, sprintBacklogID: null, done: false }],
+        persons: [{ firstName: '', lastName: '', roleID: null }],
+        productGoal: { Description: '', createdByPersonID: null },
+        backlogItems: [{ itemName: '', itemDescription: '', itemPriority: '', sprintBacklogID: null, done: false }],
         timeboxes: [{ timeboxDescription: '', duration: '' }],
-        sprints: [{ sprintGoal: '', startDate: '', endDate: '', timeboxID: '', backlogItems: [] }],
-        definitionOfDone: [{description: ''}],
-        acceptanceCriterias: [{description: ''}],
-        workItems: [{ description: '', timeboxID: '', backlogItemID: '', definitionOfDone: '', workItemTypeID: '', hasDeadline: false, done: false, workingPersons: [] }],
-        increments: [{ description: '', relatedSprintID: '', receivedByPersonID: '', relatedToSprintGoal: false, hasDeadline: false }]
+        sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalCreatedByPersonID: null}],
+        definitionOfDone: [{constraintDescription: ''}],
+        acceptanceCriterias: [{constraintDescription: ''}],
+        workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneID: null, workItemTypeID: null, deadline: '', done: false, workingPersons: [] }],
+        increments: [{ description: '', RelatedSprintDtoID: null, ReceivedByPersonDtoID: null, relatedToSprintGoal: false, deadline: '' }]
     });
 
     const sendScrumTeam = async () => {
+      console.log(formValues);
+
+      formValues.sprints.forEach((sprint, index) => {
+        var start = new Date(sprint.startDate??null);
+        var end = new Date(sprint.startDate??null);
+
+        sprint.startDate = start.toISOString();
+        sprint.endDate = end.toISOString();
+      });
+
+      formValues.workItems.forEach((workItem, index) => {
+        var deadline = new Date(workItem.startDate??null);
+        workItem.deadline = deadline.toISOString();
+      });
+
+      formValues.increments.forEach((increment, index) => {
+        var deadline = new Date(increment.startDate??null);
+        increment.deadline = deadline.toISOString();
+      });
+
       try {
         const response = await fetch('https://localhost:52765/api/team/create', {
           method: 'POST',
@@ -63,7 +83,7 @@ const AddTeamStepper = () => {
         break;
         
         case 2: // Product Goal Step
-        if (!formValues.productGoal.productGoalDescription) {
+        if (!formValues.productGoal.Description) {
           console.log('Product Goal Description is required');
           isValid = false;
         }
@@ -98,7 +118,7 @@ const AddTeamStepper = () => {
 
         case 6: // DoD Step
           formValues.definitionOfDone.forEach((DoD, index) => {
-            if (!DoD.description) {
+            if (!DoD.constraintDescription) {
               console.log('All are required');
               isValid = false;
             }
@@ -107,7 +127,7 @@ const AddTeamStepper = () => {
 
         case 7: // Acceptance Criteria Step
           formValues.acceptanceCriterias.forEach((acceptanceCriteria, index) => {
-            if (!acceptanceCriteria.description) {
+            if (!acceptanceCriteria.constraintDescription) {
               console.log('All are required');
               isValid = false;
             }
@@ -127,7 +147,7 @@ const AddTeamStepper = () => {
         case 9: // Increments Step
           console.log(formValues);
           formValues.increments.forEach((increment, index) => {
-            if (!increment.relatedSprintID) {
+            if (!increment.RelatedSprintDtoID) {
               console.log('Fields related sprint are required');
               isValid = false;
             }
@@ -223,7 +243,7 @@ const AddTeamStepper = () => {
     const addSprint = () => {
         setFormValues((prevValues) => ({
         ...prevValues,
-        sprints: [...prevValues.sprints, { sprintGoal: '', startDate: '', endDate: '', timeboxID: '', backlogItems: [] }]
+        sprints: [...prevValues.sprints, { sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: '', backlogItems: [], goalCreatedByPersonID: '' }]
         }));
     };
 
@@ -253,7 +273,7 @@ const AddTeamStepper = () => {
       const addDoD = () => {
         setFormValues((prevValues) => ({
         ...prevValues,
-        definitionOfDone: [...prevValues.definitionOfDone, { description: '' }]
+        definitionOfDone: [...prevValues.definitionOfDone, { constraintDescription: '' }]
         }));
       };
 
@@ -273,7 +293,7 @@ const AddTeamStepper = () => {
       const addAcceptanceCriteria = () => {
         setFormValues((prevValues) => ({
         ...prevValues,
-        acceptanceCriterias: [...prevValues.acceptanceCriterias, { description: '' }]
+        acceptanceCriterias: [...prevValues.acceptanceCriterias, { constraintDescription: '' }]
         }));
       };
 
@@ -297,8 +317,8 @@ const AddTeamStepper = () => {
               ...prevValues.increments,
               {
                   description: '',
-                  relatedSprintID: '',
-                  receivedByPersonID: '',
+                  RelatedSprintDtoID: null,
+                  ReceivedByPersonDtoID: null,
                   relatedToSprintGoal: false,
                   relatedToProductGoal: false,
                   hasDeadline: false,
@@ -326,24 +346,22 @@ const AddTeamStepper = () => {
         ...prevValues,
         workItems: [...prevValues.workItems, { 
           description: '', 
-          backlogItemID: '', 
-          workItemTypeID: '', 
+          BacklogItemDtoID: null, 
+          workItemTypeID: null, 
           done: false, 
           workingPersons: [], 
-          acceptanceCriteria: '', 
-          definitionOfDone: '', 
-          timeboxID: '', 
-          hasDeadline: false 
+          acceptanceCriteriaID: null,
+          TimeboxDtoID: null,
         }]
       }));
     };
 
     const handleWorkItemChange = (index, field, value) => {
       const updatedWorkItems = formValues.workItems.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
+          i === index ? { ...item, [field]: field === 'BacklogItemDtoID' ? Number(value) : value } : item
       );
       setFormValues((prevValues) => ({ ...prevValues, workItems: updatedWorkItems }));
-    };
+  };
 
     const handleDeleteWorkItem = (index) => {
       const updatedWorkItems = formValues.workItems.filter((_, i) => i !== index);
@@ -430,11 +448,11 @@ const AddTeamStepper = () => {
               label="Product Goal Description"
               variant="outlined"
               fullWidth
-              value={formValues.productGoal.productGoalDescription} // Updated
+              value={formValues.productGoal.Description} // Updated
               onChange={(e) =>
                 handleChange('productGoal', {
                   ...formValues.productGoal,
-                  productGoalDescription: e.target.value,
+                  Description: e.target.value,
                 })
               }
               required
@@ -444,11 +462,11 @@ const AddTeamStepper = () => {
               label="Responsible Person"
               variant="outlined"
               fullWidth
-              value={formValues.productGoal.responsiblePersonID} // Updated
+              value={formValues.productGoal.createdByPersonID} // Updated
               onChange={(e) =>
                 handleChange('productGoal', {
                   ...formValues.productGoal,
-                  responsiblePersonID: e.target.value,
+                  createdByPersonID: e.target.value,
                 })
               }
             >
@@ -580,7 +598,7 @@ const AddTeamStepper = () => {
               {formValues.sprints.map((sprint, index) => (
                 <Box key={index} style={{ marginBottom: '40px' }}>
                   <Grid container spacing={2}>
-                    <Grid item xs={7}>
+                    <Grid item xs={5}>
                       <TextField
                         label="Sprint Goal"
                         variant="outlined"
@@ -589,6 +607,22 @@ const AddTeamStepper = () => {
                         fullWidth
                         required
                       />
+                    </Grid>
+                    <Grid item xs={2}>
+                    <TextField
+                      select
+                      label="Goal Created By"
+                      variant="outlined"
+                      fullWidth
+                      value={sprint.goalCreatedByPersonID} // Updated
+                      onChange={(e) => handleSprintChange(index, 'goalCreatedByPersonID', e.target.value)}
+                    >
+                      {formValues.persons.map((person, index) => (
+                        <MenuItem key={index} value={index}>
+                          {person.firstName} {person.lastName} ({scrumRoles[person.roleID-1].roleName})
+                        </MenuItem>
+                      ))}
+                    </TextField>
                     </Grid>
                     <Grid item xs={2}>
                       <TextField
@@ -631,8 +665,8 @@ const AddTeamStepper = () => {
                       <TextField
                         select
                         label="Timebox"
-                        value={sprint.timeboxID}
-                        onChange={(e) => handleSprintChange(index, 'timeboxID', e.target.value)}
+                        value={sprint.TimeboxDtoID}
+                        onChange={(e) => handleSprintChange(index, 'TimeboxDtoID', e.target.value)}
                         fullWidth
                       >
                         {formValues.timeboxes.map((timebox, idx) => (
@@ -679,8 +713,8 @@ const AddTeamStepper = () => {
                     <TextField
                       label="Definition of Done"
                       variant="outlined"
-                      value={DoD.description}
-                      onChange={(e) => handleDoDChange(index, 'description', e.target.value)}
+                      value={DoD.constraintDescription}
+                      onChange={(e) => handleDoDChange(index, 'constraintDescription', e.target.value)}
                       fullWidth
                       required
                     />
@@ -712,8 +746,8 @@ const AddTeamStepper = () => {
                     <TextField
                       label="Acceptance Criteria"
                       variant="outlined"
-                      value={acceptanceCriteria.description}
-                      onChange={(e) => handleAcceptanceCriteriaChange(index, 'description', e.target.value)}
+                      value={acceptanceCriteria.constraintDescription}
+                      onChange={(e) => handleAcceptanceCriteriaChange(index, 'constraintDescription', e.target.value)}
                       fullWidth
                       required
                     />
@@ -743,21 +777,19 @@ const AddTeamStepper = () => {
                 <Box key={index} style={{ marginBottom: '40px' }}>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
-                      <TextField
+                    <TextField
                         label="Description"
-                        variant="outlined"
                         value={item.description || ''}
                         onChange={(e) => handleWorkItemChange(index, 'description', e.target.value)}
                         fullWidth
-                        required
-                      />
+                    />
                     </Grid>
                     <Grid item xs={3}>
                       <TextField
                         select
                         label="Backlog Item"
-                        value={item.backlogItemID}
-                        onChange={(e) => handleWorkItemChange(index, 'backlogItemID', e.target.value)}
+                        value={item.BacklogItemDtoID}
+                        onChange={(e) => handleWorkItemChange(index, 'BacklogItemDtoID', e.target.value)}
                         fullWidth
                       >
                         {formValues.backlogItems.map((backlog, i) => (
@@ -802,7 +834,7 @@ const AddTeamStepper = () => {
                       >
                         {formValues.definitionOfDone.map((DoD, index) => (
                           <MenuItem key={index} value={index}>
-                            {DoD.description}
+                            {DoD.constraintDescription}
                           </MenuItem>
                         ))}
                       </TextField>
@@ -813,12 +845,12 @@ const AddTeamStepper = () => {
                         label="Acceptance Criteria"
                         variant="outlined"
                         fullWidth
-                        value={item.acceptanceCriteria}
-                        onChange={(e) => handleWorkItemChange(index, 'acceptanceCriteria', e.target.value)}
+                        value={item.acceptanceCriteriaID}
+                        onChange={(e) => handleWorkItemChange(index, 'acceptanceCriteriaID', e.target.value)}
                       >
                         {formValues.acceptanceCriterias.map((acceptanceCriteria, index) => (
                           <MenuItem key={index} value={index}>
-                            {acceptanceCriteria.description}
+                            {acceptanceCriteria.constraintDescription}
                           </MenuItem>
                         ))}
                       </TextField>
@@ -854,8 +886,8 @@ const AddTeamStepper = () => {
                       <TextField
                         select
                         label="Timebox"
-                        value={item.timeboxID}
-                        onChange={(e) => handleWorkItemChange(index, 'timeboxID', e.target.value)}
+                        value={item.TimeboxDtoID}
+                        onChange={(e) => handleWorkItemChange(index, 'TimeboxDtoID', e.target.value)}
                         fullWidth
                       >
                         {formValues.timeboxes.map((timebox, i) => (
@@ -905,14 +937,14 @@ const AddTeamStepper = () => {
                                   select
                                   label="Related Sprint"
                                   variant="outlined"
-                                  value={increment.relatedSprintID}
-                                  onChange={(e) => handleIncrementChange(index, 'relatedSprintID', e.target.value)}
+                                  value={increment.RelatedSprintDtoID}
+                                  onChange={(e) => handleIncrementChange(index, 'RelatedSprintDtoID', e.target.value)}
                                   fullWidth
                                   required
                               >
                                   {/* Assuming you have a list of sprints to map over */}
-                                  {formValues.sprints.map((sprint) => (
-                                      <MenuItem key={sprint.sprintGoal} value={sprint.sprintGoal}>
+                                  {formValues.sprints.map((sprint, index) => (
+                                      <MenuItem key={sprint.sprintGoal} value={index}>
                                           {sprint.sprintGoal}
                                       </MenuItem>
                                   ))}
@@ -923,13 +955,13 @@ const AddTeamStepper = () => {
                                   select
                                   label="Received By"
                                   variant="outlined"
-                                  value={increment.receivedByPersonID}
-                                  onChange={(e) => handleIncrementChange(index, 'receivedByPersonID', e.target.value)}
+                                  value={increment.ReceivedByPersonDtoID}
+                                  onChange={(e) => handleIncrementChange(index, 'ReceivedByPersonDtoID', e.target.value)}
                                   fullWidth
                               >
                                   {/* Assuming you have a list of persons to map over */}
-                                  {formValues.persons.map((person) => (
-                                      <MenuItem key={person.firstName + person.lastName} value={person.firstName}>
+                                  {formValues.persons.map((person, index) => (
+                                      <MenuItem key={person.firstName + person.lastName} value={index}>
                                           {person.firstName} {person.lastName} ({scrumRoles[person.roleID-1].roleName})
                                       </MenuItem>
                                   ))}
@@ -1029,9 +1061,14 @@ const AddTeamStepper = () => {
               <Button disabled={activeStep === 0} onClick={handleBack}>
                 Back
               </Button>
-              <Button variant="contained" color="primary" onClick={handleNext}>
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              {activeStep === steps.length - 1 ?
+              <Button variant="contained" color="primary" onClick={sendScrumTeam}>
+               Finish
               </Button>
+               :
+               <Button variant="contained" color="primary" onClick={handleNext}>
+               Next
+              </Button>}
             </Box>
           </>
         )}

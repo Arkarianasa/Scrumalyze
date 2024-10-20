@@ -19,12 +19,12 @@ namespace Scrumalyze.Models
         public int? TimeboxID { get; set; }
         public bool Done { get; set; }
 
-        public required BacklogItem BacklogItem { get; set; }
+        public BacklogItem? BacklogItem { get; set; }
         public AcceptanceCriteria? AcceptanceCriteria { get; set; }
         public DefinitionOfDone? DefinitionOfDone { get; set; }
         public Increment? Increment { get; set; }
         public required WorkItemType WorkItemType { get; set; }
         public Timebox? Timebox { get; set; }
-        public ICollection<PersonWorkItem>? PersonWorkItems { get; set; }
+        public required ICollection<PersonWorkItem> PersonWorkItems { get; set; }
     }
 }

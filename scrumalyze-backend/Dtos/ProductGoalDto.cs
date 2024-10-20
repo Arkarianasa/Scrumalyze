@@ -2,7 +2,7 @@
 {
     public class ProductGoalDto
     {
-        public required string ProductGoalDescription { get; set; }
-        public int ResponsiblePersonID { get; set; }
+        public required string Description { get; set; }
+        public int CreatedByPersonDtoID { get; set; }
     }
 }

@@ -11,27 +11,18 @@ namespace Scrumalyze.Controllers
     public class TeamController : ControllerBase
     {
         private readonly TeamService _teamService;
-        private readonly IMapper _mapper;
 
-        public TeamController(TeamService teamContextService, IMapper mapper)
+        public TeamController(TeamService teamContextService)
         {
             _teamService = teamContextService;
-            _mapper = mapper;
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateTeam([FromBody] ScrumTeamDto formValues)
+        public async Task<IActionResult> CreateTeam([FromBody] ScrumTeamDto request)
         {
-            if (formValues == null)
-            {
-                return BadRequest("Invalid form data");
-            }
-
-            // Use AutoMapper or manual mapping to map DTO to your domain model
-            ScrumTeam team = _mapper.Map<ScrumTeam>(formValues);
 
             // Call the service to save the team
-            await _teamService.CreateTeamAsync(team);
+            await _teamService.CreateTeamAsync(request);
 
             return Ok();
         }

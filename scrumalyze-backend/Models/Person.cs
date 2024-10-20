@@ -14,6 +14,7 @@ namespace Scrumalyze.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public required ScrumRole Role { get; set; }
+        public required ScrumTeam ScrumTeam { get; set; }
         public ICollection<PersonWorkItem>? PersonWorkItems { get; set; }
     }
 }

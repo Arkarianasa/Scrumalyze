@@ -9,6 +9,9 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Register AutoMapper
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
         // Configure services
         builder.Services.AddCors(options =>
         {
@@ -33,9 +36,6 @@ public static class Program
         builder.Services.AddScoped<GlobalService>();
         builder.Services.AddScoped<TeamService>();
 
-        // Register AutoMapper
-        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
         var app = builder.Build();
 
         // Enable CORS
@@ -50,17 +50,17 @@ public static class Program
             var evaluationService = new ScrumEvaluationService(context);
 
             var evaluationResult = evaluationService.EvaluateScrumImplementation(1);
-            evaluationResult.PrettyPrint();
+            evaluationResult?.PrettyPrint();
 
-            evaluationResult.NullResult();
+            evaluationResult?.NullResult();
 
             evaluationResult = evaluationService.EvaluateScrumImplementation(2);
-            evaluationResult.PrettyPrint();
+            evaluationResult?.PrettyPrint();
 
-            evaluationResult.NullResult();
+            evaluationResult?.NullResult();
 
             evaluationResult = evaluationService.EvaluateScrumImplementation(3);
-            evaluationResult.PrettyPrint();
+            evaluationResult?.PrettyPrint();
         }
 
         app.Run();

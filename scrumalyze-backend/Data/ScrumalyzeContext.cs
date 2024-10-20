@@ -71,12 +71,26 @@ namespace Scrumalyze.Data
                 .HasForeignKey(p => p.RoleID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configure the relationship between Person and ScrumTeam
+            modelBuilder.Entity<Person>()
+                .HasOne(p => p.ScrumTeam)
+                .WithMany(st => st.Persons)
+                .HasForeignKey(p => p.ScrumTeamID)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Configure the relationship between ProductGoal and Person
             modelBuilder.Entity<ProductGoal>()
-                        .HasOne(pg => pg.CreatedByPerson) // Each ProductGoal is created by one Person
+                        .HasOne(pg => pg.CreatedByPerson)
                         .WithMany()
-                        .HasForeignKey(pg => pg.CreatedByPersonID) // Specify the foreign key
-                        .OnDelete(DeleteBehavior.Restrict); // Specify delete behavior, adjust as necessary
+                        .HasForeignKey(pg => pg.CreatedByPersonID)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure the relationship between Product Goal and ScrumTeam
+            modelBuilder.Entity<ProductGoal>()
+                .HasOne(pg => pg.ScrumTeam)
+                .WithMany()
+                .HasForeignKey(pg => pg.ScrumTeamID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ScrumRole Primary Key
             modelBuilder.Entity<ScrumRole>()
@@ -101,6 +115,12 @@ namespace Scrumalyze.Data
                 .HasForeignKey(wi => wi.TimeboxID)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<Timebox>()
+                .HasOne(t => t.ScrumTeam)
+                .WithMany()
+                .HasForeignKey(t => t.ScrumTeamID)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Acceptance Criteria and Definition of Done relationships
             modelBuilder.Entity<WorkItem>()
                 .HasOne(wi => wi.AcceptanceCriteria)
@@ -112,6 +132,18 @@ namespace Scrumalyze.Data
                 .HasOne(wi => wi.DefinitionOfDone)
                 .WithMany()
                 .HasForeignKey(wi => wi.DefinitionOfDoneID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AcceptanceCriteria>()
+                .HasOne(ac => ac.ScrumTeam)
+                .WithMany()
+                .HasForeignKey(ac => ac.ScrumTeamID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DefinitionOfDone>()
+                .HasOne(dod => dod.ScrumTeam)
+                .WithMany()
+                .HasForeignKey(dod => dod.ScrumTeamID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Sprint and SprintGoal/ProductGoal relationships

@@ -7,14 +7,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Map ScrumTeamDto to ScrumTeam and vice versa
-        CreateMap<ScrumTeamDto, ScrumTeam>()
-            .ForMember(dest => dest.TeamName, opt => opt.MapFrom(src => src.TeamName));
-
-        // Map PersonDto to Person and vice versa
+        CreateMap<ScrumTeamDto, ScrumTeam>();
         CreateMap<PersonDto, Person>();
-
-        // Add mappings for other DTOs as needed
         CreateMap<ProductGoalDto, ProductGoal>();
         CreateMap<BacklogItemDto, BacklogItem>();
         CreateMap<TimeboxDto, Timebox>();

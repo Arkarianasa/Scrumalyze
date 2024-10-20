@@ -11,5 +11,6 @@ namespace Scrumalyze.Models
         public int AcceptanceCriteriaID { get; set; }
         public string ConstraintDescription { get; set; } = string.Empty;
         public int ScrumTeamID { get; set; }
+        public ScrumTeam? ScrumTeam { get; set; }
     }
 }

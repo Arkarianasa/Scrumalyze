@@ -16,7 +16,7 @@ namespace Scrumalyze.Models
         public int? ReceivedByID { get; set; }
         public required string Description { get; set; }
 
-        public required Sprint Sprint { get; set; }
+        public Sprint? Sprint { get; set; }
         public SprintGoal? SprintGoal { get; set; }
         public ProductGoal? ProductGoal { get; set; }
         public Person? ReceivedBy { get; set; }

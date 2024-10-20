@@ -14,5 +14,6 @@ namespace Scrumalyze.Models
         public int CreatedByPersonID { get; set; }
         public int ScrumTeamID { get; set; }
         public required Person CreatedByPerson { get; set; }
+        public ScrumTeam? ScrumTeam { get; set; }
     }
 }
