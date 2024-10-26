@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Button, MenuItem, Select, FormControl, InputLabel, Box } from '@mui/material';
 import { GlobalContext } from '../context/GlobalContext';
 import logo from '../logo.png';
 
@@ -9,14 +9,16 @@ const MainPage = () => {
 
     const handleOpenTeam = () => {
         if (selectedTeamID !== '') {
-            setSelectedTeam(selectedTeamID);
+            setSelectedTeam(scrumTeams.find((element) => {
+                return element.scrumTeamID === selectedTeamID;
+              }));
             setCurrentPage('team-dashboard');
         }
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '12%' }}>
-            <Card variant="outlined" style={{ width: '50%', marginBottom: '70px' }} >
+        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10%' }}>
+            <Card variant="outlined" style={{ width: '500px', marginBottom: '70px' }} >
                 <CardMedia component="img" alt="logo" image={logo} />
                 <CardContent>
                     <Typography variant="h5" component="div" align="center">
@@ -58,7 +60,7 @@ const MainPage = () => {
                     </Button>
                 </CardContent>
             </Card>
-        </div>
+        </Box>
     );
 };
 

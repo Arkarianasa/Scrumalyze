@@ -1,36 +1,67 @@
 import React, { useContext } from 'react';
-import { Container } from '@mui/material';
+import { Container, Box } from '@mui/material';
 import MainPage from './components/MainPage';
 import TeamDashboardPage from './components/TeamDashboardPage';
 import NewTeamPage from './components/NewTeamPage';
 import { GlobalContext } from './context/GlobalContext';
 import { TeamProvider } from './context/TeamContext';
+import backgroundImage from './background.jpg';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import MainBar from './components/MainBar';
+
 function App() {
     const { currentPage, setCurrentPage } = useContext(GlobalContext);
+
+    const theme = createTheme({
+        typography: {
+          fontFamily: 'Montserrat, Arial, sans-serif', // Set the font family here
+        },
+      });
 
     const renderPage = () => {
         switch (currentPage) {
             case 'main':
-                return <MainPage />;
+                return (
+                    <Box sx={{
+                        backgroundImage: `url(${backgroundImage})`,
+                        backgroundSize: 'auto',
+                        backgroundRepeat: 'repeat',
+                        backgroundPosition: 'top left',
+                        minHeight: '100vh',
+                      }}>
+                        <MainPage />
+                    </Box>
+                );
             case 'team-dashboard':
                 return (
-                    < TeamProvider >
-                        <TeamDashboardPage />
-                    </TeamProvider >
+                    <Box>
+                        <MainBar />
+                        < TeamProvider >
+                            <TeamDashboardPage />
+                        </TeamProvider >
+                    </Box>
                 );
             case 'new-team':
-                return <NewTeamPage />;
+                return (
+                    <Box sx={{
+                        backgroundImage: `url(${backgroundImage})`,
+                        backgroundSize: 'auto',
+                        backgroundRepeat: 'repeat',
+                        backgroundPosition: 'top left',
+                        minHeight: '100vh',
+                      }}>
+                        <MainBar />
+                        <NewTeamPage />
+                    </Box>
+                );
             default:
-                return <MainPage />; // Fallback to MainPage
+                return <MainPage />;
         }
     };
   return (
-      <Container>
+    <ThemeProvider theme={theme}>
           {renderPage()}
-          <button onClick={() => setCurrentPage('main')}>Go to Main Page</button>
-          <button onClick={() => setCurrentPage('team-dashboard')}>Go to Team Dashboard</button>
-          <button onClick={() => setCurrentPage('new-team')}>Go to New Team Page</button>
-      </Container>
+    </ThemeProvider>
 
   );
 }

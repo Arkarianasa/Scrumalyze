@@ -40,8 +40,9 @@ export const GlobalProvider = ({ children }) => {
                 selectedTeam,
                 setSelectedTeam,
                 scrumTeams,
+                setScrumTeams,
                 scrumRoles,
-                workItemTypes,
+                workItemTypes
             }}
         >
             {children}

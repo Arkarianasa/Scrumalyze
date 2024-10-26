@@ -4,7 +4,7 @@
     {
         public required string Description { get; set; }
         public int? TimeboxDtoID { get; set; }
-        public int BacklogItemDtoID { get; set; }
+        public int? BacklogItemDtoID { get; set; }
         public int WorkItemTypeID { get; set; }
         public DateTime Deadline { get; set; }
         public bool Done { get; set; }

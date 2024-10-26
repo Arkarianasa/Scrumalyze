@@ -11,10 +11,12 @@ namespace Scrumalyze.Controllers
     public class TeamController : ControllerBase
     {
         private readonly TeamService _teamService;
+        private readonly GlobalService _globalContextService;
 
-        public TeamController(TeamService teamContextService)
+        public TeamController(TeamService teamContextService, GlobalService globalContextService)
         {
             _teamService = teamContextService;
+            _globalContextService = globalContextService;
         }
 
         [HttpPost("create")]
@@ -24,7 +26,9 @@ namespace Scrumalyze.Controllers
             // Call the service to save the team
             await _teamService.CreateTeamAsync(request);
 
-            return Ok();
+            var scrumTeams = _globalContextService.GetAllScrumTeams();
+
+            return Ok(scrumTeams);
         }
 
         [HttpGet("persons/{teamId}")]

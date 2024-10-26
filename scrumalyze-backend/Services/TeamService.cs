@@ -7,23 +7,16 @@ using System.Collections.Generic;
 
 namespace Scrumalyze.Services
 {
-    public class TeamService
+    public class TeamService(ScrumalyzeContext context, IMapper mapper)
     {
-        private readonly ScrumalyzeContext _context;
-        private readonly IMapper _mapper;
-
-        public TeamService(ScrumalyzeContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
+        private readonly ScrumalyzeContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
         public List<Person> GetPersonList(int teamID)
         {  
-            return _context.Person
+            return [.. _context.Person
                 .Include(p => p.Role)
-                .Where(p => p.ScrumTeamID == teamID)
-                .ToList();
+                .Where(p => p.ScrumTeamID == teamID)];
         }
         public ProductGoal? GetProductGoal(int teamID)
         {
@@ -31,15 +24,15 @@ namespace Scrumalyze.Services
         }
         public List<DefinitionOfDone> GetDoDList(int teamID)
         {
-            return _context.DefinitionOfDone.Where(dod => dod.ScrumTeamID == teamID).ToList();
+            return [.. _context.DefinitionOfDone.Where(dod => dod.ScrumTeamID == teamID)];
         }
         public List<AcceptanceCriteria> GetAcceptanceCriteriaList(int teamID)
         {
-            return _context.AcceptanceCriteria.Where(ac => ac.ScrumTeamID == teamID).ToList();
+            return [.. _context.AcceptanceCriteria.Where(ac => ac.ScrumTeamID == teamID)];
         }
         public List<Timebox> GetTimeboxList(int teamID)
         {
-            return _context.Timebox.Where(t => t.ScrumTeamID == teamID).ToList();
+            return [.. _context.Timebox.Where(t => t.ScrumTeamID == teamID)];
         }
         public ProductBacklog? GetProductBacklog(int teamID)
         {
@@ -50,30 +43,36 @@ namespace Scrumalyze.Services
         }
         public List<WorkItem> GetWorkItemList(int teamID)
         {
-            return _context.WorkItem.Where(wi => wi.BacklogItem.ProductBacklog.ProductGoal.ScrumTeamID == teamID).ToList();
+            return [.. _context.WorkItem
+                .Where(wi => wi.BacklogItem != null
+                             && wi.BacklogItem.ProductBacklog != null
+                             && wi.BacklogItem.ProductBacklog.ProductGoal != null
+                             && wi.BacklogItem.ProductBacklog.ProductGoal.ScrumTeamID == teamID)];
         }
         public List<Sprint> GetSprintList(int teamID)
         {
-            return _context.Sprint
+            return [.. _context.Sprint
                 .Include(s => s.SprintGoal)
-                .Where(s => s.ProductGoal.ScrumTeamID == teamID)
-                .ToList();
+                .Where(s => s.ProductGoal.ScrumTeamID == teamID)];
         }
         public List<SprintBacklog> GetSprintBacklogList(int teamID)
         {
-            return _context.SprintBacklog.Where(sb => sb.Sprint.ProductGoal.ScrumTeamID == teamID).ToList();
+            return [.. _context.SprintBacklog.Where(sb => sb.Sprint.ProductGoal.ScrumTeamID == teamID)];
         }
         public List<SprintGoal> GetSprintGoalList(int teamID)
         {
-            return _context.SprintGoal.Where(sg => sg.CreatedByPerson.ScrumTeamID == teamID).ToList();
+            return [.. _context.SprintGoal.Where(sg => sg.CreatedByPerson.ScrumTeamID == teamID)];
         }
         public List<ProcessStep> GetProcessStepList(int teamID)
         {
-            return _context.ProcessStep.Where(ps => ps.Sprint.ProductGoal.ScrumTeamID == teamID).ToList();
+            return [.. _context.ProcessStep.Where(ps => ps.Sprint.ProductGoal.ScrumTeamID == teamID)];
         }
         public List<Increment> GetIncrementList(int teamID)
         {
-            return _context.Increment.Where(i => i.Sprint.ProductGoal.ScrumTeamID == teamID).ToList();
+            return [.. _context.Increment
+                .Where(i => i.Sprint != null
+                            && i.Sprint.ProductGoal != null
+                            && i.Sprint.ProductGoal.ScrumTeamID == teamID)];
         }
 
         public async Task<bool> CreateTeamAsync(ScrumTeamDto teamDto)
@@ -111,7 +110,7 @@ namespace Scrumalyze.Services
 
             List<BacklogItem> backlogItems = _mapper.Map<List<BacklogItem>>(teamDto.BacklogItems);
 
-            ProductBacklog productBacklog = new ProductBacklog
+            ProductBacklog productBacklog = new()
             {
                 ProductGoal = productGoal,
                 BacklogItems = backlogItems
@@ -122,16 +121,16 @@ namespace Scrumalyze.Services
                 backlogItem.ProductBacklog = productBacklog;
             }
 
-            List<Sprint> sprints = new List<Sprint>();
+            List<Sprint> sprints = [];
             foreach (var sprintDto in teamDto.Sprints)
             {
-                SprintGoal sprintGoal = new SprintGoal
+                SprintGoal sprintGoal = new()
                 {
                     Description = sprintDto.SprintGoal,
                     CreatedByPerson = persons[sprintDto.GoalCreatedByPersonID]
                 };
 
-                Sprint sprint = new Sprint
+                Sprint sprint = new()
                 {
                     SprintGoal = sprintGoal,
                     ProductGoal = productGoal,
@@ -145,7 +144,7 @@ namespace Scrumalyze.Services
                     .Where(bi => sprintDto.BacklogItems.Contains(bi.BacklogItemID))
                     .ToList();
 
-                SprintBacklog sprintBacklog = new SprintBacklog { Sprint = sprint, BacklogItems = sprintBacklogItems };
+                SprintBacklog sprintBacklog = new() { Sprint = sprint, BacklogItems = sprintBacklogItems };
 
                 foreach (var backlogItem in sprintBacklogItems)
                 {
@@ -156,24 +155,21 @@ namespace Scrumalyze.Services
             }
 
             // Create WorkItems
-            List<WorkItem> workItems = new List<WorkItem>();
+            List<WorkItem> workItems = [];
             foreach (var workItemDto in teamDto.WorkItems)
             {
                 var workItem = _mapper.Map<WorkItem>(workItemDto);
 
-                workItem.BacklogItem = backlogItems[workItemDto.BacklogItemDtoID];
+                if (workItemDto.BacklogItemDtoID.HasValue)
+                    workItem.BacklogItem = backlogItems[workItemDto.BacklogItemDtoID.Value];
 
                 // Set AcceptanceCriteria if needed with null checks
                 if (workItemDto.AcceptanceCriteriaID.HasValue && acceptanceCriterias.Count > workItemDto.AcceptanceCriteriaID.Value)
-                {
                     workItem.AcceptanceCriteria = acceptanceCriterias[workItemDto.AcceptanceCriteriaID.Value];
-                }
 
                 // Set DefinitionOfDone if needed with null checks
                 if (workItemDto.DefinitionOfDoneID.HasValue && definitionsOfDone.Count > workItemDto.DefinitionOfDoneID.Value)
-                {
                     workItem.DefinitionOfDone = definitionsOfDone[workItemDto.DefinitionOfDoneID.Value];
-                }
 
                 // Set WorkItemType
                 workItem.WorkItemTypeID = workItemDto.WorkItemTypeID;
@@ -182,10 +178,7 @@ namespace Scrumalyze.Services
                 if (workItemDto.WorkingPersons != null) // Check if WorkingPersons is not null
                 {
                     // Ensure PersonWorkItems is initialized
-                    if (workItem.PersonWorkItems == null)
-                    {
-                        workItem.PersonWorkItems = new List<PersonWorkItem>();
-                    }
+                    workItem.PersonWorkItems ??= [];
 
                     foreach (var workPerson in workItemDto.WorkingPersons)
                     {
@@ -194,9 +187,7 @@ namespace Scrumalyze.Services
                         {
                             var person = persons.FirstOrDefault(p => p.FirstName == workPerson.FirstName && p.LastName == workPerson.LastName && p.RoleID == workPerson.RoleID);
                             if (person != null)
-                            {
                                 workItem.PersonWorkItems.Add(new PersonWorkItem { Person = person, WorkItem = workItem });
-                            }
                         }
                     }
                 }
@@ -205,7 +196,7 @@ namespace Scrumalyze.Services
             }
 
             // Create Increments
-            List<Increment> increments = new List<Increment>();
+            List<Increment> increments = [];
             foreach (var incrementDto in teamDto.Increments)
             {
                 Increment increment = _mapper.Map<Increment>(incrementDto);
@@ -214,7 +205,8 @@ namespace Scrumalyze.Services
                 increment.Sprint = sprints[incrementDto.RelatedSprintDtoID];
 
                 // Set the person who received it
-                increment.ReceivedBy = persons[incrementDto.ReceivedByPersonDtoID];
+                if (incrementDto.ReceivedByPersonDtoID.HasValue)
+                    increment.ReceivedBy = persons[incrementDto.ReceivedByPersonDtoID.Value];
 
                 // Set the ProductGoal
                 increment.ProductGoal = productGoal;

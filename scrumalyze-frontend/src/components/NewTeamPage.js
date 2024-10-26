@@ -1,13 +1,12 @@
 import React from 'react';
-import { Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import AddTeamStepper from '../components/TeamStepper';
 
 const NewTeamPage = () => {
     return (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <Typography variant="h4">New Team Page</Typography>
+        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '40px' }}>
             <AddTeamStepper />
-        </div>
+        </Box>
     );
 };
 

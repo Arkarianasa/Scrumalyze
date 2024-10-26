@@ -1,19 +1,19 @@
-import React, { useState, useContext, toISOString } from 'react';
-import { Button, Stepper, Step, StepLabel, TextField, MenuItem, Typography, Grid, Checkbox, FormControlLabel, Box, Autocomplete } from '@mui/material';
+import React, { useState, useContext } from 'react';
+import { Button, Stepper, Step, StepLabel, TextField, MenuItem, Typography, Grid, Checkbox, FormControlLabel, Box, Autocomplete, Card, CardContent, CardActions } from '@mui/material';
 import { GlobalContext } from '../context/GlobalContext'; // Assuming you have GlobalContext setup for roles, work item types
 
 const steps = ['Team Name', 'Involved Persons', 'Product Goal', 'Product Backlog', 'Timeboxes', 'Sprints', 'Definition Of Done', 'Acceptance Criteria', 'Work Items', 'Increments'];
 
 const AddTeamStepper = () => {
-    const { scrumRoles, workItemTypes } = useContext(GlobalContext); // Fetch roles and work item types from GlobalContext
+    const { scrumRoles, workItemTypes, setScrumTeams, setCurrentPage } = useContext(GlobalContext); // Fetch roles and work item types from GlobalContext
     const [activeStep, setActiveStep] = useState(0);
     const [formValues, setFormValues] = useState({
         teamName: '',
         persons: [{ firstName: '', lastName: '', roleID: null }],
-        productGoal: { Description: '', createdByPersonID: null },
+        productGoal: { Description: '', createdByPersonID: '' },
         backlogItems: [{ itemName: '', itemDescription: '', itemPriority: '', sprintBacklogID: null, done: false }],
         timeboxes: [{ timeboxDescription: '', duration: '' }],
-        sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalCreatedByPersonID: null}],
+        sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalCreatedByPersonID: ''}],
         definitionOfDone: [{constraintDescription: ''}],
         acceptanceCriterias: [{constraintDescription: ''}],
         workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneID: null, workItemTypeID: null, deadline: '', done: false, workingPersons: [] }],
@@ -54,8 +54,11 @@ const AddTeamStepper = () => {
           throw new Error(`Server error: ${response.statusText}`);
         }
     
-        const data = await response.json();
-        console.log('Success:', data);
+        const scrumTeams = await response.json();
+        console.log('Scrum team saved');
+        setScrumTeams(scrumTeams);
+
+        setCurrentPage('main');
       } catch (error) {
         console.error('Error sending formValues:', error);
       }
@@ -87,6 +90,10 @@ const AddTeamStepper = () => {
           console.log('Product Goal Description is required');
           isValid = false;
         }
+        if (formValues.productGoal.createdByPersonID === '') {
+          console.log('Responsible person is required');
+          isValid = false;
+        }
         break;
 
         case 3: // Product Backlog Step
@@ -111,6 +118,10 @@ const AddTeamStepper = () => {
           formValues.sprints.forEach((sprint, index) => {
             if (!sprint.sprintGoal || !sprint.startDate) {
               console.log('Fields sprint goal and start date are required');
+              isValid = false;
+            }
+            if (sprint.goalCreatedByPersonID === '') {
+              console.log('Goal responsible person is required');
               isValid = false;
             }
           });
@@ -469,6 +480,7 @@ const AddTeamStepper = () => {
                   createdByPersonID: e.target.value,
                 })
               }
+              required
             >
               {formValues.persons.map((person, index) => (
                 <MenuItem key={index} value={index}>
@@ -616,6 +628,7 @@ const AddTeamStepper = () => {
                       fullWidth
                       value={sprint.goalCreatedByPersonID} // Updated
                       onChange={(e) => handleSprintChange(index, 'goalCreatedByPersonID', e.target.value)}
+                      required
                     >
                       {formValues.persons.map((person, index) => (
                         <MenuItem key={index} value={index}>
@@ -782,6 +795,7 @@ const AddTeamStepper = () => {
                         value={item.description || ''}
                         onChange={(e) => handleWorkItemChange(index, 'description', e.target.value)}
                         fullWidth
+                        required
                     />
                     </Grid>
                     <Grid item xs={3}>
@@ -1042,39 +1056,43 @@ const AddTeamStepper = () => {
   };
 
   return (
-    <Box>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => (
-          <Step key={index}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-
-      <Box style={{ marginTop: '20px' }}>
-        {activeStep === steps.length ? (
-          <Typography>All steps completed!</Typography>
+    <Card style={{ textAlign: 'center', padding: '16px', height: '700px', display: 'flex', flexDirection: 'column' }}>
+      <CardContent style={{ flexGrow: 1, overflow: 'auto' }}>
+        <Typography style={{ paddingBottom: '16px' }} variant="h4">New Team Page</Typography>
+        <Stepper activeStep={activeStep}>
+          {steps.map((label, index) => (
+            <Step key={index}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+  
+        <Box style={{ marginTop: '20px' }}>
+          {activeStep === steps.length ? (
+            <Typography>All steps completed!</Typography>
+          ) : (
+            <>
+              {getStepContent(activeStep)}
+            </>
+          )}
+        </Box>
+      </CardContent>
+      <CardActions style={{ justifyContent: 'center' }}>
+        <Button disabled={activeStep === 0} onClick={handleBack}>
+          Back
+        </Button>
+        {activeStep === steps.length - 1 ? (
+          <Button variant="contained" color="primary" onClick={sendScrumTeam}>
+            Finish
+          </Button>
         ) : (
-          <>
-            {getStepContent(activeStep)}
-            <Box style={{ marginTop: '20px' }}>
-              <Button disabled={activeStep === 0} onClick={handleBack}>
-                Back
-              </Button>
-              {activeStep === steps.length - 1 ?
-              <Button variant="contained" color="primary" onClick={sendScrumTeam}>
-               Finish
-              </Button>
-               :
-               <Button variant="contained" color="primary" onClick={handleNext}>
-               Next
-              </Button>}
-            </Box>
-          </>
+          <Button variant="contained" color="primary" onClick={handleNext}>
+            Next
+          </Button>
         )}
-      </Box>
-    </Box>
-  );
+      </CardActions>
+    </Card>
+  );  
 };
 
 export default AddTeamStepper;
