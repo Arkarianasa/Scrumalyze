@@ -146,7 +146,7 @@ const AddTeamStepper = () => {
           break;
 
         case 8: // Work Items Step
-          console.log(formValues.workItems[0].workingPersons);
+          //console.log(formValues.workItems[0].workingPersons);
           formValues.workItems.forEach((workItem, index) => {
             if (!workItem.description || !workItem.workItemTypeID) {
               console.log('Fields description and type are required');

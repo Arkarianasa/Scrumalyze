@@ -33,6 +33,8 @@ namespace Scrumalyze.Services
             EvaluateGatekeeping(result, team.ScrumTeamID);
             EvaluateProductOwnerFailures(result, team.ScrumTeamID);
             EvaluateProductOwnerInadequacy(result, team.ScrumTeamID);
+            EvaluateProductOwnerPresence(result, team.ScrumTeamID);
+            EvaluateScrumMasterPresence(result, team.ScrumTeamID);
             EvaluateTimeboxIssues(result, team.ScrumTeamID);
             EvaluateDeadlines(result, team.ScrumTeamID);
             EvaluateIncrementBinding(result, team.ScrumTeamID);
@@ -53,11 +55,11 @@ namespace Scrumalyze.Services
 
             if (workItemsWithoutDoD.Any())
             {
-                result.AddTest("Absence of Definition of Done", "Some work items lack a Definition of Done.", false, SeverityLevel.Major);
+                result.AddTest("Definition of Done Absence", "Some work items are missing a Definition of Done.", false, SeverityLevel.Major);
             }
             else
             {
-                result.AddTest("Definition of Done Present", "All work items have a Definition of Done.", true, SeverityLevel.None);
+                result.AddTest("Definition of Done Absence", "All work items have a Definition of Done.", true, SeverityLevel.None);
             }
         }
 
@@ -74,11 +76,11 @@ namespace Scrumalyze.Services
 
             if (workItemsWithoutAC.Any())
             {
-                result.AddTest("Absence of Acceptance Criteria", "Some work items are missing Acceptance Criteria.", false, SeverityLevel.Minor);
+                result.AddTest("Acceptance Criteria Absence", "Some work items are missing Acceptance Criteria.", false, SeverityLevel.Major);
             }
             else
             {
-                result.AddTest("Acceptance Criteria Present", "All work items have proper Acceptance Criteria.", true, SeverityLevel.None);
+                result.AddTest("Acceptance Criteria Absence", "All work items have Acceptance Criteria.", true, SeverityLevel.None);
             }
         }
 
@@ -91,7 +93,7 @@ namespace Scrumalyze.Services
 
             if (!communicationsWithStakeholders.Any())
             {
-                result.AddTest("No Communication with Stakeholders", "No communication between Stakeholders and Scrum team members.", false, SeverityLevel.Major);
+                result.AddTest("Gatekeeping", "No communication between Stakeholders and Scrum team members.", false, SeverityLevel.Critical);
             }
             else
             {
@@ -106,7 +108,7 @@ namespace Scrumalyze.Services
                 }
                 else
                 {
-                    result.AddTest("Open Communication with Stakeholders", "Developers communicate freely with Stakeholders.", true, SeverityLevel.None);
+                    result.AddTest("Gatekeeping", "Developers communicate freely with Stakeholders.", true, SeverityLevel.None);
                 }
             }
         }
@@ -119,11 +121,11 @@ namespace Scrumalyze.Services
 
             if (productGoalsNotByProductOwner.Any())
             {
-                result.AddTest("Product Goals Not Created by Product Owner", "Some Product Goals were not created by the Product Owner.", false, SeverityLevel.Major);
+                result.AddTest("Product Goal responsibility by Product Owner", "Product Goal was not created by the Product Owner.", false, SeverityLevel.Critical);
             }
             else
             {
-                result.AddTest("Product Goals Managed by Product Owner", "All Product Goals were created by the Product Owner.", true, SeverityLevel.None);
+                result.AddTest("Product Goal responsibility by Product Owner", "Product Goal was created by the Product Owner.", true, SeverityLevel.None);
             }
 
             var backlogItemsWithoutPriority = _context.BacklogItem
@@ -135,40 +137,76 @@ namespace Scrumalyze.Services
 
             if (backlogItemsWithoutPriority.Any())
             {
-                result.AddTest("Backlog Items Missing Priority", "Some Backlog Items do not have a priority assigned.", false, SeverityLevel.Major);
+                result.AddTest("Product Backlog Prioritization by Product Owner", "Some Backlog Items do not have a priority assigned.", false, SeverityLevel.Minor);
             }
             else
             {
-                result.AddTest("Backlog Items Properly Prioritized", "All Backlog Items have a priority assigned.", true, SeverityLevel.None);
+                result.AddTest("Product Backlog Prioritization by Product Owner", "All Backlog Items have a priority assigned.", true, SeverityLevel.None);
             }
         }
 
         private void EvaluateProductOwnerInadequacy(ScrumEvaluationResult result, int scrumTeamId)
         {
-            var productOwnerRole = _context.ScrumRole.FirstOrDefault(r => r.RoleName == "Product Owner");
-
-            if (productOwnerRole != null)
-            {
-                result.AddTest("Product Owner Role Present", "Product Owner role exists in the system.", true, SeverityLevel.None);
-
-                var inadequateProcessSteps = _context.ProcessStep
-                    .Where(ps => _context.Person.Any(p => p.PersonID == ps.GuidedByPersonID &&
-                                                          p.RoleID == productOwnerRole.RoleID &&
-                                                          p.ScrumTeamID == scrumTeamId))
+            var productOwnerRoles = _context.Person
+                    .Where(p => p.Role.RoleName == "Product Owner" && p.ScrumTeamID == scrumTeamId)
+                    .Select(po => po.PersonID)
                     .ToList();
+
+            if (productOwnerRoles.Any())
+            {
+                var inadequateProcessSteps = _context.ProcessStep
+                                    .Where(ps => ps.GuidedByPersonID != null && productOwnerRoles.Contains(ps.GuidedByPersonID.Value))
+                                    .ToList();
 
                 if (inadequateProcessSteps.Any())
                 {
-                    result.AddTest("Product Owner Guiding Process Steps", "Product Owner is guiding Process Steps, which is inadequate.", false, SeverityLevel.Minor);
+                    result.AddTest("Product Owner Adequacy", "Product Owner is guiding Process Steps, which is inadequate.", false, SeverityLevel.Major);
                 }
                 else
                 {
-                    result.AddTest("Product Owner Not Guiding Process Steps", "Product Owner is not guiding Process Steps.", true, SeverityLevel.None);
+                    result.AddTest("Product Owner Adequacy", "Product Owner is adequate.", true, SeverityLevel.None);
                 }
             }
             else
             {
-                result.AddTest("Product Owner Role Missing", "No Product Owner role found in the system.", false, SeverityLevel.Critical);
+                result.AddTest("Product Owner Adequacy", "No Product Owner role found in the system.", false, SeverityLevel.Critical);
+            }
+        }
+
+
+
+        private void EvaluateProductOwnerPresence(ScrumEvaluationResult result, int scrumTeamId)
+        {
+            var scrumProductOwnerCount = _context.ScrumRole.Count(r => r.RoleName == "Product Owner");
+
+            if (scrumProductOwnerCount > 0)
+            {
+                if (scrumProductOwnerCount > 1)
+                {
+                    result.AddTest("Presence of the Product Owner", "More than one Product Owner found in the team.", false, SeverityLevel.Major);
+                }
+                result.AddTest("Presence of the Product Owner", "Product Owner role exists in the system.", true, SeverityLevel.None);
+            }
+            else
+            {
+                result.AddTest("Presence of the Product Owner", "Product Owner role found in the system.", false, SeverityLevel.Critical);
+            }
+        }
+        private void EvaluateScrumMasterPresence(ScrumEvaluationResult result, int scrumTeamId)
+        {
+            var scrumMasterRoleCount = _context.ScrumRole.Count(r => r.RoleName == "Scrum Master");
+
+            if (scrumMasterRoleCount > 0)
+            {
+                if (scrumMasterRoleCount > 1)
+                {
+                    result.AddTest("Presence of the Scrum Master", "More than one Scrum Master found in the team.", false, SeverityLevel.Major);
+                }
+                result.AddTest("Presence of the Scrum Master", "Scrum Master role exists in the system.", true, SeverityLevel.None);
+            }
+            else
+            {
+                result.AddTest("Presence of the Scrum Master", "Scrum Master role found in the system.", false, SeverityLevel.Critical);
             }
         }
 
@@ -183,12 +221,25 @@ namespace Scrumalyze.Services
 
             foreach (var sprint in sprints)
             {
-                var sprintDuration = sprint.EndDate - sprint.StartDate;
+                if (sprint.EndDate == null) continue;
+
+                var sprintDuration = sprint.EndDate.Value - sprint.StartDate;
+
+                // Calculate working hours, assuming 8 hours per workday
+                int workingDays = 0;
+                for (var date = sprint.StartDate; date <= sprint.EndDate.Value; date = date.AddDays(1))
+                {
+                    if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                    {
+                        workingDays++;
+                    }
+                }
+                double totalWorkingHours = workingDays * 8;
 
                 if (sprint.TimeboxID != null)
                 {
                     var timebox = _context.Timebox.FirstOrDefault(tb => tb.TimeboxID == sprint.TimeboxID);
-                    if (timebox != null && sprintDuration.HasValue && sprintDuration.Value.TotalHours > timebox.Duration)
+                    if (timebox != null && totalWorkingHours > timebox.Duration)
                     {
                         timeboxExceeded = true;
                     }
@@ -201,15 +252,15 @@ namespace Scrumalyze.Services
 
             if (timeboxExceeded)
             {
-                result.AddTest("Sprint Timebox Exceeded", "One or more sprints exceeded their timebox.", false, SeverityLevel.Major);
+                result.AddTest("Sprint Timebox", "Some sprints exceeded their timebox.", false, SeverityLevel.Major);
             }
             else if (timeboxMissing)
             {
-                result.AddTest("Sprint Timebox Missing", "One or more sprints are missing a timebox.", false, SeverityLevel.Major);
+                result.AddTest("Sprint Timebox", "One or more sprints are missing a timebox.", false, SeverityLevel.Major);
             }
             else
             {
-                result.AddTest("Sprint Timebox Adhered", "All sprints are within their timebox.", true, SeverityLevel.None);
+                result.AddTest("Sprint Timebox", "All sprints are within their timebox.", true, SeverityLevel.None);
             }
         }
 
@@ -261,11 +312,11 @@ namespace Scrumalyze.Services
 
             if (unboundIncrements.Any())
             {
-                result.AddTest("Incomplete Product Goals", "Some Product Goals are incomplete.", false, SeverityLevel.Major);
+                result.AddTest("Increment Binding", "Some Increment are not properly binded.", false, SeverityLevel.Major);
             }
             else
             {
-                result.AddTest("Complete Product Goals", "All Product Goals are complete.", true, SeverityLevel.None);
+                result.AddTest("Increment Binding", "All Product Goals are properly binded.", true, SeverityLevel.None);
             }
         }
     }

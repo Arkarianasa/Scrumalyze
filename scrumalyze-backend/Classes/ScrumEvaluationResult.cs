@@ -17,15 +17,15 @@ namespace Scrumalyze.Classes
 
     public class Test
     {
-        public string Description { get; set; }
-        public string ProblemDetails { get; set; }
+        public string Name { get; set; }
+        public string Details { get; set; }
         public bool Passed { get; set; }
         public SeverityLevel SeverityLevel { get; set; }
 
         public Test(string description, string details, bool passed, SeverityLevel severityLevel)
         {
-            Description = description;
-            ProblemDetails = details;
+            Name = description;
+            Details = details;
             Passed = passed;
             SeverityLevel = severityLevel;
         }
@@ -35,7 +35,7 @@ namespace Scrumalyze.Classes
     {
         public int TeamID { get; set; }
         public string TeamName { get; set; }
-        public List<Test> Tests { get; set; } = new List<Test>();
+        public List<Test> Tests { get; set; } = [];
         public int ScorePercentage { get; set; }
 
         public ScrumEvaluationResult(int teamID, string name)
@@ -46,7 +46,7 @@ namespace Scrumalyze.Classes
 
         public bool AddTest(string description, string details, bool passed, SeverityLevel severityLevel)
         {
-            if (Tests.Any(test => test.Description == description))
+            if (Tests.Any(test => test.Name == description))
             {
                 return false;
             }
@@ -70,7 +70,7 @@ namespace Scrumalyze.Classes
         public void NullResult()
         {
             ScorePercentage = 0;
-            Tests = new List<Test>();
+            Tests = [];
         }
 
         public string PrettyPrint()
@@ -90,7 +90,7 @@ namespace Scrumalyze.Classes
                 {
                     if (!Tests[i].Passed)
                     {
-                        result.AppendLine($"{i + 1}. {Tests[i].Description} - Severity: {Tests[i].SeverityLevel}");
+                        result.AppendLine($"{i + 1}. {Tests[i].Name} - Severity: {Tests[i].SeverityLevel}");
                     }
                 }
             }

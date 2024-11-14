@@ -44,6 +44,7 @@ namespace Scrumalyze.Services
         public List<WorkItem> GetWorkItemList(int teamID)
         {
             return [.. _context.WorkItem
+                .Include(wi => wi.PersonWorkItems)
                 .Where(wi => wi.BacklogItem != null
                              && wi.BacklogItem.ProductBacklog != null
                              && wi.BacklogItem.ProductBacklog.ProductGoal != null

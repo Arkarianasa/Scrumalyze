@@ -30,7 +30,7 @@ const TeamDashboard = () => {
     }
 
     return (
-        <Grid container spacing={3} alignItems="stretch">
+        <Grid container spacing={1} alignItems="stretch">
                 {/* Product Goal */}
                 <Grid item xs={12} sm={6} md={4}>
                     <Card style={{ height: '100%' }}>
@@ -100,7 +100,7 @@ const TeamDashboard = () => {
                                 sx={{ ml: -10 }}  // Move the chart to the left with negative margin
                             >
                                 <PieChart
-                                    colors={['green', 'blue', 'red']}
+                                    colors={['#1976d2', '#f57c00', '#d32f2f']}
                                     series={[
                                         {
                                             data: [
@@ -121,8 +121,8 @@ const TeamDashboard = () => {
                 </Grid>
 
                 {/* Product Backlog */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Card style={{ height: '100%' }}>
+                <Grid item xs={12} sm={6} md={4} style={{ height: '500px' }}>
+                    <Card style={{ height: '100%', flexGrow: 1, overflow: 'auto' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
                                 Product Backlog
@@ -176,8 +176,8 @@ const TeamDashboard = () => {
                 </Grid>
 
                 {/* Sprints */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Card style={{ height: '100%' }}>
+                <Grid item xs={12} sm={6} md={4} style={{ height: '500px' }}>
+                    <Card style={{ height: '100%', flexGrow: 1, overflow: 'auto' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
                                 Sprints Overview
@@ -220,8 +220,8 @@ const TeamDashboard = () => {
 
 
                 {/* Team Members */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Card style={{ height: '100%' }}>
+                <Grid item xs={12} sm={6} md={4} style={{ height: '500px' }}>
+                    <Card style={{ height: '100%', flexGrow: 1, overflow: 'auto' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
                                 Team Members

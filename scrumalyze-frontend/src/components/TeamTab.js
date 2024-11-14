@@ -2,10 +2,10 @@ import React from 'react';
 import { Tabs, Tab } from '@mui/material';
 
 const TeamTab = ({ selectedTab, handleTabChange }) => {
+    
     return (
         <Tabs
             orientation="vertical"
-            variant="scrollable"
             value={selectedTab}
             onChange={handleTabChange}
             sx={{
@@ -18,7 +18,7 @@ const TeamTab = ({ selectedTab, handleTabChange }) => {
         >
             <Tab label="Team Dashboard" />
             <Tab label="Problems Overview" />
-            <Tab label="Work Items Overview" />
+            <Tab label="Work Items" />
             <Tab label="Sprints Dashboard" />
         </Tabs>
     );

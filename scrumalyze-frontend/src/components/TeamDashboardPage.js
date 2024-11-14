@@ -6,7 +6,7 @@ import { GlobalContext } from '../context/GlobalContext';
 import TeamTab from './TeamTab';
 import TeamDashboard from './TeamDashboard';
 import ProblemsOverview from './ProblemsOverview';
-import WorkItemsOverview from './WorkItemsOverview';
+import WorkItems from './WorkItems';
 import SprintsDashboard from './SprintsDashboard';
 
 const TeamDashboardPage = () => {
@@ -24,7 +24,7 @@ const TeamDashboardPage = () => {
             case 1:
                 return <ProblemsOverview />;
             case 2:
-                return <WorkItemsOverview />;
+                return <WorkItems />;
             case 3:
                 return <SprintsDashboard />;
             default:
@@ -33,32 +33,59 @@ const TeamDashboardPage = () => {
     };
 
     return (
-        <Box sx={{ display: 'flex', height: '100vh' }}>
-            <Box sx={{ width: '250px', position: 'fixed', top: '60px', left: 0 }}>
-                <TeamTab selectedTab={selectedTab} handleTabChange={handleTabChange} />
-            </Box>
-            <Box 
-                sx={{ 
-                    marginLeft: '240px',
-                    width: '100%', 
-                    overflowY: 'auto', 
-                    padding: 2 
+        <Box sx={{ display: 'flex' }}>
+            {/* Sidebar */}
+            <Box
+                sx={{
+                    width: '250px',
+                    position: 'fixed',
+                    top: '60px',
+                    left: 0,
+                    backgroundColor: '#1976d2',
+                    borderRight: 'none', // Remove any borders that may cause shadow effects
+                    boxShadow: 'none',  // Ensure no shadow is applied here
+                    padding: 0,
+                    margin: 0
                 }}
             >
-                <Typography variant="h4" sx={{ padding: '10px', paddingBottom:'5px' }}>
-                    Team {selectedTeam.teamName} Dashboard
-                </Typography>
-                
-                <Box
+                <TeamTab selectedTab={selectedTab} handleTabChange={handleTabChange} />
+            </Box>
+
+            {/* Main Content */}
+            <Box
+                sx={{
+                    marginLeft: '250px',
+                    padding: 2,
+                    width: '100%',
+                    overflowY: 'auto',
+                    backgroundColor: '#fff',
+                    padding: 0,
+                    margin: 0
+                }}
+            >
+                {/* Fixed Header */}
+                <Typography
+                    variant="h4"
                     sx={{
-                        padding: '16px',
-                        paddingTop: '0px'
+                        padding: '10px',
+                        position: 'fixed',
+                        top: '60px',
+                        left: '250px', // Align with sidebar width
+                        width: 'calc(100% - 250px)',
+                        backgroundColor: '#fff',
+                        zIndex: 1000,
                     }}
                 >
+                    Team {selectedTeam.teamName}
+                </Typography>
+
+                {/* Content Area with Padding Offset for Header */}
+                <Box sx={{ paddingTop: '120px', marginLeft: '260px', marginRight: '16px', paddingBottom: '16px' }}>
                     {renderContent()}
                 </Box>
             </Box>
         </Box>
+
     );
 };
 

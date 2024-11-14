@@ -21,7 +21,7 @@ const MainBar = () => {
   const { setCurrentPage } = useContext(GlobalContext); // Accessing setCurrentPage from GlobalContext
 
   return (
-    <AppBar position="static" className={classes.header} style={{ backgroundColor: '#004aad' }}>
+    <AppBar position="static" className={classes.header} style={{ backgroundColor: '#004aad', position: 'fixed', zIndex: 1000, }}>
       <Toolbar>
         <IconButton edge="start" color="inherit" onClick={() => setCurrentPage('main')}>
           <img src={logo_white} alt="Logo" className={classes.logo} />
