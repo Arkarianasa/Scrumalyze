@@ -10,6 +10,7 @@ export const GlobalProvider = ({ children }) => {
     const [scrumTeams, setScrumTeams] = useState([]); // List of ScrumTeams
     const [scrumRoles, setScrumRoles] = useState([]); // List of ScrumRoles
     const [workItemTypes, setWorkItemTypes] = useState([]); // List of WorkItemTypes
+    const [prioritizationSchemes, setPrioritizationSchemes] = useState([]); // List of PrioritizationSchemes
 
     // Fetch global data from the API
     useEffect(() => {
@@ -24,6 +25,7 @@ export const GlobalProvider = ({ children }) => {
                 setScrumTeams(data.scrumTeams);
                 setScrumRoles(data.scrumRoles);
                 setWorkItemTypes(data.workItemTypes);
+                setPrioritizationSchemes(data.prioritizationSchemes);
             } catch (error) {
                 console.error('Failed to fetch global context data:', error);
             }
@@ -42,7 +44,8 @@ export const GlobalProvider = ({ children }) => {
                 scrumTeams,
                 setScrumTeams,
                 scrumRoles,
-                workItemTypes
+                workItemTypes,
+                prioritizationSchemes
             }}
         >
             {children}

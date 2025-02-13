@@ -90,7 +90,7 @@ namespace Scrumalyze.Classes
                 {
                     if (!Tests[i].Passed)
                     {
-                        result.AppendLine($"{i + 1}. {Tests[i].Name} - Severity: {Tests[i].SeverityLevel}");
+                        result.AppendLine($"{i + 1}. {Tests[i].Name}, {Tests[i].Details} - Severity: {Tests[i].SeverityLevel}");
                     }
                 }
             }

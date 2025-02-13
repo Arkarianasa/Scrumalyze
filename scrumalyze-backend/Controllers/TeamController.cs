@@ -98,13 +98,6 @@ namespace Scrumalyze.Controllers
             return Ok(sprintBacklogs);
         }
 
-        [HttpGet("sprintgoals/{teamId}")]
-        public ActionResult<List<SprintGoal>> GetSprintGoalList(int teamId)
-        {
-            var sprintGoals = _teamService.GetSprintGoalList(teamId);
-            return Ok(sprintGoals);
-        }
-
         [HttpGet("processsteps/{teamId}")]
         public ActionResult<List<ProcessStep>> GetProcessStepList(int teamId)
         {

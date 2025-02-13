@@ -19,7 +19,6 @@ export const TeamProvider = ({ children }) => {
         workItems: [],
         sprints: [],
         sprintBacklogs: [],
-        sprintGoals: [],
         processSteps: [],
         increments: [],
         evaluation: null,
@@ -38,7 +37,6 @@ export const TeamProvider = ({ children }) => {
                 `https://localhost:52765/api/team/workitems/${teamId}`,
                 `https://localhost:52765/api/team/sprints/${teamId}`,
                 `https://localhost:52765/api/team/sprintbacklogs/${teamId}`,
-                `https://localhost:52765/api/team/sprintgoals/${teamId}`,
                 `https://localhost:52765/api/team/processsteps/${teamId}`,
                 `https://localhost:52765/api/team/increments/${teamId}`,
                 `https://localhost:52765/api/evaluation/${teamId}`
@@ -67,7 +65,6 @@ export const TeamProvider = ({ children }) => {
                 workItems = [],
                 sprints = [],
                 sprintBacklogs = [],
-                sprintGoals = [],
                 processSteps = [],
                 increments = [],
                 evaluation = null
@@ -84,7 +81,6 @@ export const TeamProvider = ({ children }) => {
                 workItems,
                 sprints,
                 sprintBacklogs,
-                sprintGoals,
                 processSteps,
                 increments,
                 evaluation,

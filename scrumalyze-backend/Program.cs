@@ -47,8 +47,9 @@ public static class Program
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<ScrumalyzeContext>();
-            var evaluationService = new ScrumEvaluationService(context);
+            var evaluationService = scope.ServiceProvider.GetRequiredService<ScrumEvaluationService>();
 
+            /*
             var evaluationResult = evaluationService.EvaluateScrumImplementation(1);
             evaluationResult?.PrettyPrint();
 
@@ -61,6 +62,7 @@ public static class Program
 
             evaluationResult = evaluationService.EvaluateScrumImplementation(3);
             evaluationResult?.PrettyPrint();
+            */
         }
 
         app.Run();

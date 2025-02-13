@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Button, Stepper, Step, StepLabel, TextField, MenuItem, Typography, Grid, Checkbox, FormControlLabel, Box, Autocomplete, Card, CardContent, CardActions } from '@mui/material';
-import { GlobalContext } from '../context/GlobalContext'; // Assuming you have GlobalContext setup for roles, work item types
+import { GlobalContext } from '../../context/GlobalContext'; // Assuming you have GlobalContext setup for roles, work item types
 
 const steps = ['Team Name', 'Involved Persons', 'Product Goal', 'Product Backlog', 'Timeboxes', 'Sprints', 'Definition Of Done', 'Acceptance Criteria', 'Work Items', 'Increments'];
 
@@ -9,6 +9,7 @@ const AddTeamStepper = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [formValues, setFormValues] = useState({
         teamName: '',
+        workDayHours: 8,
         persons: [{ firstName: '', lastName: '', roleID: null }],
         productGoal: { Description: '', createdByPersonID: '' },
         backlogItems: [{ itemName: '', itemDescription: '', itemPriority: '', sprintBacklogID: null, done: false }],
@@ -17,7 +18,7 @@ const AddTeamStepper = () => {
         definitionOfDone: [{constraintDescription: ''}],
         acceptanceCriterias: [{constraintDescription: ''}],
         workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneID: null, workItemTypeID: null, deadline: '', done: false, workingPersons: [] }],
-        increments: [{ description: '', RelatedSprintDtoID: null, ReceivedByPersonDtoID: null, relatedToSprintGoal: false, deadline: '' }]
+        increments: [{ description: '', RelatedSprintDtoID: null, ReceivedByPersonDtoID: null, allignedWithSprintGoal: false, allignedWithProductGoal: false, deadline: '' }]
     });
 
     const sendScrumTeam = async () => {
@@ -72,6 +73,10 @@ const AddTeamStepper = () => {
         case 0: // Team Name Step
           if (!formValues.teamName) {
             console.log('Team Name is required');
+            isValid = false;
+          }
+          if (!formValues.workDayHours) {
+            console.log('Work Day Hours are required');
             isValid = false;
           }
           break;
@@ -330,8 +335,8 @@ const AddTeamStepper = () => {
                   description: '',
                   RelatedSprintDtoID: null,
                   ReceivedByPersonDtoID: null,
-                  relatedToSprintGoal: false,
-                  relatedToProductGoal: false,
+                  allignedWithSprintGoal: false,
+                  allignedWithProductGoal: false,
                   hasDeadline: false,
                   done: false,
               },
@@ -383,14 +388,25 @@ const AddTeamStepper = () => {
         switch (step) {
         case 0:
             return (
-            <TextField
-                label="Team Name"
+            <Box>
+              <TextField
+                  label="Team Name"
+                  variant="outlined"
+                  fullWidth
+                  value={formValues.teamName}
+                  onChange={(e) => handleChange('teamName', e.target.value)}
+                  required
+                  style={{ marginBottom: '20px' }}
+              />
+              <TextField
+                label="Work Day Hours"
                 variant="outlined"
+                value={formValues.workDayHours}
+                onChange={(e) => handleChange('workDayHours', e.target.value)}
                 fullWidth
-                value={formValues.teamName}
-                onChange={(e) => handleChange('teamName', e.target.value)}
                 required
-            />
+              />
+            </Box>
             );
         case 1:
             return (
@@ -578,7 +594,7 @@ const AddTeamStepper = () => {
                   </Grid>
                   <Grid item xs={3}>
                     <TextField
-                      label="Duration in human-hours"
+                      label="Duration in work hours"
                       variant="outlined"
                       value={timebox.duration}
                       onChange={(e) => handleTimeboxChange(index, 'duration', e.target.value)}
@@ -1013,8 +1029,8 @@ const AddTeamStepper = () => {
                               <FormControlLabel
                                   control={
                                       <Checkbox
-                                          checked={increment.relatedToSprintGoal}
-                                          onChange={(e) => handleIncrementChange(index, 'relatedToSprintGoal', e.target.checked)}
+                                          checked={increment.allignedWithSprintGoal}
+                                          onChange={(e) => handleIncrementChange(index, 'allignedWithSprintGoal', e.target.checked)}
                                           color="primary"
                                       />
                                   }
@@ -1025,8 +1041,8 @@ const AddTeamStepper = () => {
                               <FormControlLabel
                                   control={
                                       <Checkbox
-                                          checked={increment.relatedToProductGoal}
-                                          onChange={(e) => handleIncrementChange(index, 'relatedToProductGoal', e.target.checked)}
+                                          checked={increment.allignedWithProductGoal}
+                                          onChange={(e) => handleIncrementChange(index, 'allignedWithProductGoal', e.target.checked)}
                                           color="primary"
                                       />
                                   }
@@ -1058,7 +1074,7 @@ const AddTeamStepper = () => {
   return (
     <Card style={{ textAlign: 'center', padding: '16px', height: '700px', display: 'flex', flexDirection: 'column' }}>
       <CardContent style={{ flexGrow: 1, overflow: 'auto' }}>
-        <Typography style={{ paddingBottom: '16px' }} variant="h4">New Team Page</Typography>
+        <Typography style={{ paddingBottom: '16px' }} variant="h4" color='primary'>New Team Page</Typography>
         <Stepper activeStep={activeStep}>
           {steps.map((label, index) => (
             <Step key={index}>

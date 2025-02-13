@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import AddTeamStepper from '../components/TeamStepper';
+import AddTeamStepper from '../components/TeamStepper/TeamStepper';
 
 const NewTeamPage = () => {
     return (

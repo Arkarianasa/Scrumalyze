@@ -17,7 +17,8 @@ const TeamTab = ({ selectedTab, handleTabChange }) => {
             }}
         >
             <Tab label="Team Dashboard" />
-            <Tab label="Problems Overview" />
+            <Tab label="SCRUM Overview" />
+            <Tab label="Pathological Behaviors" />
             <Tab label="Work Items" />
             <Tab label="Sprints Dashboard" />
         </Tabs>

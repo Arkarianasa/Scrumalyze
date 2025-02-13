@@ -28,9 +28,9 @@ const ProblemsOverview = () => {
 
     // Severity level mapping
     const severityMap = {
-        1: 'Minor Problem',
-        2: 'Major Problem',
-        3: 'Critical Problem'
+        1: 'Minor Pathological Behaviour',
+        2: 'Major Pathological Behaviour',
+        3: 'Critical Pathological Behaviour'
     };
 
     return (

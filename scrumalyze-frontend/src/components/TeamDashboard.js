@@ -17,9 +17,11 @@ import {
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { TeamContext } from '../context/TeamContext';
+import { GlobalContext } from '../context/GlobalContext';
 
 const TeamDashboard = () => {
     const { teamData, loading } = useContext(TeamContext);
+    const { prioritizationSchemes } = useContext(GlobalContext);
 
     if (loading) {
         return (
@@ -28,6 +30,8 @@ const TeamDashboard = () => {
             </div>
         );
     }
+
+    console.log(teamData.productBacklog)
 
     return (
         <Grid container spacing={1} alignItems="stretch">
@@ -48,7 +52,10 @@ const TeamDashboard = () => {
                                         Created on: {new Date(teamData.productGoal.createdDate).toLocaleDateString()}
                                     </Typography>
                                     <Typography variant="body2">
-                                        Created by: {`${teamData.productGoal.createdByPerson.firstName} ${teamData.productGoal.createdByPerson.lastName}`}
+                                        Owner:{" "}
+                                        {teamData.productGoal.responsiblePerson
+                                            ? `${teamData.productGoal.responsiblePerson.firstName} ${teamData.productGoal.responsiblePerson.lastName}`
+                                            : "The Whole Team"}
                                     </Typography>
                                 </>
                             ) : (
@@ -65,7 +72,7 @@ const TeamDashboard = () => {
                     <Card style={{ height: '100%' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
-                                Tests Passed
+                                SCRUM Evaulation
                             </Typography>
                             <Gauge
                             value={teamData?.evaluation?.tests?.filter(test => test.passed).length || 0}
@@ -92,7 +99,7 @@ const TeamDashboard = () => {
                     <Card style={{ height: '100%' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
-                                Problems Overview
+                                Pathological Behaviours
                             </Typography>
                             <Box
                                 display="flex"
@@ -104,9 +111,9 @@ const TeamDashboard = () => {
                                     series={[
                                         {
                                             data: [
-                                                { id: 0, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 1).length || 0, label: 'Minor Problem' },
-                                                { id: 1, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 2).length || 0, label: 'Major Problem' },
-                                                { id: 2, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 3).length || 0, label: 'Critical Problem' },
+                                                { id: 0, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 1).length || 0, label: 'Minor' },
+                                                { id: 1, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 2).length || 0, label: 'Major' },
+                                                { id: 2, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 3).length || 0, label: 'Critical' },
                                             ],
                                             highlightScope: { fade: 'global', highlight: 'item' },
                                             faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
@@ -127,6 +134,12 @@ const TeamDashboard = () => {
                             <Typography variant="h5" gutterBottom>
                                 Product Backlog
                             </Typography>
+                            <Typography variant="body2">
+                                        Owner:{" "}
+                                        {teamData.productBacklog.responsiblePerson
+                                            ? `${teamData.productBacklog.responsiblePerson.firstName} ${teamData.productBacklog.responsiblePerson.lastName}`
+                                            : "The Whole Team"}
+                                    </Typography>
                             {Array.isArray(teamData?.productBacklog?.backlogItems) && teamData.productBacklog.backlogItems.length > 0 ? (
                                 <List>
                                     {teamData.productBacklog.backlogItems
@@ -134,42 +147,89 @@ const TeamDashboard = () => {
                                             // First, prioritize active items over inactive ones
                                             if (a.done && !b.done) return 1;
                                             if (!a.done && b.done) return -1;
-                                            // Then, sort by itemPriority (null values go last)
-                                            if (a.itemPriority === null) return 1;
-                                            if (b.itemPriority === null) return -1;
-                                            return a.itemPriority - b.itemPriority;
+
+                                            // Then, sort by primaryPriorityValue (null values go last)
+                                            if (a.primaryPriorityValue === null) return 1;
+                                            if (b.primaryPriorityValue === null) return -1;
+                                            const primaryComparison = a.primaryPriorityValue - b.primaryPriorityValue;
+                                            if (primaryComparison !== 0) return primaryComparison;
+
+                                            // Lastly, sort by secondaryPriorityValue (null values go last)
+                                            if (a.secondaryPriorityValue === null) return 1;
+                                            if (b.secondaryPriorityValue === null) return -1;
+                                            return a.secondaryPriorityValue - b.secondaryPriorityValue;
                                         })
-                                        .map((item) => (
-                                            <ListItem key={item.backlogItemID}>
-                                                <ListItemText
-                                                    primary={`${item.itemName}`}
-                                                    secondary={
-                                                        <>
-                                                            <Typography component="span" variant="body2" color="textPrimary">
-                                                                {item.itemDescription}
-                                                            </Typography>
-                                                            <br />
-                                                            <Typography component="span" variant="body2">
-                                                                Priority: {item.itemPriority !== null ? item.itemPriority : 'None'}
-                                                            </Typography>
-                                                        </>
-                                                    }
-                                                />
-                                                <ListItemSecondaryAction>
-                                                    <Typography
-                                                        variant="body2"
-                                                        color={!item.done ? 'green' : 'textSecondary'}
-                                                    >
-                                                        {!item.done ? 'Active' : 'Done'}
-                                                    </Typography>
-                                                </ListItemSecondaryAction>
-                                            </ListItem>
-                                        ))}
+                                        .map((item) => {
+                                            const primaryScheme = prioritizationSchemes.find(
+                                                (scheme) => scheme.prioritizationSchemeID === teamData.productBacklog.primaryPrioritizationSchemeID
+                                            );
+
+                                            const secondaryScheme = prioritizationSchemes.find(
+                                                (scheme) => scheme.prioritizationSchemeID === teamData.productBacklog.secondaryPrioritizationSchemeID
+                                            );
+
+                                            let primaryPriorityDisplay;
+                                            if (primaryScheme) {
+                                                if (primaryScheme.schemeName === "Numerical Ranking") {
+                                                    primaryPriorityDisplay = item.primaryPriorityValue !== null ? item.primaryPriorityValue : "None";
+                                                } else {
+                                                    const level = primaryScheme.prioritizationLevels.find(
+                                                        (level) => level.levelValue === item.primaryPriorityValue
+                                                    );
+                                                    primaryPriorityDisplay = level ? level.levelName : "None";
+                                                }
+                                            } else {
+                                                primaryPriorityDisplay = "None";
+                                            }
+
+                                            let secondaryPriorityDisplay;
+                                            if (secondaryScheme) {
+                                                if (secondaryScheme.schemeName === "Numerical Ranking") {
+                                                    secondaryPriorityDisplay = item.secondaryPriorityValue !== null ? item.secondaryPriorityValue : "None";
+                                                } else {
+                                                    const level = secondaryScheme.prioritizationLevels.find(
+                                                        (level) => level.levelValue === item.secondaryPriorityValue
+                                                    );
+                                                    secondaryPriorityDisplay = level ? level.levelName : "None";
+                                                }
+                                            } else {
+                                                secondaryPriorityDisplay = "None";
+                                            }
+
+                                            return (
+                                                <ListItem key={item.backlogItemID}>
+                                                    <ListItemText
+                                                        primary={`${item.itemName}`}
+                                                        secondary={
+                                                            <>
+                                                                <Typography component="span" variant="body2" color="textPrimary">
+                                                                    {item.itemDescription}
+                                                                </Typography>
+                                                                <br />
+                                                                <Typography component="span" variant="body2">
+                                                                    Primary Priority: {primaryPriorityDisplay}
+                                                                </Typography>
+                                                                <br />
+                                                                <Typography component="span" variant="body2">
+                                                                    Secondary Priority: {secondaryPriorityDisplay}
+                                                                </Typography>
+                                                            </>
+                                                        }
+                                                    />
+                                                    <ListItemSecondaryAction>
+                                                        <Typography
+                                                            variant="body2"
+                                                            color={!item.done ? "green" : "textSecondary"}
+                                                        >
+                                                            {!item.done ? "Active" : "Done"}
+                                                        </Typography>
+                                                    </ListItemSecondaryAction>
+                                                </ListItem>
+                                            );
+                                        })}
                                 </List>
                             ) : (
-                                <Typography variant="body2">
-                                    No backlog items found.
-                                </Typography>
+                                <Typography variant="body2">No backlog items found.</Typography>
                             )}
                         </CardContent>
                     </Card>

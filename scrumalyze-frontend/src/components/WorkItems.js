@@ -8,6 +8,9 @@ import {
     Typography,
     Grid,
     Chip,
+    List,
+    ListItem,
+    ListItemText
 } from '@mui/material';
 import { TeamContext } from '../context/TeamContext';
 import { GlobalContext } from '../context/GlobalContext';
@@ -16,9 +19,6 @@ import AssignedPersons from './AssignedPersons.js';
 const WorkItems = () => {
     const { teamData, loading } = useContext(TeamContext);
     const { workItemTypes } = useContext(GlobalContext);
-
-
-    console.log(teamData.workItems);
 
     if (loading) {
         return (
@@ -32,8 +32,8 @@ const WorkItems = () => {
         <Grid container spacing={3} sx={{ padding: 2 }}>
             {teamData.workItems.map((workItem) => {
                 const workItemType = workItemTypes.find(type => type.workItemTypeID === workItem.workItemTypeID);
-                const acceptanceCriteria = teamData.acceptanceCriteria.find(ac => ac.acceptanceCriteriaID === workItem.acceptanceCriteriaID);
-                const definitionOfDone = teamData.dodList.find(dod => dod.definitionOfDoneID === workItem.definitionOfDoneID);
+                const acceptanceCriterias = teamData.acceptanceCriteria.find(ac => ac.acceptanceCriteriaID === workItem.acceptanceCriteriaID);
+                const definitionsOfDone = teamData.dodList.find(dod => dod.definitionOfDoneID === workItem.definitionOfDoneID);
                 const timebox = teamData.timeboxes.find(tb => tb.timeboxID === workItem.timeboxID);
 
                 return (
@@ -46,34 +46,12 @@ const WorkItems = () => {
                                 <Typography variant="body2" color="textSecondary">
                                     Type: {workItemType ? workItemType.typeName : 'N/A'}
                                 </Typography>
+                                {workItem.deadline ?
                                 <Typography variant="body2" color="textSecondary">
-                                    Deadline: {workItem.deadline ? new Date(workItem.deadline).toLocaleDateString() : 'None'}
+                                    Deadline:  {new Date(workItem.deadline).toLocaleDateString()}
                                 </Typography>
-                                <Typography variant="body2" color="textSecondary" gutterBottom>
-                                    Status: {workItem.done ? 'Done' : 'In Progress'}
-                                </Typography>
+                                 : ''}
 
-                                {acceptanceCriteria && (
-                                    <Box mt={1}>
-                                        <Typography variant="subtitle2" color="textPrimary">
-                                            Acceptance Criteria
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {acceptanceCriteria.constraintDescription}
-                                        </Typography>
-                                    </Box>
-                                )}
-
-                                {definitionOfDone && (
-                                    <Box mt={1}>
-                                        <Typography variant="subtitle2" color="textPrimary">
-                                            Definition of Done
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {definitionOfDone.constraintDescription}
-                                        </Typography>
-                                    </Box>
-                                )}
 
                                 {timebox && (
                                     <Box mt={1}>
@@ -86,16 +64,62 @@ const WorkItems = () => {
                                     </Box>
                                 )}
 
+                                {/* Acceptance Criteria Section */}
+                                {Array.isArray(teamData.acceptanceCriteria) && teamData.acceptanceCriteria.length > 0 && (
+                                    <Box mt={2}>
+                                        <Typography variant="subtitle2" color="textPrimary">
+                                            Acceptance Criteria
+                                        </Typography>
+                                        <List dense>
+                                            {teamData.acceptanceCriteria.map((criteria) => (
+                                                <ListItem
+                                                    key={criteria.acceptanceCriteriaID}
+                                                    sx={{
+                                                        bgcolor: 'background.paper',
+                                                        borderRadius: 1,
+                                                        mb: 1,
+                                                    }}
+                                                >
+                                                    <ListItemText primary={criteria.constraintDescription} />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    </Box>
+                                )}
+
+                                {/* Definition of Done Section */}
+                                {Array.isArray(teamData.dodList) && teamData.dodList.length > 0 && (
+                                    <Box mt={2}>
+                                        <Typography variant="subtitle2" color="textPrimary">
+                                            Definition of Done
+                                        </Typography>
+                                        <List dense>
+                                            {teamData.dodList.map((dod) => (
+                                                <ListItem
+                                                    key={dod.definitionOfDoneID}
+                                                    sx={{
+                                                        bgcolor: 'background.paper',
+                                                        borderRadius: 1,
+                                                        mb: 1,
+                                                    }}
+                                                >
+                                                    <ListItemText primary={dod.constraintDescription} />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    </Box>
+                                )}
+
                                 {
                                     <AssignedPersons 
-                                        personWorkItems={workItem.personWorkItems} 
+                                        workItemPersons={workItem.persons} 
                                         persons={teamData.persons} 
                                     />
                                 }
 
                             </CardContent>
                             <CardActions sx={{ mt: 'auto' }}>
-                                <Chip label={workItem.done ? 'Completed' : 'In Progress'} color={workItem.done ? 'success' : 'warning'} />
+                                <Chip label={workItem.done ? 'Done' : 'In Progress'} color={workItem.done ? 'success' : 'warning'} />
                             </CardActions>
                         </Card>
                     </Grid>

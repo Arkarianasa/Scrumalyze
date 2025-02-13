@@ -1,4 +1,5 @@
-﻿using Scrumalyze.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Scrumalyze.Data;
 using Scrumalyze.Models;
 
 namespace Scrumalyze.Services
@@ -14,17 +15,21 @@ namespace Scrumalyze.Services
 
         public List<ScrumTeam> GetAllScrumTeams()
         {
-            return _context.ScrumTeam.ToList(); // Fetch all ScrumTeams
+            return [.. _context.ScrumTeam]; // Fetch all ScrumTeams
         }
 
         public List<WorkItemType> GetAllWorkItemTypes()
         {
-            return _context.WorkItemType.ToList(); // Fetch all WorkItemTypes
+            return [.. _context.WorkItemType]; // Fetch all WorkItemTypes
         }
 
         public List<ScrumRole> GetAllScrumRoles()
         {
-            return _context.ScrumRole.ToList(); // Fetch all ScrumRoles
+            return [.. _context.ScrumRole.Where(role => role.ScrumTeamID == null)];
+        }
+        public List<PrioritizationScheme> GetAllPrioritizationSchemes()
+        {
+            return [.. _context.PrioritizationScheme.Include(ps => ps.PrioritizationLevels)]; // Fetch all PrioritizationSchemes
         }
     }
 }

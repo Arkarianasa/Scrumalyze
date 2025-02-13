@@ -1,6 +1,6 @@
 DECLARE @sql NVARCHAR(MAX) = N'';
 
--- Generate a script to drop all foreign keys
+-- Script to drop all foreign keys
 SELECT @sql += 'ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(parent_object_id)) + '.' + QUOTENAME(OBJECT_NAME(parent_object_id)) +
                ' DROP CONSTRAINT ' + QUOTENAME(name) + ';' + CHAR(13)
 FROM sys.foreign_keys;
@@ -10,7 +10,11 @@ EXEC sp_executesql @sql;
 
 -- Drop tables in the correct order
 DROP TABLE IF EXISTS Communication;
-DROP TABLE IF EXISTS PersonWorkItem;
+DROP TABLE IF EXISTS WorkItem_DefinitionOfDone;
+DROP TABLE IF EXISTS WorkItem_AcceptanceCriteria;
+DROP TABLE IF EXISTS PrioritizationScheme;
+DROP TABLE IF EXISTS PrioritizationLevel;
+DROP TABLE IF EXISTS WorkItem_Person;
 DROP TABLE IF EXISTS WorkItem;
 DROP TABLE IF EXISTS WorkItemType;
 DROP TABLE IF EXISTS ProcessStep;

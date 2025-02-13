@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography, List, ListItem, ListItemAvatar, ListItemText, Avatar } from '@mui/material';
 
-const AssignedPersons = ({ personWorkItems, persons }) => {
-    if (personWorkItems.length === 0) {
+const AssignedPersons = ({ workItemPersons, persons }) => {
+    if (workItemPersons.length === 0) {
         return null; // Return nothing if there are no assigned persons
     }
 
@@ -12,7 +12,7 @@ const AssignedPersons = ({ personWorkItems, persons }) => {
                 Assigned Persons
             </Typography>
             <List>
-                {personWorkItems.map((item) => {
+                {workItemPersons.map((item) => {
                     const person = persons.find(p => p.personID === item.personID);
                     return person ? (
                         <ListItem key={person.personID}>

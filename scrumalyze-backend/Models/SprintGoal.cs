@@ -11,7 +11,7 @@ namespace Scrumalyze.Models
         public int SprintGoalID { get; set; }
         public string Description { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public int CreatedByPersonID { get; set; }
-        public required Person CreatedByPerson { get; set; }
+        public int? ResponsiblePersonID { get; set; }
+        public Person? ResponsiblePerson { get; set; }
     }
 }

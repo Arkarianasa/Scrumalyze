@@ -5,6 +5,7 @@ import { GlobalContext } from '../context/GlobalContext';
 
 import TeamTab from './TeamTab';
 import TeamDashboard from './TeamDashboard';
+import TestsOverview from './TestsOverview';
 import ProblemsOverview from './ProblemsOverview';
 import WorkItems from './WorkItems';
 import SprintsDashboard from './SprintsDashboard';
@@ -22,10 +23,12 @@ const TeamDashboardPage = () => {
             case 0:
                 return <TeamDashboard />;
             case 1:
-                return <ProblemsOverview />;
+                return <TestsOverview />;
             case 2:
-                return <WorkItems />;
+                return <ProblemsOverview />;
             case 3:
+                return <WorkItems />;
+            case 4:
                 return <SprintsDashboard />;
             default:
                 return <TeamDashboard />;
@@ -66,6 +69,7 @@ const TeamDashboardPage = () => {
                 {/* Fixed Header */}
                 <Typography
                     variant="h4"
+                    color="primary"
                     sx={{
                         padding: '10px',
                         position: 'fixed',

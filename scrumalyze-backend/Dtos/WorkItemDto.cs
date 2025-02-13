@@ -2,14 +2,14 @@
 {
     public class WorkItemDto
     {
-        public required string Description { get; set; }
-        public int? TimeboxDtoID { get; set; }
         public int? BacklogItemDtoID { get; set; }
-        public int WorkItemTypeID { get; set; }
-        public DateTime Deadline { get; set; }
+        public int? TimeboxDtoID { get; set; }
+        public required List<string> AcceptanceCriterias { get; set; }
+        public DateTime? Deadline { get; set; }
+        public required List<int> DefinitionOfDoneIDs { get; set; }
+        public required string Description { get; set; }
         public bool Done { get; set; }
+        public int? WorkItemTypeID { get; set; }
         public required List<PersonDto> WorkingPersons { get; set; }
-        public int? AcceptanceCriteriaID { get; set; }
-        public int? DefinitionOfDoneID { get; set; }
     }
 }
