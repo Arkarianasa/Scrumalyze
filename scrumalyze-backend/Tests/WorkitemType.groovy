@@ -7,45 +7,75 @@ import groovy.json.JsonOutput
  * Returns a Major severity if any work item is missing its WorkItemType.
  *
  * Usage: groovy WorkitemType.groovy <path_to_json_file>
+ *
+ * @param teamData A Map containing:
+ *   - WorkItems: A list of work items, each possibly with a 'WorkItemType'.
+ * @return A map representing the evaluation result with standard fields.
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
     // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Work Item Type Check"
-    def descriptionPass = "All work items have a work item type set."
-    def descriptionFail = "One or more work items do not have a work item type set."
+    def severityFail = "Major"
+    def definition = """
+        This check ensures that every work item is assigned a valid work item 
+        type. Missing or null WorkItemType can lead to confusion about the 
+        nature and intended handling of the item.
+    """.stripIndent().trim()
+
+    def possibleRootCauses = [
+        "Work items were created without specifying a type.",
+        "Team members are not aware of the requirement to set a work item type.",
+        "Team members are not using work item types."
+    ]
+
+    // We'll collect work items that lack a type
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
-    // 2. Retrieve work items and evaluate
+    // 2. Evaluate all Work Items
     // ----------------------------------------------------------------------------
+    def teamName = teamData.team?.TeamName ?: "Unknown Team"
+    System.err.println "Starting work item type check for team '${teamName}'"
+
     def workItems = teamData.WorkItems ?: []
-    def anyMissingType = workItems.any { wi ->
-        // Fails if WorkItemType is null or not set.
-        !wi.WorkItemType
+    workItems.each { wi ->
+        if (!wi.WorkItemType) {
+            // If missing, record a symptom
+            def itemDesc = wi.Description ?: "No Description"
+            symptoms << "WorkItem '${itemDesc}' does not have a WorkItemType."
+        }
     }
 
     // ----------------------------------------------------------------------------
     // 3. Determine pass/fail
     // ----------------------------------------------------------------------------
-    def passed = !anyMissingType
-    def severity = passed ? "None" : "Major"
-    def outcomeDescription = passed ? descriptionPass : descriptionFail
+    def passed = symptoms.isEmpty()
+    def severity = passed ? "None" : severityFail
+    def outcomeDescription = passed
+        ? "All work items have a work item type set."
+        : "One or more work items do not have a work item type set."
 
     // ----------------------------------------------------------------------------
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
         name               : name,
+        definition         : definition,
         severity           : severity,
         passed             : passed,
         outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+System.err.println "Script started..."
+
 if (args.length < 1) {
     System.err.println "Usage: groovy WorkitemType.groovy <path_to_json_file>"
     System.exit(1)
@@ -55,5 +85,8 @@ def jsonFilePath = args[0]
 def fileContent = new File(jsonFilePath).text
 def teamData = new JsonSlurper().parseText(fileContent)
 
+// Execute the evaluation
 def result = evaluate(teamData)
+System.err.println "Evaluation complete."
+
 println JsonOutput.toJson(result)

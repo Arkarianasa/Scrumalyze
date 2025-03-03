@@ -11,7 +11,7 @@ const StepProductBacklog = ({ formValues, handleChange }) => {
             <TextField
                 style={{ marginBottom: '20px' }}
                 select
-                label="Product Goal"
+                label="Related Product Goal"
                 variant="outlined"
                 fullWidth
                 value={formValues.productBacklog.productGoalID}
@@ -22,6 +22,9 @@ const StepProductBacklog = ({ formValues, handleChange }) => {
                     })
                 }
             >
+                <MenuItem value={null}>
+                    None
+                </MenuItem>
                 {formValues.productGoals.map((goal, index) => (
                     <MenuItem key={index} value={index}>
                         {goal.description}
@@ -88,32 +91,34 @@ const StepProductBacklog = ({ formValues, handleChange }) => {
             </TextField>
 
             {/* Dropdown for Secondary Prioritization Scheme */}
-            <TextField
-                style={{ marginBottom: '20px' }}
-                select
-                label="Secondary Prioritization Scheme"
-                variant="outlined"
-                fullWidth
-                value={formValues.productBacklog.secondaryPrioritizationSchemeID}
-                onChange={(e) =>
-                    handleChange('productBacklog', {
-                        ...formValues.productBacklog,
-                        secondaryPrioritizationSchemeID: e.target.value,
-                    })
-                }
-            >
-                <MenuItem value={null}>
-                    None
-                </MenuItem>
-                {prioritizationSchemes.map((scheme, index) => (
-                    <MenuItem key={index} value={scheme.prioritizationSchemeID}>
-                        {scheme.schemeName}{' '}
-                        {scheme.prioritizationLevels.length > 0
-                            ? `[${scheme.prioritizationLevels.map(level => level.levelName).join(', ')}]`
-                            : ''}
-                    </MenuItem>
-                ))}
-            </TextField>
+            {formValues.productBacklog.primaryPrioritizationSchemeID && (
+                <TextField
+                    style={{ marginBottom: '20px' }}
+                    select
+                    label="Secondary Prioritization Scheme"
+                    variant="outlined"
+                    fullWidth
+                    value={formValues.productBacklog.secondaryPrioritizationSchemeID}
+                    onChange={(e) =>
+                        handleChange('productBacklog', {
+                            ...formValues.productBacklog,
+                            secondaryPrioritizationSchemeID: e.target.value,
+                        })
+                    }
+                >
+                    <MenuItem value={null}>None</MenuItem>
+                    {prioritizationSchemes.map((scheme, index) => (
+                        <MenuItem key={index} value={scheme.prioritizationSchemeID}>
+                            {scheme.schemeName}{' '}
+                            {scheme.prioritizationLevels.length > 0
+                                ? `[${scheme.prioritizationLevels
+                                      .map((level) => level.levelName)
+                                      .join(', ')}]`
+                                : ''}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            )}
         </Box>
     );
 };

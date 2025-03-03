@@ -28,7 +28,7 @@ const StepProductGoals = ({ formValues, handleChange }) => {
         <Box>
             {formValues.productGoals.map((goal, index) => (
                 <Grid container spacing={2} key={index} style={{ marginBottom: '20px', alignItems: 'center' }}>
-                    <Grid item xs={7}>
+                    <Grid item xs={8}>
                         <TextField
                             label="Product Goal Description"
                             variant="outlined"
@@ -38,7 +38,7 @@ const StepProductGoals = ({ formValues, handleChange }) => {
                             required
                         />
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
                         <TextField
                             select
                             label="Responsible Person"

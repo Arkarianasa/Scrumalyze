@@ -1,4 +1,3 @@
-
 CREATE TABLE ScrumTeam (
     ScrumTeamID INT PRIMARY KEY IDENTITY(1,1),
     TeamName NVARCHAR(255) NOT NULL,
@@ -141,15 +140,24 @@ CREATE TABLE BacklogItem (
     FOREIGN KEY (SprintBacklogID) REFERENCES SprintBacklog(SprintBacklogID)
 );
 
+CREATE TABLE ProcessStepType (
+    ProcessStepTypeID INT PRIMARY KEY IDENTITY(1,1),
+	ProcessStepName NVARCHAR(100) NOT NULL,
+);
+
 CREATE TABLE ProcessStep (
     ProcessStepID INT PRIMARY KEY IDENTITY(1,1),
-	ProcessStepName NVARCHAR(100) NOT NULL,
-    SprintID INT NOT NULL,
-	StartDate DATETIME NOT NULL,
-    EndDate DATETIME NULL,
+	ScrumTeamID INT NOT NULL,
+	ProcessStepTypeID INT NOT NULL,
 	TimeboxID INT NULL,
-	GuidedByPersonID INT NULL,
-    FOREIGN KEY (SprintID) REFERENCES Sprint(SprintID),
+	AverageDuration FLOAT NOT NULL, -- Duration in hours (0.25 means 15 minutes)
+	GuidedByPersonID INT NULL, -- NULL means whole team is responsible
+	ReviewsIncrement BIT NOT NULL DEFAULT 0, -- DailySCRUM
+	UpdatesProductBacklog BIT NOT NULL DEFAULT 0, -- BacklogRefinement
+	AdjustsProductGoal BIT NOT NULL DEFAULT 0, -- SprintReview
+	CreatesSprintGoal BIT NOT NULL DEFAULT 0, -- SprintPlanning
+	ImprovesSprint BIT NOT NULL DEFAULT 0, -- SprintRetrospective
+	FOREIGN KEY (ScrumTeamID) REFERENCES ScrumTeam(ScrumTeamID),
 	FOREIGN KEY (TimeboxID) REFERENCES Timebox(TimeboxID),
 	FOREIGN KEY (GuidedByPersonID) REFERENCES Person(PersonID)
 );
@@ -202,8 +210,39 @@ CREATE TABLE Communication (
     CommunicationID INT PRIMARY KEY IDENTITY(1,1),
     SourcePersonID INT NOT NULL,
     TargetPersonID INT NOT NULL,
-    CommunicationDescription NVARCHAR(255) NULL,
     FOREIGN KEY (SourcePersonID) REFERENCES Person(PersonID),
     FOREIGN KEY (TargetPersonID) REFERENCES Person(PersonID)
 );
 
+CREATE TABLE ScrumEvaluation
+(
+    ScrumEvaluationID INT PRIMARY KEY IDENTITY(1,1),
+
+    ScrumTeamID INT NOT NULL,
+
+    -- The date/time for the entire evaluation run
+    [EvaluatedOn] DATETIME2 NOT NULL CONSTRAINT DF_ScrumEvaluationTest_EvaluatedOn DEFAULT (SYSUTCDATETIME()),
+
+    ScorePercentage INT NOT NULL DEFAULT (0),
+
+	FOREIGN KEY (ScrumTeamID) REFERENCES ScrumTeam(ScrumTeamID)
+);
+
+CREATE TABLE ScrumEvaluationTest
+(
+    ScrumEvaluationTestID INT PRIMARY KEY IDENTITY(1,1),
+
+	ScrumEvaluationID INT NOT NULL,
+
+    [Name] NVARCHAR(255) NOT NULL,
+    [Definition] NVARCHAR(MAX) NOT NULL,
+    Severity NVARCHAR(50) NOT NULL,
+    Passed BIT NOT NULL,
+    OutcomeDescription NVARCHAR(MAX) NOT NULL,
+
+    -- Arrays of strings stored as JSON text
+    SymptomsJson NVARCHAR(MAX) NULL, 
+    PossibleRootCausesJson NVARCHAR(MAX) NULL,
+
+	FOREIGN KEY (ScrumEvaluationID) REFERENCES ScrumEvaluation(ScrumEvaluationID)
+);

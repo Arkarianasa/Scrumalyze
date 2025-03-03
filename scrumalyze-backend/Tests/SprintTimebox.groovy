@@ -7,104 +7,140 @@ import java.time.temporal.ChronoUnit
 
 /**
  * Checks whether each Sprint:
- *   1) Has a Timebox assigned (i.e., TimeboxID is not null).
- *   2) The actual duration (in hours) of the Sprint (difference between StartDate and EndDate, in days, times team.WorkDayHours)
- *      does not exceed the Timebox's duration property.
+ *  1) Has a non-null Timebox (i.e., TimeboxID and a referenced Timebox object).
+ *  2) Does not exceed the timebox duration (based on start/end date difference 
+ *     multiplied by team.WorkDayHours).
  *
- * Fails if either condition is not met for any Sprint.
+ * Fails with:
+ *  - "Major" severity if any sprint is missing a timebox.
+ *  - "Minor" severity if no sprint is missing a timebox but at least one sprint exceeds its timebox duration.
+ *  - Otherwise, passes with "None".
  *
  * Usage: groovy SprintTimebox.groovy <path_to_json_file>
  *
  * @param teamData A Map containing:
- *                 - team -> Sprints (array of sprints)
- *                 - team -> WorkDayHours (number of hours per day)
- * @return A map (as JSON) with the fields:
+ *   - team -> Sprints (list of sprints, each potentially having TimeboxID, Timebox)
+ *   - team -> WorkDayHours (number of hours per day; defaults to 8 if absent)
+ * @return A map (as JSON) with standard fields:
  *         - name
+ *         - definition
  *         - severity
  *         - passed
  *         - outcomeDescription
+ *         - symptoms
+ *         - possibleRootCauses
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
-    // 1. Define Metadata
+    // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Sprint Timebox Check"
-    def severity = "Major"
-    def descriptionPass = "All sprints reference a Timebox and are within the allocated timebox duration."
-    def descriptionFailNoTimebox = "One or more sprints do not reference a timebox."
-    def descriptionFailDuration = "One or more sprints exceed the allocated timebox duration."
+    def definition = """
+        This check ensures that each Sprint references a defined Timebox (i.e., 
+        TimeboxID and Timebox object) and that its actual duration (start-to-end 
+        dates multiplied by the team's daily working hours) does not exceed the 
+        Timebox's allocated duration.
+    """.stripIndent().trim()
+
+    // Potential reasons for missing or exceeding timeboxes
+    def possibleRootCauses = [
+        "Sprints were set up without linking to a timebox.",
+        "Team does not use any timebox for their Sprints.",
+        "Timebox duration was underestimated or the Sprint ran longer than planned.",
+        "Dates for the Sprint (start/end) or the timebox are entered incorrectly."
+    ]
+
+    // We'll gather info about which sprints fail each condition
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
-    // 2. Parse relevant data
+    // 2. Retrieve data
     // ----------------------------------------------------------------------------
+    def teamName = teamData.team?.TeamName ?: "Unknown Team"
+    System.err.println "Starting timebox check for team '${teamName}'"
+
     def sprints = teamData.team?.Sprints ?: []
-    def workDayHours = teamData.team?.WorkDayHours ?: 8 // Default to 8 if missing
+    def workDayHours = teamData.team?.WorkDayHours ?: 8
 
-    // Helper method to parse date strings
+    // Helper method for date parsing
     def parseDateTime = { dtString ->
-        if(!dtString) return null
+        if (!dtString) return null
         LocalDateTime.parse(dtString, DateTimeFormatter.ISO_DATE_TIME)
     }
 
+    // Flags to track whether we have major/minor conditions
+    def missingTimeboxFound = false
+    def exceedTimeboxFound = false
+
     // ----------------------------------------------------------------------------
-    // 3. Check conditions for each sprint
+    // 3. Evaluate each sprint
     // ----------------------------------------------------------------------------
+    sprints.each { sprint ->
+        def sprintName = sprint.SprintGoal.Description ?: "that started on " + sprint.StartDate
 
-    // Condition A: Any sprint missing TimeboxID or no actual Timebox reference?
-    def anyMissingTimebox = sprints.any { sprint ->
-        !sprint.TimeboxID || !sprint.Timebox
-    }
+        // Condition A: Missing Timebox
+        if (!sprint.TimeboxID || !sprint.Timebox) {
+            missingTimeboxFound = true
+            symptoms << "Sprint '${sprintName}' is missing a valid timebox (TimeboxID or Timebox object)."
+            // If this sprint is missing a timebox, we don't need to check the next condition for it
+            return
+        }
 
-    // Condition B: Any sprint that exceeds the timebox duration?
-    def anyExceedTimeboxDuration = sprints.any { sprint ->
-        // Skip if timebox is missing or has no duration
-        if (!sprint.TimeboxID || !sprint.Timebox?.Duration) return false
+        // Condition B: Timebox exceeded
+        def timeboxHours = sprint.Timebox?.Duration
+        if (timeboxHours == null) {
+            // If we can't confirm a duration, skip the exceed check for this sprint
+            return
+        }
 
-        // Parse start/end, calculate difference in days
+        // Calculate actual hours from start/end date
         def startDt = parseDateTime(sprint.StartDate)
         def endDt   = parseDateTime(sprint.EndDate)
-        if (!startDt || !endDt) return false  // If dates can't be parsed, skip or consider failing
+        if (startDt && endDt) {
+            def daysBetween = ChronoUnit.DAYS.between(startDt, endDt)
+            def actualHours = daysBetween * workDayHours
 
-        def daysBetween = ChronoUnit.DAYS.between(startDt, endDt)
-        def actualHours = daysBetween * workDayHours
-        def timeboxHours = sprint.Timebox.Duration
-
-        // True if actual sprint hours exceed timebox hours
-        actualHours > timeboxHours
+            if (actualHours > timeboxHours) {
+                exceedTimeboxFound = true
+                symptoms << "Sprint '${sprintName}' (actual ${actualHours}h) exceeds timebox limit (${timeboxHours}h)."
+            }
+        }
     }
 
     // ----------------------------------------------------------------------------
-    // 4. Determine pass/fail
+    // 4. Determine pass/fail severity
     // ----------------------------------------------------------------------------
-    def passed
-    def outcomeDescription
+    // If any sprint is missing a timebox, that's a Major fail
+    def severity = "None"
+    def outcomeDescription = "All sprints reference a timebox and are within the allocated duration."
 
-    if (anyMissingTimebox) {
-        passed = false
-        outcomeDescription = descriptionFailNoTimebox
-    } else if (anyExceedTimeboxDuration) {
-        passed = false
+    if (missingTimeboxFound) {
+        severity = "Major"
+        outcomeDescription = "One or more sprints do not reference a timebox."
+    } else if (exceedTimeboxFound) {
         severity = "Minor"
-        outcomeDescription = descriptionFailDuration
-    } else {
-        passed = true
-        outcomeDescription = descriptionPass
+        outcomeDescription = "One or more sprints exceed the allocated timebox duration."
     }
+
+    def passed = (severity == "None")
 
     // ----------------------------------------------------------------------------
     // 5. Return the result
     // ----------------------------------------------------------------------------
     return [
         name               : name,
+        definition         : definition,
         severity           : severity,
         passed             : passed,
-        outcomeDescription : outcomeDescription
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 System.err.println "Script started..."
 
 if (args.length < 1) {

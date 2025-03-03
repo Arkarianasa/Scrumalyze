@@ -3,77 +3,96 @@ import groovy.json.JsonSlurper
 import groovy.json.JsonOutput
 
 /**
- * Checks whether each Sprint has a non-null and non-empty Sprint Goal.
+ * Checks whether each Sprint has a non-null and non-empty SprintGoal.
  * Fails if any Sprint's SprintGoal is null or an empty string.
  *
  * Usage: groovy SprintGoalExists.groovy <path_to_json_file>
  *
  * @param teamData A Map containing a "team" object that may have "Sprints".
- * @return A map with the following fields:
- *         - name
- *         - severity
- *         - passed
- *         - outcomeDescription
+ * @return A map (converted to JSON) representing the evaluation result.
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
-    // 1. Define metadata
+    // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Sprint Goal Exists Check"
-    def severity = "Critical"
-    def descriptionPass = "All Sprints have a non-empty Sprint Goal."
-    def descriptionFail = "One or more Sprints have a missing or empty Sprint Goal."
+    def severityFail = "Critical"
+    def definition = """
+        This check ensures that each Sprint has a clearly defined, 
+        non-empty Sprint Goal. A missing or empty goal indicates a 
+        lack of focus or clarity for that sprint.
+    """.stripIndent().trim()
+
+    // Potential explanations for why a SprintGoal might be empty or missing
+    def possibleRootCauses = [
+        "Sprint Goal was not recorded by the team.",
+        "Team does not use Sprint Goals for their Sprints."
+    ]
+
+    // We'll collect any sprints that have missing or empty goals
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
-    // 2. Gather sprints
+    // 2. Gather Sprints and evaluate
     // ----------------------------------------------------------------------------
+    def teamName = teamData.team?.TeamName ?: "Unknown Team"
+    System.err.println "Starting sprint goal check for team '${teamName}'"
+
     def sprints = teamData.team?.Sprints ?: []
 
-    // ----------------------------------------------------------------------------
-    // 3. Check each sprint's SprintGoal for null or empty
-    // ----------------------------------------------------------------------------
-    // We fail if any sprint's SprintGoal is null OR an empty string.
-    def anyGoalMissingOrEmpty = sprints.any { sprint ->
+    sprints.each { sprint ->
         def sprintGoal = sprint.SprintGoal
-        // Some data models store the goal as a full object with a "GoalDescription" property.
-        // Others might store it as a simple string. Adjust below as needed.
-        // For safety, handle both possible structures:
+
+        // Check if sprintGoal is missing or empty 
         if (!sprintGoal) {
-            // If completely null, definitely fail
-            return true
+            // Null or falsy
+            symptoms << "Sprint that started '${sprint.StartDate}' has a null or missing SprintGoal."
         } else if (sprintGoal instanceof String) {
-            // If it's a string, check if it's empty
-            return sprintGoal.trim().isEmpty()
+            // If it's a string, check if it's empty or whitespace
+            if (sprintGoal.trim().isEmpty()) {
+                symptoms << "Sprint that started '${sprint.StartDate}' has an empty SprintGoal (string)."
+            }
         } else if (sprintGoal instanceof Map && sprintGoal.containsKey("GoalDescription")) {
-            // Example: "SprintGoal": { "GoalDescription": "..." }
-            return !sprintGoal.GoalDescription || sprintGoal.GoalDescription.trim().isEmpty()
+            // If it's a map with a "GoalDescription" key
+            def goalDesc = sprintGoal.GoalDescription
+            if (!goalDesc || goalDesc.trim().isEmpty()) {
+                symptoms << "Sprint that started '${sprint.StartDate}' has an empty 'GoalDescription' in SprintGoal."
+            }
         } else {
-            // If it's something else, adjust logic if needed. 
-            // If we can't confirm it has content, consider it a fail by default.
-            return false
+            // If it's some other structure we can't verify, mark as questionable
+            // Adjust as needed for your data model
+            // symptoms << "Sprint '${sprintName}' has a SprintGoal in an unknown format."
         }
     }
 
     // ----------------------------------------------------------------------------
-    // 4. Determine pass/fail
+    // 3. Determine pass/fail
     // ----------------------------------------------------------------------------
-    def passed = !anyGoalMissingOrEmpty
-    def outcomeDescription = passed ? descriptionPass : descriptionFail
+    def passed = symptoms.isEmpty()
+    def severity = passed ? "None" : severityFail
+    def outcomeDescription = passed
+        ? "All Sprints have a non-empty Sprint Goal."
+        : "One or more Sprints have a missing or empty Sprint Goal."
 
     // ----------------------------------------------------------------------------
-    // 5. Return result
+    // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
         name               : name,
+        definition         : definition,
         severity           : severity,
         passed             : passed,
-        outcomeDescription : outcomeDescription
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+System.err.println "Script started..."
+
 if (args.length < 1) {
     System.err.println "Usage: groovy SprintGoalExists.groovy <path_to_json_file>"
     System.exit(1)
@@ -84,4 +103,7 @@ def fileContent = new File(jsonFilePath).text
 def teamData = new JsonSlurper().parseText(fileContent)
 
 def result = evaluate(teamData)
+System.err.println "Evaluation complete."
+
+// Print the result as JSON
 println JsonOutput.toJson(result)

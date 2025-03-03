@@ -6,6 +6,8 @@ using Scrumalyze.Dtos;
 using Scrumalyze.Models;
 using Microsoft.EntityFrameworkCore;
 using Scrumalyze.Services;
+using Newtonsoft.Json.Linq;
+using Scrumalyze.Models.Scrumalyze.Classes;
 
 namespace Scrumalyze.Services
 {
@@ -144,69 +146,78 @@ namespace Scrumalyze.Services
         }
         */
 
-        public ScrumEvaluationResult? EvaluateScrumImplementation(int teamID)
+        public ScrumEvaluation? GetLatestEvaluation(int teamID)
         {
-            // Get the Scrum team by team ID
+            // Find the newest ScrumEvaluation row for that team
+            return _context.ScrumEvaluation
+                .Where(e => e.ScrumTeamID == teamID)
+                .OrderByDescending(e => e.EvaluatedOn)
+                .Include(e => e.Tests)
+                .FirstOrDefault();
+        }
+
+        public ScrumEvaluation? EvaluateScrumImplementation(int teamID)
+        {
+            // 1) Load the Scrum Team
             var team = _context.ScrumTeam
                 .Include(st => st.ScrumRoles)
-                .Include(st => st.Persons)
-                    .ThenInclude(p => p.Role)
-                .Include(st => st.ProductGoals)
-                    .ThenInclude(pg => pg.ResponsiblePerson)
-                .Include(st => st.ProductBacklog)
-                    .ThenInclude(pb => pb.BacklogItems)
+                .Include(st => st.Persons).ThenInclude(p => p.Role)
+                .Include(st => st.ProductGoals).ThenInclude(pg => pg.ResponsiblePerson)
+                .Include(st => st.ProductBacklog).ThenInclude(pb => pb.BacklogItems)
                 .Include(st => st.DefinitionsOfDone)
                 .Include(st => st.Timeboxes)
-                .Include(st => st.Sprints)
-                    .ThenInclude(s => s.Timebox)
-                .Include(st => st.Sprints)
-                    .ThenInclude(s => s.SprintGoal)
-                .Include(st => st.Sprints)
-                    .ThenInclude(s => s.ProductGoal)
+                .Include(st => st.Sprints).ThenInclude(s => s.Timebox)
+                .Include(st => st.Sprints).ThenInclude(s => s.SprintGoal)
+                .Include(st => st.Sprints).ThenInclude(s => s.ProductGoal)
                 .Include(st => st.Increments)
                 .FirstOrDefault(t => t.ScrumTeamID == teamID);
-
-            var workItems = _context.WorkItem
-                .Include(wi => wi.Persons)
-                .Include(wi => wi.AcceptanceCriterias)
-                    .ThenInclude(ac => ac.AcceptanceCriteria)
-                .Include(wi => wi.DefinitionsOfDone)
-                    .ThenInclude(dods => dods.DefinitionOfDone)
-                .Include(wi => wi.WorkItemType)
-                .Where(wi => wi.BacklogItem != null
-                             && wi.BacklogItem.ProductBacklog != null
-                             && wi.BacklogItem.ProductBacklog.ScrumTeamID == teamID)
-                .ToList();
-
 
             if (team == null)
                 return null;
 
-            var result = new ScrumEvaluationResult(teamID, team.TeamName);
+            // 2) Also load related WorkItems (if needed by Groovy scripts)
+            var workItems = _context.WorkItem
+                .Include(wi => wi.Persons)
+                .Include(wi => wi.AcceptanceCriterias).ThenInclude(ac => ac.AcceptanceCriteria)
+                .Include(wi => wi.DefinitionsOfDone).ThenInclude(dods => dods.DefinitionOfDone)
+                .Include(wi => wi.WorkItemType)
+                .Where(wi => wi.BacklogItem != null
+                          && wi.BacklogItem.ProductBacklog != null
+                          && wi.BacklogItem.ProductBacklog.ScrumTeamID == teamID)
+                .ToList();
 
+            // 3) Create a new ScrumEvaluation (parent)
+            //    so we keep a record of this run (the "date for all tests")
+            var newEvaluation = new ScrumEvaluation
+            {
+                ScrumTeam = _context.ScrumTeam.FirstOrDefault(t => t.ScrumTeamID == teamID),
+                EvaluatedOn = DateTime.UtcNow,
+                ScorePercentage = 0  // We'll compute later
+            };
+            _context.ScrumEvaluation.Add(newEvaluation);
+            _context.SaveChanges(); // get the ID
+
+            // 4) Build an object to pass to Groovy scripts
             var teamData = new
             {
                 team,
                 WorkItems = workItems
             };
 
-            // Directory where the Groovy scripts are stored
-            string testDirectory = "Tests";
-
-            //Console.WriteLine($"Working Directory: {Directory.GetCurrentDirectory()}");
-
-            // Serialize the data to JSON.
+            // 5) Serialize to JSON file
             var jsonSettings = new JsonSerializerSettings
             {
-                //ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                //PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 Formatting = Formatting.Indented
             };
-
             string json = JsonConvert.SerializeObject(teamData, jsonSettings);
             string jsonFilePath = Path.Combine(Path.GetTempPath(), "teamData.json");
             File.WriteAllText(jsonFilePath, json);
 
+            // Prepare to store test results in a local list, for computing final score
+            var allTestResults = new List<ScrumEvaluationTest>();
+
+            // 6) Run each Groovy script
+            string testDirectory = "Tests";
             if (Directory.Exists(testDirectory))
             {
                 var testFiles = Directory.GetFiles(testDirectory, "*.groovy");
@@ -215,7 +226,6 @@ namespace Scrumalyze.Services
                 {
                     try
                     {
-                        // Create the process to run Groovy
                         var process = new Process
                         {
                             StartInfo = new ProcessStartInfo
@@ -230,40 +240,63 @@ namespace Scrumalyze.Services
                         };
 
                         process.Start();
-
-                        // Read the output
                         string output = process.StandardOutput.ReadToEnd();
                         string error = process.StandardError.ReadToEnd();
-
                         process.WaitForExit();
 
                         if (process.ExitCode == 0)
                         {
-                            // Parse JSON or structured output from Groovy script
-                            dynamic? testResult = Newtonsoft.Json.JsonConvert.DeserializeObject(output);
-
+                            // Try parse the JSON from the script
+                            var testResult = Newtonsoft.Json.Linq.JObject.Parse(output);
                             if (testResult != null)
                             {
-                                bool passed = (bool)testResult.passed;
-                                string name = (string)testResult.name;
-                                string desc = (string)testResult.outcomeDescription;
-                                string severity = passed? "None" : (string)testResult.severity;
+                                bool passed = (bool)testResult["passed"];
+                                string name = (string)testResult["name"];
+                                string definition = (string)testResult["definition"];
+                                string severity = passed ? "None" : (string)testResult["severity"];
+                                string outcomeDescription = (string)testResult["outcomeDescription"];
 
-                                result.AddTest(
-                                    name,
-                                    desc,
-                                    passed,
-                                    Enum.Parse<SeverityLevel>(severity, true)
-                                );
+                                // Arrays
+                                var symptomsArray = testResult["symptoms"] as Newtonsoft.Json.Linq.JArray;
+                                var rootCausesArray = testResult["possibleRootCauses"] as Newtonsoft.Json.Linq.JArray;
+
+                                var symptoms = (symptomsArray != null)
+                                    ? symptomsArray.ToObject<List<string>>()
+                                    : new List<string>();
+
+                                var rootCauses = (rootCausesArray != null)
+                                    ? rootCausesArray.ToObject<List<string>>()
+                                    : new List<string>();
+
+                                // Build child entity
+                                var childTest = new ScrumEvaluationTest
+                                {
+                                    ScrumEvaluationID = newEvaluation.ScrumEvaluationID,
+                                    ScrumEvaluation = newEvaluation,
+                                    Name = name,
+                                    Definition = definition,
+                                    Severity = severity,
+                                    Passed = passed,
+                                    OutcomeDescription = outcomeDescription,
+                                    Symptoms = symptoms,
+                                    PossibleRootCauses = rootCauses
+                                };
+
+                                // Insert into DB
+                                _context.ScrumEvaluationTest.Add(childTest);
+                                _context.SaveChanges();
+
+                                // Keep in memory list to compute final score
+                                allTestResults.Add(childTest);
                             }
                             else
                             {
-                                Console.WriteLine($"Failed to parse Groovy script output from file {testFile}: {output}");
+                                Console.WriteLine($"Failed to parse output from {testFile}:\n{output}");
                             }
                         }
                         else
                         {
-                            Console.WriteLine($"Error in Groovy script {testFile}: {error}");
+                            Console.WriteLine($"Error in Groovy script {testFile}:\n{error}");
                         }
                     }
                     catch (Exception ex)
@@ -277,9 +310,26 @@ namespace Scrumalyze.Services
                 Console.WriteLine($"Test directory '{testDirectory}' does not exist.");
             }
 
-            return result;
+            // 7) Compute final ScorePercentage from how many tests passed
+            if (allTestResults.Count > 0)
+            {
+                int passedCount = allTestResults.Count(tr => tr.Passed);
+                int percentage = (passedCount * 100) / allTestResults.Count;
+                newEvaluation.ScorePercentage = percentage;
+            }
+            else
+            {
+                newEvaluation.ScorePercentage = 0;
+            }
+
+            // Update DB with final score
+            _context.SaveChanges();
+
+            // 8) Return the new parent record with final data
+            return newEvaluation;
         }
-        
+
+
 
         /*
         public ScrumEvaluationResult? EvaluateScrumImplementation(int teamID)
@@ -308,7 +358,7 @@ namespace Scrumalyze.Services
             return result;
         }
         */
-
+        /*
         private void EvaluateDefinitionOfDone(ScrumEvaluationResult result, int scrumTeamId)
         {
             var workItemsWithoutDoD = _context.WorkItem
@@ -596,7 +646,7 @@ namespace Scrumalyze.Services
                 {
                     bool receivedByStakeholders = true;
                     // If there is a responsible person, check if that person is a Stakeholder
-                    /*foreach (var increment in increments.Where(i => i.ReceivedByID != null))
+                    foreach (var increment in increments.Where(i => i.ReceivedByID != null))
                     {
                         // TODO
                         var person = _context.Person.FirstOrDefault(p => p.PersonID == increment.ReceivedByID);
@@ -609,7 +659,7 @@ namespace Scrumalyze.Services
                                 break;
                         }
                         
-                    }*/
+                    }
 
                     if (receivedByStakeholders)
                         result.AddTest("Increment Receiver", "Some increments are not received by Stakeholder.", false, SeverityLevel.Minor);
@@ -619,6 +669,6 @@ namespace Scrumalyze.Services
 
             }
         }
-        
+        */
     }
 }

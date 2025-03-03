@@ -4,78 +4,93 @@ import groovy.json.JsonOutput
 
 /**
  * Checks whether each ProductGoal has a responsible person assigned, and that person is a Product Owner.
- * Fails if responsible person is missing or if the assigned person is not a Product Owner.
+ * Fails if any ProductGoal lacks a responsible person or if the assigned person is not a Product Owner.
  *
  * Usage: groovy ProductGoalResponsible.groovy <path_to_json_file>
  *
- * @param teamData A Map containing, among other things, a "team" object that has "ProductGoals".
- * @return A map representing the evaluation result.
+ * @param teamData A Map containing, among other things, a "team" object that may have "ProductGoals".
+ * @return A map representing the evaluation result with the standard fields.
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
-    // 1. Define metadata
+    // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Product Goal Responsible Check"
-    def severity = "Critical"
-    def descriptionPass = "All ProductGoals have a Product Owner as responsible."
-    def descriptionFailMissingResponsible = "One or more ProductGoals do not have a responsible person assigned."
-    def descriptionFailNotProductOwner = "One or more ProductGoals have a responsible person who isn't a Product Owner."
+    def severityFail = "Critical"
+    def definition = """
+        This check ensures that each ProductGoal has a responsible person who 
+        is specifically a 'Product Owner'.
+    """.stripIndent().trim()
+
+    def possibleRootCauses = [
+        "ProductGoal was created without linking a responsible person.",
+        "'Product Owner' role is not set to the Product Owner that is responsible for this goal.",
+        "Whole team is responsible for Product Goal instead of 'Product Owner'."
+    ]
+
+    // We'll track any ProductGoal that fails one of the conditions in 'symptoms'
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
-    // 2. Begin the evaluation
+    // 2. Retrieve ProductGoals
     // ----------------------------------------------------------------------------
     def teamName = teamData.team?.TeamName ?: "Unknown Team"
     System.err.println "Starting ProductGoal responsible check for team '${teamName}'"
 
-    // Retrieve the product goals array (if any)
     def productGoals = teamData.team?.ProductGoals ?: []
     System.err.println "Found ${productGoals.size()} ProductGoal(s)."
 
     // ----------------------------------------------------------------------------
-    // 3. Determine pass/fail
+    // 3. Evaluate each ProductGoal
     // ----------------------------------------------------------------------------
-    // We fail if:
-    //   A) Any ProductGoal has no responsible person, OR
-    //   B) Responsible person is not a Product Owner.
-    // We pass only if all ProductGoals have a responsible person with RoleName == "Product Owner".
+    productGoals.each { pg ->
+        // Use a name or fallback to "Unnamed"
+        def pgName = pg.Description ?: "Unnamed ProductGoal"
 
-    def anyMissingResponsible = productGoals.any { pg -> 
-        pg.ResponsiblePerson == null
-    }
-    def anyNotProductOwner = productGoals.any { pg ->
-        // If there's a ResponsiblePerson, check their role name
-        pg.ResponsiblePerson != null && pg.ResponsiblePerson?.Role?.RoleName != "Product Owner"
+        // Condition A: Missing responsible person
+        if (!pg.ResponsiblePerson) {
+            symptoms << "ProductGoal '${pgName}' has no responsible person assigned."
+        }
+        // Condition B: If responsible person is present, must be 'Product Owner'
+        else {
+            def roleName = pg.ResponsiblePerson?.Role?.RoleName ?: ""
+            if (roleName != "Product Owner") {
+                symptoms << "ProductGoal '${pgName}' is assigned to a role '${roleName}', not 'Product Owner'."
+            }
+        }
     }
 
-    def passed
+    // ----------------------------------------------------------------------------
+    // 4. Determine pass/fail
+    // ----------------------------------------------------------------------------
+    def passed = symptoms.isEmpty()
+    def severity = passed ? "None" : severityFail
     def outcomeDescription
-
-    if (anyMissingResponsible) {
-        passed = false
-        outcomeDescription = descriptionFailMissingResponsible
-    } else if (anyNotProductOwner) {
-        passed = false
-        outcomeDescription = descriptionFailNotProductOwner
+    if (passed) {
+        outcomeDescription = "All ProductGoals have a Product Owner as responsible."
+    } else if (symptoms.any { it.contains("no responsible person") }) {
+        outcomeDescription = "One or more ProductGoals do not have a responsible person assigned."
     } else {
-        // If neither of the fail conditions applies, we pass
-        passed = true
-        outcomeDescription = descriptionPass
+        outcomeDescription = "One or more ProductGoals have a responsible person who isn't a Product Owner."
     }
 
     // ----------------------------------------------------------------------------
-    // 4. Return the evaluation result as a map
+    // 5. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name                              : name,
-        severity                          : severity,
-        passed                            : passed,
-        outcomeDescription                : outcomeDescription
+        name               : name,
+        definition         : definition,
+        severity           : severity,
+        passed             : passed,
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 System.err.println "Script started..."
 
 if (args.length < 1) {

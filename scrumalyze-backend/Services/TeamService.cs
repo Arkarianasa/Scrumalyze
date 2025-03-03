@@ -65,7 +65,7 @@ namespace Scrumalyze.Services
         }
         public List<ProcessStep> GetProcessStepList(int teamID)
         {
-            return [.. _context.ProcessStep.Where(ps => ps.Sprint.ScrumTeamID == teamID)];
+            return [.. _context.ProcessStep.Where(ps => ps.ScrumTeamID == teamID)];
         }
         public List<Increment> GetIncrementList(int teamID)
         {
@@ -187,10 +187,7 @@ namespace Scrumalyze.Services
             {
                 var backlogItem = _mapper.Map<BacklogItem>(backlogItemDto);
 
-                if (backlogItemDto.ProductBacklogID != null)
-                {
-                    backlogItem.ProductBacklog = productBacklog;
-                }
+                backlogItem.ProductBacklog = productBacklog;
 
                 backlogItems.Add(backlogItem);
             }
@@ -421,7 +418,7 @@ namespace Scrumalyze.Services
             {
                 var increment = new Increment
                 {
-                    ScrumTeam = scrumTeam, // Assign ScrumTeam
+                    ScrumTeam = scrumTeam,
                     ScrumTeamID = scrumTeam.ScrumTeamID,
                     Description = incrementDto.Description,
                     Deadline = incrementDto.Deadline
@@ -477,7 +474,95 @@ namespace Scrumalyze.Services
                 // Add Increment to the list
                 increments.Add(increment);
             }
-            
+
+            // Map Communication (CommunicationMatrix)
+            List<Communication> communications = new();
+            if (teamDto.CommunicationMatrix != null)
+            {
+                foreach (var pair in teamDto.CommunicationMatrix)
+                {
+                    // Validate indices
+                    if (pair.SourcePersonID < 0 || pair.SourcePersonID >= persons.Count ||
+                        pair.TargetPersonID < 0 || pair.TargetPersonID >= persons.Count)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid communication pair: source={pair.SourcePersonID}, target={pair.TargetPersonID}."
+                        );
+                    }
+
+                    var communication = new Communication
+                    {
+                        // Source and target persons
+                        SourcePerson = persons[pair.SourcePersonID],
+                        SourcePersonID = persons[pair.SourcePersonID].PersonID,
+
+                        TargetPerson = persons[pair.TargetPersonID],
+                        TargetPersonID = persons[pair.TargetPersonID].PersonID
+                    };
+
+                    communications.Add(communication);
+                }
+            }
+
+            // Map Process Steps
+            List<ProcessStep> processSteps = new();
+            if (teamDto.ProcessSteps != null)
+            {
+                int counter = 0;
+                foreach (var stepDto in teamDto.ProcessSteps)
+                {
+                    var processStep = new ProcessStep
+                    {
+                        ProcessStepTypeID = counter++,
+
+                        ScrumTeam = scrumTeam,
+                        ScrumTeamID = scrumTeam.ScrumTeamID,
+
+                        AverageDuration = stepDto.AverageDuration,
+                        ReviewsIncrement = stepDto.ReviewsIncrement,
+                        UpdatesProductBacklog = stepDto.UpdatesProductBacklog,
+                        AdjustsProductGoal = stepDto.AdjustsProductGoal,
+                        CreatesSprintGoal = stepDto.CreatesSprintGoal,
+                        ImprovesSprint = stepDto.ImprovesSprint
+                    };
+
+                    // If you reference a Timebox by index, validate
+                    if (stepDto.TimeboxID != null)
+                    {
+                        int idx = stepDto.TimeboxID.Value;
+                        if (idx >= 0 && idx < timeboxes.Count)
+                        {
+                            processStep.Timebox = timeboxes[idx];
+                            processStep.TimeboxID = timeboxes[idx].TimeboxID;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Invalid ProcessStep.TimeboxID index: {idx}."
+                            );
+                        }
+                    }
+
+                    // If you reference a guided person by index, validate
+                    if (stepDto.GuidedByPersonID != null)
+                    {
+                        int idx = stepDto.GuidedByPersonID.Value;
+                        if (idx >= 0 && idx < persons.Count)
+                        {
+                            processStep.GuidedByPerson = persons[idx];
+                            processStep.GuidedByPersonID = persons[idx].PersonID;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Invalid ProcessStep.GuidedByPersonID index: {idx}."
+                            );
+                        }
+                    }
+
+                    processSteps.Add(processStep);
+                }
+            }
 
             // Add entities to context
             _context.ScrumTeam.Add(scrumTeam);
@@ -487,6 +572,8 @@ namespace Scrumalyze.Services
             _context.Sprint.AddRange(sprints);
             _context.WorkItem.AddRange(workItems);
             _context.Increment.AddRange(increments);
+            _context.Communication.AddRange(communications);
+            _context.ProcessStep.AddRange(processSteps);
 
             await _context.SaveChangesAsync();
             

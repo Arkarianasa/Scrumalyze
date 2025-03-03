@@ -38,12 +38,16 @@ const StepSprints = ({ formValues, handleChange }) => {
                         <Grid item xs={4}>
                             <TextField
                                 select
-                                label="Product Goal"
+                                label="Related Product Goal"
                                 variant="outlined"
                                 fullWidth
                                 value={sprint.productGoalID}
                                 onChange={(e) => handleSprintChange(index, 'productGoalID', e.target.value)}
                             >
+                                <MenuItem value={null}>
+                                    None
+                                </MenuItem>
+
                                 {formValues.productGoals.map((goal, index) => (
                                     <MenuItem key={index} value={index}>
                                         {goal.description}
@@ -65,7 +69,7 @@ const StepSprints = ({ formValues, handleChange }) => {
 
                                 {formValues.timeboxes.map((timebox, idx) => (
                                     <MenuItem key={idx} value={idx}>
-                                        {timebox.timeboxDescription}
+                                        {timebox.timeboxDescription + "(" + timebox.duration + " work hours)"}
                                     </MenuItem>
                                 ))}
                             </TextField>

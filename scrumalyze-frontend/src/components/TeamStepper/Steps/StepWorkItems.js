@@ -34,7 +34,7 @@ const StepWorkItems = ({ formValues, handleChange }) => {
     const newItem = {
       description: '',
       BacklogItemDtoID: '',
-      workItemTypeID: '',
+      workItemTypeID: null,
       definitionOfDoneIDs: [], // Multiple definitions of done
       acceptanceCriterias: [], // Initialize as an empty array
       done: false,
@@ -102,7 +102,12 @@ const StepWorkItems = ({ formValues, handleChange }) => {
                 onChange={(e) => handleWorkItemChange(index, 'BacklogItemDtoID', e.target.value)}
                 fullWidth
               >
+                <MenuItem value={null}>
+                  None
+                </MenuItem>
+
                 {formValues.backlogItems.map((backlog, i) => (
+                  
                   <MenuItem key={i} value={i}>
                     {backlog.itemName}
                   </MenuItem>
@@ -117,7 +122,7 @@ const StepWorkItems = ({ formValues, handleChange }) => {
                 onChange={(e) => handleWorkItemChange(index, 'workItemTypeID', e.target.value)}
                 fullWidth
               >
-                <MenuItem key="none" value={null}>
+                <MenuItem value={null}>
                   None
                 </MenuItem>
                 {workItemTypes.map((type) => (
@@ -167,7 +172,7 @@ const StepWorkItems = ({ formValues, handleChange }) => {
                     handleAddAcceptanceCriteria(index, e.target.value.trim()); // Add the criteria
                   }
                 }}
-                placeholder="Press Enter to add a new criteria"
+                placeholder="Write new acceptance criteria and press Enter to add it"
                 InputProps={{
                   startAdornment: item.acceptanceCriterias && item.acceptanceCriterias.length > 0 ? (
                     <div className="flex gap-x-2" style={{ marginTop: '6px' }}>
@@ -204,9 +209,9 @@ const StepWorkItems = ({ formValues, handleChange }) => {
                 multiple
                 options={formValues.persons}
                 getOptionLabel={(person) => {
-                  const roleName = person.roleID > formValues.scrumRoles.length 
-                    ? formValues.scrumRoles[person.roleID - formValues.scrumRoles.length - 1]?.roleName 
-                    : formValues.scrumRoles[person.roleID - 1]?.roleName;
+                  const roleName = person.roleID - scrumRoles.length > 0
+                  ? formValues.scrumRoles[person.roleID - scrumRoles.length - 1].roleName
+                  : scrumRoles[person.roleID - 1].roleName;
             
                   return `${person.firstName} ${person.lastName} (${roleName})`;
                 }}

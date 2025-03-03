@@ -8,64 +8,76 @@ import groovy.json.JsonOutput
  *
  * Usage: groovy ProductGoalCheck.groovy <path_to_json_file>
  *
- * @param teamData A Map containing, among other things, a "team" object that has "ProductGoals".
- * @return A map representing the evaluation result.
+ * @param teamData A Map containing a 'team' object that may include 'ProductGoals'.
+ * @return A map representing the evaluation result with standard fields.
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
-    // 1. Define metadata
+    // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Product Goal Count"
-    def severityNone = "Critical"
-    def severityMultiple = "Major"
-    def descriptionPass = "Exactly one ProductGoal is present."
-    def descriptionFailNone = "No ProductGoals found."
-    def descriptionFailMultiple = "Multiple ProductGoals found."
+    def definition = """
+        This check ensures the team has exactly one ProductGoal.
+    """.stripIndent().trim()
+
+    def possibleRootCauses = [
+        "The team has not defined any Product Goals (0 found).",
+        "Multiple product goals have been created and not consolidated into a single overarching goal.",
+        "Data is duplicated or incorrectly recorded, resulting in multiple entries for the same goal."
+    ]
+
+    // We'll use 'symptoms' to log specific conditions, e.g., zero or multiple goals
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
-    // 2. Begin the evaluation
+    // 2. Gather data and evaluate
     // ----------------------------------------------------------------------------
     def teamName = teamData.team?.TeamName ?: "Unknown Team"
     System.err.println "Starting ProductGoal check for team '${teamName}'"
 
-    // Retrieve the product goals array (if any)
     def productGoals = teamData.team?.ProductGoals ?: []
     System.err.println "Found ${productGoals.size()} ProductGoal(s)."
 
     // ----------------------------------------------------------------------------
     // 3. Determine pass/fail
     // ----------------------------------------------------------------------------
-    def passed
-    def outcomeDescription
-    def outcomeSeverity = "None"
+    def passed = false
+    def severity = "None"
+    def outcomeDescription = ""
 
     if (productGoals.size() == 0) {
         passed = false
-        outcomeDescription = descriptionFailNone
-        outcomeSeverity = severityNone
+        severity = "Critical"
+        outcomeDescription = "No ProductGoals found."
+        symptoms << "Team has zero ProductGoals."
     } else if (productGoals.size() == 1) {
         passed = true
-        outcomeDescription = descriptionPass
+        severity = "None"
+        outcomeDescription = "Exactly one ProductGoal is present."
     } else {
         passed = false
-        outcomeDescription = descriptionFailMultiple
-        outcomeSeverity = severityMultiple
+        severity = "Major"
+        outcomeDescription = "Multiple ProductGoals found."
+        symptoms << "Team has ${productGoals.size()} ProductGoals."
     }
 
     // ----------------------------------------------------------------------------
-    // 4. Return the evaluation result as a map
+    // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name                   : name,
-        severity               : outcomeSeverity,
-        passed                 : passed,
-        outcomeDescription     : outcomeDescription
+        name               : name,
+        definition         : definition,
+        severity           : severity,
+        passed             : passed,
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 System.err.println "Script started..."
 
 if (args.length < 1) {

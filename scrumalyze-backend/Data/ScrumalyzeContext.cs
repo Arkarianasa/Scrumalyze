@@ -6,18 +6,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Scrumalyze.Models.Scrumalyze.Classes;
 
 namespace Scrumalyze.Data
 {
     public class ScrumalyzeContext : DbContext
     {
         protected readonly IConfiguration Configuration;
+
+        public DbSet<ScrumTeam> ScrumTeam { get; set; }
+
+        public DbSet<ScrumEvaluation> ScrumEvaluation { get; set; }
+        public DbSet<ScrumEvaluationTest> ScrumEvaluationTest { get; set; }
+
         public DbSet<Timebox> Timebox { get; set; }
         public DbSet<AcceptanceCriteria> AcceptanceCriteria { get; set; }
         public DbSet<DefinitionOfDone> DefinitionOfDone { get; set; }
         public DbSet<PrioritizationScheme> PrioritizationScheme { get; set; }
         public DbSet<PrioritizationLevel> PrioritizationLevel { get; set; }
-        public DbSet<ScrumTeam> ScrumTeam { get; set; }
         public DbSet<ScrumRole> ScrumRole { get; set; }
         public DbSet<Person> Person { get; set; }
         public DbSet<SprintGoal> SprintGoal { get; set; }
@@ -27,6 +33,7 @@ namespace Scrumalyze.Data
         public DbSet<ProductBacklog> ProductBacklog { get; set; }
         public DbSet<SprintBacklog> SprintBacklog { get; set; }
         public DbSet<BacklogItem> BacklogItem { get; set; }
+        public DbSet<ProcessStepType> ProcessStepType { get; set; }
         public DbSet<ProcessStep> ProcessStep { get; set; }
         public DbSet<WorkItemType> WorkItemType { get; set; }
         public DbSet<WorkItem> WorkItem { get; set; }
@@ -52,6 +59,23 @@ namespace Scrumalyze.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ScrumEvaluation>(entity =>
+            {
+                entity.HasKey(e => e.ScrumEvaluationID);
+                entity.Property(e => e.EvaluatedOn)
+                      .HasDefaultValueSql("SYSUTCDATETIME()");
+            });
+
+            modelBuilder.Entity<ScrumEvaluationTest>(entity =>
+            {
+                entity.HasKey(e => e.ScrumEvaluationTestID);
+
+                entity.HasOne(e => e.ScrumEvaluation)
+                      .WithMany(se => se.Tests)
+                      .HasForeignKey(e => e.ScrumEvaluationID)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
             // PrioritizationScheme Primary Key
             modelBuilder.Entity<PrioritizationScheme>()
                 .HasKey(ps => ps.PrioritizationSchemeID);
@@ -161,6 +185,25 @@ namespace Scrumalyze.Data
                 .WithMany(st => st.ScrumRoles)
                 .HasForeignKey(sr => sr.ScrumTeamID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Process Step relations
+            modelBuilder.Entity<ProcessStep>()
+                .HasOne(ps => ps.GuidedByPerson)
+                .WithMany()
+                .HasForeignKey(ps => ps.GuidedByPersonID)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ProcessStep>()
+                .HasOne(ps => ps.ProcessStepType)
+                .WithMany()
+                .HasForeignKey(ps => ps.ProcessStepTypeID)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ProcessStep>()
+                .HasOne(ps => ps.ScrumTeam)
+                .WithMany(st => st.ProcessSteps)
+                .HasForeignKey(ps => ps.ScrumTeamID)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Timebox relationships
             modelBuilder.Entity<Sprint>()

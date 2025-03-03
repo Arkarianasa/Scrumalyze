@@ -8,59 +8,77 @@ import groovy.json.JsonOutput
  *
  * Usage: groovy NewRoles.groovy <path_to_json_file>
  *
- * @param teamData A Map containing, among other things, a "team" object and a list of work items ("WorkItems").
- * @return A map representing the evaluation result.
+ * @param teamData A Map containing, among other things, a "team" object 
+ *        (with "Persons") and a list of work items ("WorkItems").
+ * @return A map representing the evaluation result with standard fields.
  */
-
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
     // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Custom Role Check"
-    def severity = "Major"
-    def descriptionPass = "All Scrum team members have standard roles."
-    def descriptionFail = "One or more Scrum team members have custom (non-standard) roles."
+    def severityFail = "Major"
+    def definition = """
+        This check ensures that Scrum team members only hold standard roles: 
+        'Scrum Master', 'Product Owner', or 'Developer'.
+    """.stripIndent().trim()
+
+    def possibleRootCauses = [
+        "Team does not use standard Scrum roles.",
+        "Some individuals have specialized titles or responsibilities that deviate from Scrum roles.",
+    ]
+
+    // We'll collect any team members who have a non-standard role
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
-    // 2. Begin evaluation
+    // 2. Retrieve Persons and evaluate
     // ----------------------------------------------------------------------------
     def teamName = teamData.team?.TeamName ?: "Unknown Team"
     System.err.println "Starting custom role check for team '${teamName}'"
 
     def persons = teamData.team?.Persons ?: []
 
-    // Defining the standard Scrum roles
+    // Define the standard Scrum roles
     def standardRoles = ["Scrum Master", "Product Owner", "Developer"]
 
-    // Find any persons who are team members but have a role outside the standard list
-    def customRolePersons = persons.findAll { person ->
-        person.IsScrumTeamMember &&
-        person?.Role?.RoleName &&
-        !(person.Role.RoleName in standardRoles)
+    // Identify members who have a custom (non-standard) role
+    persons.each { person ->
+        if (person.IsScrumTeamMember &&
+            person?.Role?.RoleName &&
+            !(person.Role.RoleName in standardRoles)) {
+            symptoms << "Team member '${person.FirstName} ${person.LastName}' has a custom role: '${person.Role.RoleName}'"
+        }
     }
 
     // ----------------------------------------------------------------------------
     // 3. Determine pass/fail
     // ----------------------------------------------------------------------------
-    def passed = customRolePersons.isEmpty()
-    def outcomeDescription = passed ? descriptionPass : descriptionFail
+    def passed = symptoms.isEmpty()
+    def severity = passed ? "None" : severityFail
+    def outcomeDescription = passed
+        ? "All Scrum team members have standard roles."
+        : "One or more Scrum team members have custom (non-standard) roles."
 
-    System.err.println "Found ${customRolePersons.size()} person(s) with custom roles."
+    System.err.println "Found ${symptoms.size()} person(s) with custom roles."
 
     // ----------------------------------------------------------------------------
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name              : name,
-        severity          : severity,
-        passed            : passed,
-        outcomeDescription: outcomeDescription
+        name               : name,
+        definition         : definition,
+        severity           : severity,
+        passed             : passed,
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 System.err.println "Script started..."
 
 if (args.length < 1) {
@@ -68,7 +86,6 @@ if (args.length < 1) {
     System.exit(1)
 }
 
-// Read and parse the JSON file
 def jsonFilePath = args[0]
 def fileContent = new File(jsonFilePath).text
 def teamData = new JsonSlurper().parseText(fileContent)
@@ -77,5 +94,4 @@ def teamData = new JsonSlurper().parseText(fileContent)
 def result = evaluate(teamData)
 System.err.println "Evaluation complete."
 
-// Print the result as JSON
 println JsonOutput.toJson(result)

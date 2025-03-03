@@ -23,6 +23,11 @@ namespace Scrumalyze.Services
             return [.. _context.WorkItemType]; // Fetch all WorkItemTypes
         }
 
+        public List<ProcessStepType> GetAllProcessStepTypes()
+        {
+            return [.. _context.ProcessStepType]; // Fetch all ProcessStepTypes
+        }
+
         public List<ScrumRole> GetAllScrumRoles()
         {
             return [.. _context.ScrumRole.Where(role => role.ScrumTeamID == null)];

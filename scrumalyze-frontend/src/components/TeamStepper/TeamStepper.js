@@ -10,10 +10,12 @@ import StepProductBacklog from './Steps/StepProductBacklog';
 import StepProductBacklogSample from './Steps/StepProductBacklogSample';
 import StepTimeboxes from './Steps/StepTimeboxes';
 import StepSprints from './Steps/StepSprints';
+import StepProcessSteps from './Steps/StepProcessSteps';
 import StepDefinitionsOfDone from './Steps/StepDefinitionsOfDone';
 import StepWorkItems from './Steps/StepWorkItems';
 import StepIncrements from './Steps/StepIncrements';
-const steps = ['SCRUM Team', 'SCRUM Roles', 'Involved Persons', 'Product Goal', 'Product Backlog', 'Product Backlog Sample', 'Timeboxes Sample', 'Sprints Sample', 'Definitions Of Done', 'Work Items Sample', 'Increments Sample'];
+import StepCommunication from './Steps/StepCommunication';
+const steps = ['SCRUM Team', 'SCRUM Roles', 'Involved Persons', 'Product Goal', 'Product Backlog', 'Product Backlog Sample', 'Timeboxes Sample', 'Sprints Sample', 'Process Steps', 'Definitions Of Done', 'Work Items Sample', 'Increments Sample', 'Communication Matrix'];
 
 const AddTeamStepper = () => {
     const { setScrumTeams, setCurrentPage } = useContext(GlobalContext); // Fetch roles and work item types from GlobalContext
@@ -28,7 +30,7 @@ const AddTeamStepper = () => {
         backlogItems: [{ itemName: '', itemDescription: '', sprintBacklogID: null, done: false }],
         timeboxes: [{ timeboxDescription: '', duration: '' }],
         sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalResponsiblePersonID: '', backlogResponsiblePersonID: ''}],
-        definitionsOfDone: [{constraintDescription: ''}],
+        definitionsOfDone: [{constraintDescription: '', isCompanyPolicy: false}],
         workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneIDs: [], acceptanceCriterias: [], workItemTypeID: null, deadline: '', done: false, workingPersons: [] }],
         increments: [{ description: '', relatedSprintDtoID: null, receivedByPersonDtoID: null, relatedProductGoalDtoID: null, deadline: '' }]
     });
@@ -63,6 +65,11 @@ const AddTeamStepper = () => {
       formValues.productGoals.forEach((productGoal, index) => {
         if (!Number.isInteger(productGoal.responsiblePersonID))
           productGoal.responsiblePersonID = null;
+      });
+
+      formValues.processSteps.forEach((processStep, index) => {
+        if (!Number.isInteger(processStep.guidedByPersonID))
+          processStep.guidedByPersonID = null;
       });
 
       if (!Number.isInteger(formValues.productBacklog.responsiblePersonID))
@@ -180,7 +187,10 @@ const AddTeamStepper = () => {
           });
           break;
 
-        case 8: // DoD Step
+        case 8: // Process Steps Step
+          break;
+
+        case 9: // DoD Step
           formValues.definitionsOfDone.forEach((DoD, index) => {
             if (!DoD.constraintDescription) {
               console.log('All are required');
@@ -189,7 +199,7 @@ const AddTeamStepper = () => {
           });
           break;
 
-        case 9: // Work Items Step
+        case 10: // Work Items Step
           formValues.workItems.forEach((workItem, index) => {
             if (!workItem.description) {
               console.log('Fields description is required');
@@ -198,7 +208,7 @@ const AddTeamStepper = () => {
           });
           break;
 
-        case 10: // Increments Step
+        case 11: // Increments Step
           console.log(formValues);
           formValues.increments.forEach((increment, index) => {
             if (!increment.description) {
@@ -206,6 +216,9 @@ const AddTeamStepper = () => {
               isValid = false;
             }
           });
+          break;
+
+        case 12: // Communication Step
           break;
 
         default:
@@ -236,9 +249,11 @@ const AddTeamStepper = () => {
         case 5: return <StepProductBacklogSample formValues={formValues} handleChange={handleChange} />;
         case 6: return <StepTimeboxes formValues={formValues} handleChange={handleChange} />;
         case 7: return <StepSprints formValues={formValues} handleChange={handleChange} />;
-        case 8: return <StepDefinitionsOfDone formValues={formValues} handleChange={handleChange} />;
-        case 9: return <StepWorkItems formValues={formValues} handleChange={handleChange} />;
-        case 10: return <StepIncrements formValues={formValues} handleChange={handleChange} />;
+        case 8: return <StepProcessSteps formValues={formValues} handleChange={handleChange} />;
+        case 9: return <StepDefinitionsOfDone formValues={formValues} handleChange={handleChange} />;
+        case 10: return <StepWorkItems formValues={formValues} handleChange={handleChange} />;
+        case 11: return <StepIncrements formValues={formValues} handleChange={handleChange} />;
+        case 12: return <StepCommunication formValues={formValues} handleChange={handleChange} />;
         default: return 'Unknown step';
       }
   };

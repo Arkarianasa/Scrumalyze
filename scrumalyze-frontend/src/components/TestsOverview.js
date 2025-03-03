@@ -46,7 +46,7 @@ const TestsOverview = () => {
                                     {test.name}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                                    {test.details}
+                                    {test.outcomeDescription}
                                 </Typography>
                                 <Chip
                                     label={test.passed ? 'Passed' : 'Failed'}

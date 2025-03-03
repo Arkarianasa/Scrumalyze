@@ -14,10 +14,8 @@ public class MappingProfile : Profile
         .ForMember(dest => dest.ProductGoals, opt => opt.Ignore())
         .ForMember(dest => dest.DefinitionsOfDone, opt => opt.Ignore())
         .ForMember(dest => dest.Timeboxes, opt => opt.Ignore())
-        // If you are also manually handling ProductBacklog, you might ignore it too.
-        // .ForMember(dest => dest.ProductBacklog, opt => opt.Ignore())
-        // ... keep the properties you actually want mapped automatically
-        .ForMember(dest => dest.ScrumTeamID, opt => opt.Ignore());
+        .ForMember(dest => dest.ScrumTeamID, opt => opt.Ignore())
+        .ForMember(dest => dest.ProcessSteps, opt => opt.Ignore());
 
         CreateMap<ScrumRoleDto, ScrumRole>();
         CreateMap<PersonDto, Person>();
@@ -29,5 +27,7 @@ public class MappingProfile : Profile
         CreateMap<DefinitionOfDoneDto, DefinitionOfDone>();
         CreateMap<WorkItemDto, WorkItem>();
         CreateMap<IncrementDto, Increment>();
+        CreateMap<CommunicationDto, Communication>();
+        CreateMap<ProcessStepDto, ProcessStep>();
     }
 }

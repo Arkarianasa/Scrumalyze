@@ -19,6 +19,14 @@ INSERT INTO WorkItemType (TypeName) VALUES ('Task');
 INSERT INTO WorkItemType (TypeName) VALUES ('Bug');
 INSERT INTO WorkItemType (TypeName) VALUES ('Spike');
 
+-- ProcessStepType Data
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+INSERT INTO ProcessStepType(ProcessStepName) VALUES ('Daily SCRUM');
+INSERT INTO ProcessStepType(ProcessStepName) VALUES ('Backlog Refinement');
+INSERT INTO ProcessStepType(ProcessStepName) VALUES ('Sprint Review');
+INSERT INTO ProcessStepType(ProcessStepName) VALUES ('Sprint Planning');
+INSERT INTO ProcessStepType(ProcessStepName) VALUES ('Sprint Retrospective');
+
 -- Prioratization
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- Numerical Ranking
@@ -378,200 +386,59 @@ VALUES
 	(12, 9),
     (13, 7);
 
--- ProcessStep Data
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Team Atomic: Scrum Events for Sprint 1
-
--- Sprint Planning
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (1, 'Sprint Planning', '2024-09-15 09:00:00', '2024-09-15 11:00:00', 2, 2); -- Eve Clark
-
--- Daily Standups
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (1, 'Daily Standup', '2024-09-16 09:00:00', '2024-09-16 09:15:00', 3, NULL),
-       (1, 'Daily Standup', '2024-09-17 09:00:00', '2024-09-17 09:25:00', 3, NULL),
-       (1, 'Daily Standup', '2024-09-18 09:00:00', '2024-09-18 09:35:00', 3, NULL),
-       (1, 'Daily Standup', '2024-09-19 09:00:00', '2024-09-19 09:25:00', 3, NULL),
-       (1, 'Daily Standup', '2024-09-20 09:00:00', '2024-09-20 09:15:00', 3, NULL),
-       (1, 'Daily Standup', '2024-09-21 09:00:00', '2024-09-21 09:18:00', 3, NULL),
-       (1, 'Daily Standup', '2024-09-22 09:00:00', '2024-09-22 09:15:00', 3, NULL);
-
--- Sprint Review
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (1, 'Sprint Review', '2024-09-30 14:00:00', '2024-09-30 16:00:00', 4, 1); -- Eve Clark
-
--- Sprint Retrospective
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (1, 'Sprint Retrospective', '2024-09-30 16:00:00', '2024-09-30 18:00:00', 5, 1); -- Eve Clark
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Team Atomic: Scrum Events for Sprint 4
-
--- Sprint Planning
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (4, 'Sprint Planning', '2024-10-01 09:00:00', '2024-10-01 11:00:00', 2, 1); -- Eve Clark
-
--- Daily Standups
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (4, 'Daily Standup', '2024-10-02 09:00:00', '2024-10-02 09:15:00', 3, NULL),
-       (4, 'Daily Standup', '2024-10-03 09:00:00', '2024-10-03 09:15:00', 3, NULL),
-       (4, 'Daily Standup', '2024-10-04 09:00:00', '2024-10-04 09:15:00', 3, NULL);
-
--- Sprint Review
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (4, 'Sprint Review', '2024-10-14 14:00:00', '2024-10-14 17:00:00', 4, 1); -- Eve Clark
-
--- Sprint Retrospective
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (4, 'Sprint Retrospective', '2024-10-14 16:00:00', '2024-10-14 17:00:00', 5, 1); -- Eve Clark
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Team Bionic: Scrum Events for Sprint 2
-
--- Sprint Planning
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (2, 'Sprint Planning', '2024-09-15 09:00:00', '2024-09-15 11:35:00', 2, 7); -- Isabella Davis
-
--- Daily Standups
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (2, 'Daily Standup', '2024-09-16 09:00:00', '2024-09-16 09:15:00', 3, NULL),
-       (2, 'Daily Standup', '2024-09-17 09:00:00', '2024-09-17 09:15:00', 3, NULL),
-       (2, 'Daily Standup', '2024-09-18 09:00:00', '2024-09-18 09:15:00', 3, NULL),
-       (2, 'Daily Standup', '2024-09-19 09:00:00', '2024-09-19 09:15:00', 3, NULL),
-       (2, 'Daily Standup', '2024-09-20 09:00:00', '2024-09-20 09:15:00', 3, NULL),
-       (2, 'Daily Standup', '2024-09-21 09:00:00', '2024-09-21 09:15:00', 3, NULL),
-       (2, 'Daily Standup', '2024-09-22 09:00:00', '2024-09-22 09:15:00', 3, NULL);
-
--- Sprint Review
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (2, 'Sprint Review', '2024-09-30 14:00:00', '2024-09-30 16:00:00', 4, 7); -- Isabella Davis
-
--- Sprint Retrospective
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (2, 'Sprint Retrospective', '2024-09-30 16:00:00', '2024-09-30 17:30:00', 5, 7); -- Isabella Davis
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Team Bionic: Scrum Events for Sprint 5
-
--- Sprint Planning
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (5, 'Sprint Planning', '2024-10-01 09:00:00', '2024-10-01 11:00:00', 2, 7); -- Isabella Davis
-
--- Daily Standups
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (5, 'Daily Standup', '2024-10-02 09:00:00', '2024-10-02 09:15:00', 3, NULL),
-       (5, 'Daily Standup', '2024-10-03 09:00:00', '2024-10-03 09:15:00', 3, NULL),
-       (5, 'Daily Standup', '2024-10-04 09:00:00', '2024-10-04 09:15:00', 3, NULL);
-
--- Sprint Review
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (5, 'Sprint Review', '2024-10-14 14:00:00', '2024-10-14 16:00:00', 4, 7); -- Isabella Davis
-
--- Sprint Retrospective
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (5, 'Sprint Retrospective', '2024-10-14 16:00:00', '2024-10-14 17:00:00', 5, 7); -- Isabella Davis
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Team Cosmic: Scrum Events for Sprint 3
-
--- Sprint Planning
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, GuidedByPersonID) 
-VALUES (3, 'Sprint Planning', '2024-09-15 09:00:00', '2024-09-15 11:00:00', 10); -- John Smith
-
--- Daily Standups
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID) 
-VALUES (3, 'Daily Standup', '2024-09-16 09:00:00', '2024-09-16 09:15:00', 3, NULL),
-       (3, 'Daily Standup', '2024-09-17 09:00:00', '2024-09-17 09:15:00', 3, NULL),
-       (3, 'Daily Standup', '2024-09-18 09:00:00', '2024-09-18 09:15:00', 3, NULL),
-       (3, 'Daily Standup', '2024-09-19 09:00:00', '2024-09-19 09:15:00', 3, NULL),
-       (3, 'Daily Standup', '2024-09-20 09:00:00', '2024-09-20 09:15:00', 3, NULL),
-       (3, 'Daily Standup', '2024-09-21 09:00:00', '2024-09-21 09:15:00', 3, NULL),
-       (3, 'Daily Standup', '2024-09-22 09:00:00', '2024-09-22 09:15:00', 3, NULL);
-
--- Sprint Review
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (3, 'Sprint Review', '2024-09-30 14:00:00', '2024-09-30 16:00:00', 4, 10); -- John Smith
-
--- Sprint Retrospective
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (3, 'Sprint Retrospective', '2024-09-30 16:00:00', '2024-09-30 17:00:00', 5, 10); -- John Smith
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Team Cosmic: Scrum Events for Sprint 6
-
--- Sprint Planning
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (6, 'Sprint Planning', '2024-10-01 09:00:00', '2024-10-01 11:00:00', 2, 10); -- John Smith
-
--- Daily Standups
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (6, 'Daily Standup', '2024-10-02 09:00:00', '2024-10-02 09:15:00', 3, NULL),
-       (6, 'Daily Standup', '2024-10-03 09:00:00', '2024-10-03 09:15:00', 3, NULL),
-       (6, 'Daily Standup', '2024-10-04 09:00:00', '2024-10-04 09:15:00', 3, NULL);
-
--- Sprint Review
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (6, 'Sprint Review', '2024-10-14 14:00:00', '2024-10-14 16:00:00', 4, 10); -- John Smith
-
--- Sprint Retrospective
-INSERT INTO ProcessStep (SprintID, ProcessStepName, StartDate, EndDate, TimeboxID, GuidedByPersonID)  
-VALUES (6, 'Sprint Retrospective', '2024-10-14 16:00:00', '2024-10-14 17:00:00', 5, 10); -- John Smith
-
-
-
 -- Communication Data
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- Team Atomic: Communication Data
 -- Stakeholder Meeting Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (1, 17, 'Discussed project goals and progress.'); -- Eve to Yara
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (1, 18, 'Provided updates on user authentication feature.'); -- Eve to Zane
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (1, 17); -- Eve to Yara
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (1, 18); -- Eve to Zane
 
 -- Developer Consultation Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (1, 3, 'Asked for feedback on authentication code.'); -- Eve to Grace
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (3, 1, 'Provided suggestions on improving code quality.'); -- Grace to Eve
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (1, 3); -- Eve to Grace
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (3, 1); -- Grace to Eve
 
 -- Team Sync Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (2, 1, 'Reviewed tasks and timelines during sync.'); -- Frank to Eve
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (2, 3, 'Collaborated on defining next steps for the sprint.'); -- Frank to Grace
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (2, 1); -- Frank to Eve
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (2, 3); -- Frank to Grace
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- Team Bionic: Communication Data
 -- Developer Consultation Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (9, 8, 'Consulted on UI design choices.'); -- Leo to Jack
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (9, 10, 'Sought advice on database queries.'); -- Leo to Kate
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (9, 8); -- Leo to Jack
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (9, 10); -- Leo to Kate
 
 -- Team Sync Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (7, 9, 'Reviewed sprint backlog during the sync.'); -- Isabella to Leo
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (10, 9, 'Clarified task priorities for the week.'); -- Kate to Leo
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (7, 9); -- Isabella to Leo
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (10, 9); -- Kate to Leo
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- Team Cosmic: Communication Data
 -- Stakeholder Meeting Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (12, 19, 'Discussed feedback on the web application.'); -- Maya to Henry
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (14, 19, 'Discussed feedback on the web application.'); -- Olivia to Henry
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (12, 19, 'Reviewed project timelines and expectations.'); -- Maya to Henry
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (12, 19); -- Maya to Henry
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (14, 19); -- Olivia to Henry
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (12, 19); -- Maya to Henry
 
 -- Developer Consultation Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (14, 13, 'Requested insights on performance issues.'); -- Quinn to Olivia
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (14, 15, 'Shared ideas on code optimization.'); -- Quinn to Rachel
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (14, 13); -- Quinn to Olivia
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (14, 15); -- Quinn to Rachel
 
 -- Team Sync Communication
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (12, 14, 'Coordinated on testing strategies.'); -- Maya to Quinn
-INSERT INTO Communication (SourcePersonID, TargetPersonID, CommunicationDescription)
-VALUES (12, 15, 'Discussed workload and deadlines.'); -- Maya to Rachel
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (12, 14); -- Maya to Quinn
+INSERT INTO Communication (SourcePersonID, TargetPersonID)
+VALUES (12, 15); -- Maya to Rachel

@@ -11,53 +11,74 @@ import groovy.json.JsonOutput
  *
  * @param teamData A Map containing, among other things, a "team" object that may have "Sprints".
  *                 Each Sprint may or may not have a "SprintGoal" object with a "ResponsiblePerson".
- * @return A map representing the evaluation result with fields:
- *         - name
- *         - severity
- *         - passed
- *         - outcomeDescription
+ * @return A map representing the evaluation result with the standard fields.
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
-    // 1. Define metadata
+    // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Sprint Goal Responsible Check"
-    def severity = "Major"
-    def descriptionPass = "No SprintGoal has a single responsible person set (team-level responsibility)."
-    def descriptionFail = "One or more SprintGoals have a responsible person assigned."
+    def severityFail = "Major"
+    def definition = """
+        This check verifies that no Sprint Goal is assigned to a single individual. 
+        The entire team should share responsibility for the Sprint Goal.
+    """.stripIndent().trim()
+
+    def possibleRootCauses = [
+        "A single individual was set as 'ResponsiblePerson' to track accountability for sprint goals, which counters scrum principles."
+    ]
+
+    // We'll collect specific sprints that have a single responsible person
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
     // 2. Gather sprints
     // ----------------------------------------------------------------------------
+    def teamName = teamData.team?.TeamName ?: "Unknown Team"
+    System.err.println "Starting SprintGoalResponsible check for team '${teamName}'"
+
     def sprints = teamData.team?.Sprints ?: []
 
     // ----------------------------------------------------------------------------
-    // 3. Check each sprint's SprintGoal for a responsible person
+    // 3. Check each sprint's SprintGoal for a ResponsiblePerson
     // ----------------------------------------------------------------------------
-    // We'll fail if any sprint has a SprintGoal object with a 'ResponsiblePerson' (or 'ResponsiblePersonID').
-    def anyGoalHasResponsiblePerson = sprints.any { sprint ->
+    sprints.each { sprint ->
+        def sprintName = sprint.SprintGoal.Description ?: "that started on " + sprint.StartDate
         def sprintGoal = sprint.SprintGoal
-        // If there's a SprintGoal object, check if it has a ResponsiblePerson or ResponsiblePersonID
+
         if (sprintGoal && (sprintGoal.ResponsiblePerson || sprintGoal.ResponsiblePersonID)) {
-            return true
+            symptoms << "Sprint '${sprintName}' has a responsible person assigned to its SprintGoal."
         }
-        return false
     }
 
-    def passed = !anyGoalHasResponsiblePerson
-    def outcomeDescription = passed ? descriptionPass : descriptionFail
+    // ----------------------------------------------------------------------------
+    // 4. Determine pass/fail
+    // ----------------------------------------------------------------------------
+    def passed = symptoms.isEmpty()
+    def severity = passed ? "None" : severityFail
+    def outcomeDescription = passed
+        ? "No SprintGoal has a single responsible person set (team-level responsibility)."
+        : "One or more SprintGoals have a responsible person assigned."
 
+    // ----------------------------------------------------------------------------
+    // 5. Return the evaluation result
+    // ----------------------------------------------------------------------------
     return [
         name               : name,
+        definition         : definition,
         severity           : severity,
         passed             : passed,
-        outcomeDescription : outcomeDescription
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+System.err.println "Script started..."
+
 if (args.length < 1) {
     System.err.println "Usage: groovy SprintGoalResponsible.groovy <path_to_json_file>"
     System.exit(1)
@@ -67,5 +88,9 @@ def jsonFilePath = args[0]
 def fileContent = new File(jsonFilePath).text
 def teamData = new JsonSlurper().parseText(fileContent)
 
+// Run the evaluation
 def result = evaluate(teamData)
+System.err.println "Evaluation complete."
+
+// Print the result as JSON
 println JsonOutput.toJson(result)

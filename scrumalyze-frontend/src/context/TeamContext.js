@@ -39,7 +39,7 @@ export const TeamProvider = ({ children }) => {
                 `https://localhost:52765/api/team/sprintbacklogs/${teamId}`,
                 `https://localhost:52765/api/team/processsteps/${teamId}`,
                 `https://localhost:52765/api/team/increments/${teamId}`,
-                `https://localhost:52765/api/evaluation/${teamId}`
+                `https://localhost:52765/api/evaluation/${teamId}/latest`
             ];
     
             // Fetch data for each endpoint, handling empty or invalid JSON
@@ -69,7 +69,7 @@ export const TeamProvider = ({ children }) => {
                 increments = [],
                 evaluation = null
             ] = responses;
-    
+
             // Update team data with defaults where necessary
             setTeamData({
                 persons,
@@ -101,7 +101,7 @@ export const TeamProvider = ({ children }) => {
     }, [selectedTeam.selectedTeamID]); // Re-run effect when selectedTeam changes
 
     return (
-        <TeamContext.Provider value={{ teamData, loading }}>
+        <TeamContext.Provider value={{ teamData, setTeamData, loading, setLoading  }}>
             {children}
         </TeamContext.Provider>
     );

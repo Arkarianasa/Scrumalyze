@@ -14,5 +14,7 @@
         public required List<TimeboxDto> Timeboxes { get; set; }
         public required int WorkDayHours { get; set; }
         public required List<WorkItemDto> WorkItems { get; set; }
+        public required List<ProcessStepDto> ProcessSteps { get; set; }
+        public required List<CommunicationDto> CommunicationMatrix { get; set; }
     }
 }

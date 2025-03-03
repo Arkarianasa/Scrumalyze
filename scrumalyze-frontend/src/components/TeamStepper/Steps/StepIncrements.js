@@ -82,11 +82,15 @@ const StepIncrements = ({ formValues, handleChange }) => {
             fullWidth
             >
             <MenuItem key="none" value={null}>
-                None
+                Nobody
             </MenuItem>
             {formValues.persons.map((person, personIndex) => (
                 <MenuItem key={personIndex} value={personIndex}>
-                {person.firstName} {person.lastName}
+                {person.firstName} {person.lastName} (
+                            {(person.roleID - scrumRoles.length > 0
+                                ? formValues.scrumRoles[person.roleID - scrumRoles.length - 1].roleName
+                                : scrumRoles[person.roleID - 1].roleName)}
+                            )
                 </MenuItem>
             ))}
             </TextField>
@@ -123,11 +127,11 @@ const StepIncrements = ({ formValues, handleChange }) => {
             select
             label="Related Product Goal"
             variant="outlined"
-            value={increment.relatedProductGoalDtoID || ''}
+            value={increment.relatedProductGoalDtoID}
             onChange={(e) => handleIncrementChange(index, 'relatedProductGoalDtoID', e.target.value)}
             fullWidth
             >
-            <MenuItem key="none" value={null}>
+            <MenuItem value={null}>
                 None
             </MenuItem>
             {formValues.productGoals.map((goal, goalIndex) => (

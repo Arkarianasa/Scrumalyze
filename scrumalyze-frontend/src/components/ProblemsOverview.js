@@ -6,7 +6,10 @@ import {
     Card,
     CardContent,
     Alert,
-    AlertTitle
+    AlertTitle,
+    List,
+    ListItem,
+    ListItemText
 } from '@mui/material';
 import { TeamContext } from '../context/TeamContext';
 
@@ -23,15 +26,8 @@ const ProblemsOverview = () => {
 
     // Filter and sort tests that did not pass by severity (descending)
     const failedTests = teamData.evaluation.tests
-    .filter(test => !test.passed)
-    .sort((a, b) => b.severityLevel - a.severityLevel);
-
-    // Severity level mapping
-    const severityMap = {
-        1: 'Minor Pathological Behaviour',
-        2: 'Major Pathological Behaviour',
-        3: 'Critical Pathological Behaviour'
-    };
+        .filter(test => !test.passed)
+        .sort((a, b) => b.severityLevel - a.severityLevel);
 
     return (
         <Box sx={{ padding: '5px', display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -40,9 +36,9 @@ const ProblemsOverview = () => {
                     key={index}
                     sx={{
                         borderLeft: `4px solid ${
-                            test.severityLevel === 3
+                            test.severity === 'Critical'
                                 ? '#d32f2f'
-                                : test.severityLevel === 2
+                                : test.severity === 'Major'
                                 ? '#f57c00'
                                 : '#1976d2'
                         }`,
@@ -50,18 +46,57 @@ const ProblemsOverview = () => {
                     }}
                 >
                     <CardContent>
-                        <Alert severity={
-                            test.severityLevel === 3
-                                ? 'error'
-                                : test.severityLevel === 2
-                                ? 'warning'
-                                : 'info'
-                        }>
+                        <Alert
+                            severity={
+                                test.severity === 'Critical'
+                                    ? 'error'
+                                    : test.severity === 'Major'
+                                    ? 'warning'
+                                    : 'info'
+                            }
+                        >
                             <AlertTitle>
-                                {severityMap[test.severityLevel] || 'Unknown Severity'}
+                                {test.severity} Pathological Behaviour
                             </AlertTitle>
-                            <Typography variant="h6">{test.name}</Typography>
-                            <Typography variant="body2">{test.details}</Typography>
+
+                            {/* Test Name and Description */}
+                            <Typography variant="h6" gutterBottom>
+                                {test.name}
+                            </Typography>
+                            <Typography variant="body2" sx={{ marginBottom: '8px' }}>
+                                {test.definition}
+                            </Typography>
+                            <Typography variant="body2" sx={{ marginBottom: '8px' }}>
+                                {test.outcomeDescription}
+                            </Typography>
+
+                            {/* Symptoms */}
+                            {test.symptoms && test.symptoms.length > 0 && (
+                                <Box sx={{ mt: 1 }}>
+                                    <Typography variant="subtitle2">Symptoms:</Typography>
+                                    <List dense>
+                                        {test.symptoms.map((symptom, i) => (
+                                            <ListItem key={i} sx={{ pl: 0 }}>
+                                                <ListItemText primary={symptom} />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            )}
+
+                            {/* Possible Root Causes */}
+                            {test.possibleRootCauses && test.possibleRootCauses.length > 0 && (
+                                <Box sx={{ mt: 1 }}>
+                                    <Typography variant="subtitle2">Possible Root Causes:</Typography>
+                                    <List dense>
+                                        {test.possibleRootCauses.map((cause, i) => (
+                                            <ListItem key={i} sx={{ pl: 0 }}>
+                                                <ListItemText primary={cause} />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            )}
                         </Alert>
                     </CardContent>
                 </Card>

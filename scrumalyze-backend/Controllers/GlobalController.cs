@@ -20,6 +20,7 @@ namespace Scrumalyze.Controllers
             var scrumTeams = _globalContextService.GetAllScrumTeams();
             var scrumRoles = _globalContextService.GetAllScrumRoles();
             var workItemTypes = _globalContextService.GetAllWorkItemTypes();
+            var processStepTypes = _globalContextService.GetAllProcessStepTypes();
             var prioritizationSchemes = _globalContextService.GetAllPrioritizationSchemes();
 
             var globalData = new
@@ -27,6 +28,7 @@ namespace Scrumalyze.Controllers
                 ScrumTeams = scrumTeams,
                 ScrumRoles = scrumRoles,
                 WorkItemTypes = workItemTypes,
+                ProcessStepTypes = processStepTypes,
                 PrioritizationSchemes = prioritizationSchemes
             };
 

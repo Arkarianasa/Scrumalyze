@@ -13,6 +13,8 @@ import {
     Divider,
     Box,
     ListItemSecondaryAction,
+    Button,
+    Stack,
 } from '@mui/material';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { PieChart } from '@mui/x-charts/PieChart';
@@ -20,8 +22,8 @@ import { TeamContext } from '../context/TeamContext';
 import { GlobalContext } from '../context/GlobalContext';
 
 const TeamDashboard = () => {
-    const { teamData, loading } = useContext(TeamContext);
-    const { prioritizationSchemes } = useContext(GlobalContext);
+    const { teamData, loading, setLoading, setTeamData } = useContext(TeamContext);
+    const { prioritizationSchemes, selectedTeam } = useContext(GlobalContext);
 
     if (loading) {
         return (
@@ -31,7 +33,32 @@ const TeamDashboard = () => {
         );
     }
 
-    console.log(teamData.productBacklog)
+    const handleRetakeTest = async () => {
+        setLoading(true);
+        try {    
+            const response = await fetch(`https://localhost:52765/api/evaluation/${selectedTeam.scrumTeamID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Failed to retake the test: ${response.statusText}`);
+            }
+    
+            const updatedEvaluation = await response.json();
+    
+            setTeamData(prevState => ({
+                ...prevState,
+                evaluation: updatedEvaluation
+            }));
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };    
 
     return (
         <Grid container spacing={1} alignItems="stretch">
@@ -71,24 +98,42 @@ const TeamDashboard = () => {
                 <Grid item xs={12} sm={6} md={4}>
                     <Card style={{ height: '100%' }}>
                         <CardContent>
-                            <Typography variant="h5" gutterBottom>
-                                SCRUM Evaulation
-                            </Typography>
+                            {/* Stack for title, subtitle, and button in a row */}
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+                                <div>
+                                    <Typography variant="h5">
+                                        SCRUM Evaluation
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        {teamData.evaluation?.evaluatedOn
+                                            ? new Date(teamData.evaluation.evaluatedOn).toLocaleString()
+                                            : "Not yet evaluated"}
+                                    </Typography>
+                                </div>
+                                <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    size="small"
+                                    onClick={() => handleRetakeTest(teamData.ScrumTeamID, setLoading)}
+                                >
+                                    Retake Test
+                                </Button>
+                            </Stack>
+
+                            {/* Gauge component */}
                             <Gauge
-                            value={teamData?.evaluation?.tests?.filter(test => test.passed).length || 0}
-                             startAngle={-110}
-                             endAngle={110}
-                            valueMax={teamData?.evaluation?.tests?.length}
-                            sx={{
-                                [`& .${gaugeClasses.valueText}`]: {
-                                  fontSize: 30,
-                                  transform: 'translate(0px, 0px)',
-                                },
-                              }}
-                              text={
-                                ({ value, valueMax }) => `${value} / ${valueMax}`
-                             }
-                             style={{ height: '130px', width: '100%' }}  // Add explicit height and width
+                                value={teamData?.evaluation?.tests?.filter(test => test.passed).length || 0}
+                                startAngle={-110}
+                                endAngle={110}
+                                valueMax={teamData?.evaluation?.tests?.length}
+                                sx={{
+                                    [`& .${gaugeClasses.valueText}`]: {
+                                        fontSize: 30,
+                                        transform: 'translate(0px, 0px)',
+                                    },
+                                }}
+                                text={({ value, valueMax }) => `${value} / ${valueMax}`}
+                                style={{ height: '130px', width: '100%' }}  
                             />
                         </CardContent>
                     </Card>
@@ -101,19 +146,22 @@ const TeamDashboard = () => {
                             <Typography variant="h5" gutterBottom>
                                 Pathological Behaviours
                             </Typography>
+                            <Typography variant="body2" color="textSecondary" >
+                            {new Date(teamData.evaluation.evaluatedOn).toLocaleString()}
+                            </Typography>
                             <Box
                                 display="flex"
                                 justifyContent="flex-start"  // Align content to the left
-                                sx={{ ml: -10 }}  // Move the chart to the left with negative margin
+                                sx={{ mt: 1 }}  // Move the chart to the left with negative margin
                             >
                                 <PieChart
                                     colors={['#1976d2', '#f57c00', '#d32f2f']}
                                     series={[
                                         {
                                             data: [
-                                                { id: 0, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 1).length || 0, label: 'Minor' },
-                                                { id: 1, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 2).length || 0, label: 'Major' },
-                                                { id: 2, value: teamData?.evaluation?.tests?.filter(test => test.severityLevel === 3).length || 0, label: 'Critical' },
+                                                { id: 0, value: teamData?.evaluation?.tests?.filter(test => test.severity === 'Minor').length || 0, label: 'Minor' },
+                                                { id: 1, value: teamData?.evaluation?.tests?.filter(test => test.severity === 'Major').length || 0, label: 'Major' },
+                                                { id: 2, value: teamData?.evaluation?.tests?.filter(test => test.severity === 'Critical').length || 0, label: 'Critical' },
                                             ],
                                             highlightScope: { fade: 'global', highlight: 'item' },
                                             faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },

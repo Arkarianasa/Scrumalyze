@@ -9,43 +9,68 @@ import groovy.json.JsonOutput
  * Usage: groovy SprintProductGoal.groovy <path_to_json_file>
  *
  * @param teamData A Map containing, among other things, a "team" object that may have "Sprints".
- * @return A map representing the evaluation result.
+ * @return A map representing the evaluation result with standard fields.
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
-    // 1. Define metadata
+    // 1. Metadata
     // ----------------------------------------------------------------------------
     def name = "Sprint Product Goal Check"
-    def severity = "Major"
-    def descriptionPass = "All sprints have an assigned Product Goal."
-    def descriptionFail = "One or more sprints do not have a Product Goal assigned."
+    def severityFail = "Major"
+    def definition = """
+        This check ensures that each sprint is aligned with a Product Goal by verifying
+        that every Sprint has a valid ProductGoalID. If any sprint lacks a ProductGoalID.
+    """.stripIndent().trim()
+
+    def possibleRootCauses = [
+        "Sprints were created without specifying alligned Product Goal.",
+        "Team is not using Product Goal."
+    ]
+
+    // We'll record details on any sprints missing a ProductGoalID
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
     // 2. Retrieve sprints and evaluate
     // ----------------------------------------------------------------------------
+    def teamName = teamData.team?.TeamName ?: "Unknown Team"
+    System.err.println "Starting Sprint Product Goal check for team '${teamName}'"
+
     def sprints = teamData.team?.Sprints ?: []
-    def anyMissing = sprints.any { sprint ->
-        // If no ProductGoalID is set, consider it missing
-        sprint.ProductGoalID == null
+
+    sprints.each { sprint ->
+        if (sprint.ProductGoalID == null) {
+            def sprintName = sprint.SprintGoal.Description ?: "that started on " + sprint.StartDate
+            symptoms << "Sprint '${sprintName}' is missing a ProductGoal."
+        }
     }
 
-    def passed = !anyMissing
-    def outcomeDescription = passed ? descriptionPass : descriptionFail
+    // ----------------------------------------------------------------------------
+    // 3. Determine pass/fail
+    // ----------------------------------------------------------------------------
+    def passed = symptoms.isEmpty()
+    def severity = passed ? "None" : severityFail
+    def outcomeDescription = passed 
+        ? "All sprints have an assigned Product Goal."
+        : "One or more sprints do not have a Product Goal assigned."
 
     // ----------------------------------------------------------------------------
-    // 3. Return the result
+    // 4. Return the result
     // ----------------------------------------------------------------------------
     return [
         name               : name,
+        definition         : definition,
         severity           : severity,
         passed             : passed,
-        outcomeDescription : outcomeDescription
+        outcomeDescription : outcomeDescription,
+        symptoms           : symptoms,
+        possibleRootCauses : possibleRootCauses
     ]
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Main script logic
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 System.err.println "Script started..."
 
 if (args.length < 1) {

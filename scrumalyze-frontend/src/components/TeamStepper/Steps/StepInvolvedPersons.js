@@ -15,7 +15,7 @@ const StepInvolvedPersons = ({ formValues, handleChange }) => {
     return (
         <Box>
             {formValues.persons.map((person, index) => (
-                <Grid container spacing={2} key={index} style={{ marginBottom: '20px', alignItems: 'center' }}>
+                <Grid container spacing={2} key={index} style={{ marginBottom: '10px', alignItems: 'center' }}>
                     <Grid item xs={4}>
                         <TextField
                             label="First Name"
