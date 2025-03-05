@@ -15,15 +15,14 @@ def evaluate(teamData) {
     def name = "Increment Sprint Check"
     def severityFail = "Major"
     def definition = """
-        This check ensures that every Increment is tied to a Sprint by verifying 
-        that each Increment has a valid (non-null) Sprint assigned. Any Increment missing 
-        a SprintID is considered an issue because it indicates a lack of 
-        clear linkage between the planned work and the current sprint timeline.
+        This check ensures that every Increment is tied to a Sprint and it's goal.
+        Any Increment missing related Sprint is considered an issue because it indicates
+        a lack of clear linkage between the planned work and the current sprint timeline.
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "Team forgot to assign an Increment to its corresponding Sprint.",
-        "The team might be unaware that every Increment must link to a Sprint."
+        "Related sprint is not correctly recorded in all or some of Increments.",
+        "todo"
     ]
 
     // We'll collect which increments fail this check.

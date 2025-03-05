@@ -24,12 +24,14 @@ def evaluate(teamData) {
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "Team does not use standard Scrum roles.",
+        "Team is using standard Scrum roles but they are named differently.",
         "Some individuals have specialized titles or responsibilities that deviate from Scrum roles.",
     ]
 
     // We'll collect any team members who have a non-standard role
     def symptoms = []
+
+
 
     // ----------------------------------------------------------------------------
     // 2. Retrieve Persons and evaluate

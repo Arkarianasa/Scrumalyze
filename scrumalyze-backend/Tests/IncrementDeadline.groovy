@@ -18,7 +18,7 @@ def evaluate(teamData) {
 
     def possibleRootCauses = [
         "Team might be confusing SCRUM increments with traditional methods that require explicit deadlines.",
-        "Administrators or team members could have automatically set deadlines without noticing."
+        "One or more deadlines were unintentionally recorded."
     ]
 
     // We'll collect increments that violate the policy (i.e., have a deadline).
@@ -36,7 +36,7 @@ def evaluate(teamData) {
     // Check each increment for a non-null deadline
     increments.each { inc ->
         if (inc.Deadline != null) {
-            symptoms << "[Increment '${inc.Description ?: 'Unnamed'}'] has a deadline: ${inc.Deadline}"
+            symptoms << "[Increment '${inc.Description ?: 'Unnamed'}'] has a deadline: ${inc.Deadline}."
         }
     }
 

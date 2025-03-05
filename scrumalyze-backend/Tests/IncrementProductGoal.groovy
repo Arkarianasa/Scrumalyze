@@ -21,8 +21,9 @@ def evaluate(teamData) {
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "ProductGoal was never set or recorded in the system for some increments.",
-        "Team is not aware that increments need to be linked to a product goal."
+        "Team is producing increments that are not related to product goal and therefore non relevant.",
+        "Team is not aware that increments needs to be linked to a product goal.",
+        "Product goal is not correctly recorded for each increment."
     ]
 
     // We'll collect which increments fail this check.

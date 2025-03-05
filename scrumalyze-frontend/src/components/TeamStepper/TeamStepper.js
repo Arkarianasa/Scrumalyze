@@ -25,11 +25,11 @@ const AddTeamStepper = () => {
         workDayHours: 8,
         scrumRoles: [],
         persons: [{ firstName: '', lastName: '', roleID: null, isScrumTeamMember: false }],
-        productGoals: [{ description: '', responsiblePersonID: '' }],
-        productBacklog: { responsiblePersonID: '', productGoalID: '', primaryPrioritizationSchemeID: null, secondaryPrioritizationSchemeID: null},
+        productGoals: [{ description: '', responsiblePersonID: null }],
+        productBacklog: { responsiblePersonID: null, productGoalID: null, primaryPrioritizationSchemeID: null, secondaryPrioritizationSchemeID: null},
         backlogItems: [{ itemName: '', itemDescription: '', sprintBacklogID: null, done: false }],
         timeboxes: [{ timeboxDescription: '', duration: '' }],
-        sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalResponsiblePersonID: '', backlogResponsiblePersonID: ''}],
+        sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalResponsiblePersonID: null, backlogResponsiblePersonID: null}],
         definitionsOfDone: [{constraintDescription: '', isCompanyPolicy: false}],
         workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneIDs: [], acceptanceCriterias: [], workItemTypeID: null, deadline: '', done: false, workingPersons: [] }],
         increments: [{ description: '', relatedSprintDtoID: null, receivedByPersonDtoID: null, relatedProductGoalDtoID: null, deadline: '' }]
@@ -37,66 +37,86 @@ const AddTeamStepper = () => {
 
     const sendScrumTeam = async () => {
       console.log(formValues);
-
-      formValues.sprints.forEach((sprint, index) => {
-        var start = new Date(sprint.startDate??null);
-        var end = new Date(sprint.endDate??null);
-
-        sprint.startDate = start.toISOString();
-        sprint.endDate = sprint.endDate === ''? null : end.toISOString();
-
-        if (!Number.isInteger(sprint.goalResponsiblePersonID))
-          sprint.goalResponsiblePersonID = null;
-
-        if (!Number.isInteger(sprint.backlogResponsiblePersonID))
-          sprint.backlogResponsiblePersonID = null;
+  
+      formValues.sprints.forEach((sprint) => {
+          if (!sprint.startDate || sprint.startDate.trim() === '') {
+              sprint.startDate = null;
+          } else {
+              sprint.startDate = new Date(sprint.startDate).toISOString();
+          }
+  
+          if (!sprint.endDate || sprint.endDate.trim() === '') {
+              sprint.endDate = null;
+          } else {
+              sprint.endDate = new Date(sprint.endDate).toISOString();
+          }
+  
+          if (!Number.isInteger(sprint.goalResponsiblePersonID)) {
+              sprint.goalResponsiblePersonID = null;
+          }
+  
+          if (!Number.isInteger(sprint.backlogResponsiblePersonID)) {
+              sprint.backlogResponsiblePersonID = null;
+          }
       });
-
-      formValues.workItems.forEach((workItem, index) => {
-        var deadline = new Date(workItem.deadline??null);
-        workItem.deadline = workItem.deadline === ''? null : deadline.toISOString();
+  
+      formValues.workItems.forEach((workItem) => {
+          if (!workItem.deadline || workItem.deadline.trim() === '') {
+              workItem.deadline = null;
+          } else {
+              const deadline = new Date(workItem.deadline);
+              workItem.deadline = isNaN(deadline.getTime()) ? null : deadline.toISOString();
+          }
       });
-
-      formValues.increments.forEach((increment, index) => {
-        var deadline = new Date(increment.deadline??null);
-        increment.deadline = increment.deadline === ''? null : deadline.toISOString();
+  
+      formValues.increments.forEach((increment) => {
+          if (!increment.deadline || increment.deadline.trim() === '') {
+              increment.deadline = null;
+          } else {
+              const deadline = new Date(increment.deadline);
+              increment.deadline = isNaN(deadline.getTime()) ? null : deadline.toISOString();
+          }
       });
-
-      formValues.productGoals.forEach((productGoal, index) => {
-        if (!Number.isInteger(productGoal.responsiblePersonID))
-          productGoal.responsiblePersonID = null;
+  
+      formValues.productGoals.forEach((productGoal) => {
+          if (!Number.isInteger(productGoal.responsiblePersonID)) {
+              productGoal.responsiblePersonID = null;
+          }
       });
-
-      formValues.processSteps.forEach((processStep, index) => {
-        if (!Number.isInteger(processStep.guidedByPersonID))
-          processStep.guidedByPersonID = null;
+  
+      formValues.processSteps.forEach((processStep) => {
+          if (!Number.isInteger(processStep.guidedByPersonID)) {
+              processStep.guidedByPersonID = null;
+          }
       });
-
-      if (!Number.isInteger(formValues.productBacklog.responsiblePersonID))
-        formValues.productBacklog.responsiblePersonID = null;
-
-      try {
-        const response = await fetch('https://localhost:52765/api/team/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formValues),
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.statusText}`);
-        }
-    
-        const scrumTeams = await response.json();
-        console.log('Scrum team saved');
-        setScrumTeams(scrumTeams);
-
-        //setCurrentPage('main');
-      } catch (error) {
-        console.error('Error sending formValues:', error);
+  
+      if (!Number.isInteger(formValues.productBacklog.responsiblePersonID)) {
+          formValues.productBacklog.responsiblePersonID = null;
       }
-    };
+  
+      try {
+          const response = await fetch('https://localhost:52765/api/team/create', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formValues),
+          });
+  
+          if (!response.ok) {
+              throw new Error(`Server error: ${response.statusText}`);
+          }
+  
+          const scrumTeams = await response.json();
+          console.log('Scrum team saved');
+          setScrumTeams(scrumTeams);
+  
+          setCurrentPage('main');
+      } catch (error) {
+          console.error('Error sending formValues:', error);
+      }
+  };
+  
 
     const validateCurrentStep = () => {
       let isValid = true;

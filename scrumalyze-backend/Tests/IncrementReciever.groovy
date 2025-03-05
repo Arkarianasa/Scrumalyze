@@ -34,8 +34,8 @@ def evaluate(teamData) {
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "Team forgot to specify a valid (non-scrum) stakeholder as the 'ReceivedBy' person.",
-        "A scrum team member was mistakenly assigned to receive the increment.",
+        "Valid (non team member) person - stakeholder is not properly recorded as the increment reciever.",
+        "A scrum team member is incorectly recieving increment.",
         "The 'Stakeholder' role is differently named or not configured properly in the system."
     ]
 

@@ -35,7 +35,7 @@ def evaluate(teamData) {
     // Possible root causes (when the check fails):
     def possibleRootCauses = []
     possibleRootCauses << "Team members might not be aware of the mandatory policy items."
-    possibleRootCauses << "Policy DoDs exist but are not linked correctly to each Work Item."
+    possibleRootCauses << "Policy DoDs are not correctly recorded to each Work Item."
     possibleRootCauses << "Company policy requirements have changed, but not all items are updated."
 
     // We'll collect which items are missing mandatory policy DoDs here

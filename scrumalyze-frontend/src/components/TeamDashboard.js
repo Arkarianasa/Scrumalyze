@@ -116,11 +116,13 @@ const TeamDashboard = () => {
                                     size="small"
                                     onClick={() => handleRetakeTest(teamData.ScrumTeamID, setLoading)}
                                 >
-                                    Retake Test
+                                    {teamData.evaluation?.evaluatedOn? "Retake evaluation" : "Evaluate SCRUM"}
+                                    
                                 </Button>
                             </Stack>
 
                             {/* Gauge component */}
+                            {teamData.evaluation?.evaluatedOn? 
                             <Gauge
                                 value={teamData?.evaluation?.tests?.filter(test => test.passed).length || 0}
                                 startAngle={-110}
@@ -135,6 +137,7 @@ const TeamDashboard = () => {
                                 text={({ value, valueMax }) => `${value} / ${valueMax}`}
                                 style={{ height: '130px', width: '100%' }}  
                             />
+                            : ""}
                         </CardContent>
                     </Card>
                 </Grid>
@@ -147,13 +150,16 @@ const TeamDashboard = () => {
                                 Pathological Behaviours
                             </Typography>
                             <Typography variant="body2" color="textSecondary" >
-                            {new Date(teamData.evaluation.evaluatedOn).toLocaleString()}
+                            {teamData.evaluation?.evaluatedOn
+                                            ? new Date(teamData.evaluation.evaluatedOn).toLocaleString()
+                                            : "Not yet evaluated"}
                             </Typography>
                             <Box
                                 display="flex"
                                 justifyContent="flex-start"  // Align content to the left
                                 sx={{ mt: 1 }}  // Move the chart to the left with negative margin
                             >
+                                {teamData.evaluation?.evaluatedOn? 
                                 <PieChart
                                     colors={['#1976d2', '#f57c00', '#d32f2f']}
                                     series={[
@@ -170,6 +176,7 @@ const TeamDashboard = () => {
                                     ]}
                                     height={130}
                                 />
+                                : ""}
                             </Box>
                         </CardContent>
                     </Card>

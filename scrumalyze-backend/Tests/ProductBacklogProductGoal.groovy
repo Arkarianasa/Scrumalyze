@@ -25,7 +25,7 @@ def evaluate(teamData) {
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "Team hasn't defined a Product Goal, or hasn't linked it to the backlog.",
+        "Team has not defined a Product Goal, or hasn't linked it to the backlog.",
     ]
 
     // We'll collect details of any issues here

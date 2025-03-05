@@ -26,11 +26,22 @@ def evaluate(teamData) {
     // Potential explanations for why a SprintGoal might be empty or missing
     def possibleRootCauses = [
         "Sprint Goal was not recorded by the team.",
-        "Team does not use Sprint Goals for their Sprints."
+        "Team does not define Sprint Goals for all or some of their Sprints.",
+        "Team does not know how to use Sprint Goals.",
+        "Team is using kanban instead of proper SCRUM hence no sprint goal."
     ]
 
     // We'll collect any sprints that have missing or empty goals
     def symptoms = []
+
+    def consequences = []
+    consequences << "Neschopnost týmu rozpoznat, že Sprint je dodán."
+    consequences << "Sprint nemuze byt propojen na Increment."
+    consequences << "Neschopnost týmu rozpoznat, že zákazník je spokojen."
+    consequences << "Ztrata transparentnosti."
+    consequences << "Hrozi ze veskera prace v ramci Sprintu je zbytecna / nepotrebna."
+    consequences << "Ztrata duvery."
+    consequences << "Financni vliv, drazsi reseni."
 
     // ----------------------------------------------------------------------------
     // 2. Gather Sprints and evaluate

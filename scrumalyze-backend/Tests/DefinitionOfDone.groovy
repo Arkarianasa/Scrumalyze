@@ -31,14 +31,14 @@ def evaluate(teamData) {
     def name = "Definition of Done Consistency Check"
     def definition = """
         This check verifies that each Work Item has non-empty, consistent Definitions of
-        Done (DoD). A DoD ensures a clear and shared understanding of work completion
-        criteria.
+        Done (DoD). A DoD ensures a clear and shared understanding when work item is done.
     """.stripIndent().trim()
 
     def possibleRootCauses = []
-    possibleRootCauses << "Definition of Done  exist, but they are not properly attached to the work item."
+    possibleRootCauses << "Definition of Done exists, but they are not properly recorded in the system."
+    possibleRootCauses << "Team does not use Definitions of Done for all or some of their work items."
     possibleRootCauses << "Definitions of Done exist only as part of the item-specific 'Acceptance Criteria'."
-    possibleRootCauses << "Definitions of Done might exist but are recorded in multiple sources and not consolidated."
+    
 
     // We’ll store ‘symptoms’ of each failure here
     def symptoms = []
@@ -53,6 +53,15 @@ def evaluate(teamData) {
     // Helper messages
     def resultPass = "All work items have consistent, non-empty Definitions of Done."
     // We’ll refine final fail message once we know if it’s Major or Minor.
+
+    def consequences = []
+    consequences << "Neschopnost týmu rozpoznat, že WI je done."
+    consequences << "Ztrata transparentnosti."
+    consequences << "Problemy s casem, hrozi gold plating - moc prace zbytecne."
+    consequences << "Ztrata duvery."
+    consequences << "Hrozi kumulace technickeho dluhu. V DoD muzou byt prvky ktere zamezuji tvorbe dluhu."
+    consequences << "Financni vliv, drazsi reseni."
+    consequences << "Neohranicenost inkrementu v iteraci - muze obsahovat non done work items."
 
     // ----------------------------------------------------------------------------
     // 2. Evaluation Logic
@@ -129,7 +138,9 @@ def evaluate(teamData) {
         outcomeDescription = "One or more work items have missing or null/empty Definitions of Done."
 
     } else if (minorFailures) {
-        severity = 'Minor'
+        severity = 'Critical'
+        possibleRootCauses = []
+        possibleRootCauses << "Team is not consistent in using of Definitions Of Done or does not understand them."
         outcomeDescription = "Definitions of Done differ among one or more work items."
     }
 

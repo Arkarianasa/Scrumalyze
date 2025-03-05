@@ -33,13 +33,13 @@ const StepWorkItems = ({ formValues, handleChange }) => {
   const addWorkItem = () => {
     const newItem = {
       description: '',
-      BacklogItemDtoID: '',
+      BacklogItemDtoID: null,
       workItemTypeID: null,
       definitionOfDoneIDs: [], // Multiple definitions of done
       acceptanceCriterias: [], // Initialize as an empty array
       done: false,
       workingPersons: [],
-      TimeboxDtoID: '',
+      TimeboxDtoID: null,
       deadline: '',
     };
     handleChange('workItems', [...formValues.workItems, newItem]);

@@ -22,20 +22,20 @@ def evaluate(teamData) {
     def definition = """
         This check ensures that every work item has clearly defined Acceptance Criteria.
         Acceptance Criteria specify the conditions, boundaries, and scope of a work item,
-        providing clarity on what 'done' means and how functionality can be validated.
+        providing clarity on understanding that work item has been delivered.
     """.stripIndent().trim()
 
     // Root causes to consider if the evaluation fails
     def possibleRootCauses = []
-    possibleRootCauses << "Acceptance Criteria exist, but they are not properly attached to the work item."
-    possibleRootCauses << "No one on the team uses or creates Acceptance Criteria for all or some of their tasks."
+    possibleRootCauses << "Acceptance Criteria might exist, but they are not properly recorded in the system or are just unspoken."
+    possibleRootCauses << "Team does not use Acceptance Criteria for all or some of their work items."
     possibleRootCauses << "Acceptance Criteria exist only as part of the overall 'Definition of Done' rather than being item-specific."
+    possibleRootCauses << "Acceptance Criteria exists but in might be lost in work item description and not separetly defined."
 
-    // We will adjust severity based on pass/fail
     def severityIfFail = "Major"
 
     def resultPass = "All work items have Acceptance Criteria."
-    def resultFail = "Some work items are missing Acceptance Criteria."
+    def resultFail = "Some or all work items are missing Acceptance Criteria."
 
     // We'll collect symptoms for failed work items
     def symptoms = []
@@ -53,7 +53,7 @@ def evaluate(teamData) {
 
     // Fill in the symptoms array with a note on each failed WorkItem
     workItemsWithoutAC.each { workItem ->
-        symptoms << "[WorkItem ${workItem.WorkItemID}] is MISSING Acceptance Criteria."
+        symptoms << "[WorkItem with description '${workItem.description}]' is MISSING Acceptance Criteria."
     }
 
     // ----------------------------------------------------------------------------
