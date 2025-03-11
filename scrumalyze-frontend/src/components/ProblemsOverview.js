@@ -97,6 +97,19 @@ const ProblemsOverview = () => {
                                     </List>
                                 </Box>
                             )}
+                            {/* Possible Consequences */}
+                            {test.possibleConsequences && test.possibleConsequences.length > 0 && (
+                                <Box sx={{ mt: 1 }}>
+                                    <Typography variant="subtitle2">Possible Consequences:</Typography>
+                                    <List dense>
+                                        {test.possibleConsequences.map((cause, i) => (
+                                            <ListItem key={i} sx={{ pl: 0 }}>
+                                                <ListItemText primary={cause} />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            )}
                         </Alert>
                     </CardContent>
                 </Card>

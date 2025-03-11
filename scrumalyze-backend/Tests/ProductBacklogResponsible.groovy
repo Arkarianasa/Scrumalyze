@@ -30,10 +30,18 @@ def evaluate(teamData) {
 
     def possibleRootCauses = [
         "The Product Backlog has not been created or linked properly in the system.",
-        "Whole team is responsible for the Product Backlog instead of 'Product Owner'.",
+        "Whole team is responsible for the Product Backlog instead of single 'Product Owner' person.",
         "The assigned role is mislabeled or does not follow the standard 'Product Owner' role naming.",
-        "Team might not be aware of the need to explicitly mark a Product Owner as responsible."
+        "Team might not be aware of the need to explicitly mark a Product Owner as responsible.",
+        "Another role in team is responsible for backlog and not the Product Owner."
     ]
+
+    def consequences = []
+    consequences << "Loss of accountability – unclear ownership leads to inconsistent backlog management."
+    consequences << "Reduced transparency – stakeholders and the team lack clarity on backlog priorities."
+    consequences << "Weakened Scrum implementation – lack of a Product Owner disrupts the balance of Scrum roles."
+    consequences << "Lack of clear ownership may lead to misalignment with business goals."
+    consequences << "Financial impact and time problems - inefficient backlog management might result in wasted development time and increased costs."
 
     // We'll collect issues in 'symptoms' to provide detailed info on failures.
     def symptoms = []
@@ -58,7 +66,7 @@ def evaluate(teamData) {
             // Ensure that responsible person is a 'Product Owner'
             def isProductOwner = (responsiblePerson?.Role?.RoleName == "Product Owner")
             if (!isProductOwner) {
-                symptoms << "Responsible person '${responsiblePerson.FirstName ?: 'Unknown'}' is not a Product Owner."
+                symptoms << "Responsible person '${responsiblePerson.FirstName} ${responsiblePerson.LastName}' is not a 'Product Owner' but '${responsiblePerson.Role.RoleName}'."
             }
         }
     }
@@ -76,13 +84,14 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

@@ -16,8 +16,7 @@ def evaluate(teamData) {
     def name = "Increment Product Goal Check"
     def severityFail = "Critical"
     def definition = """
-        This check ensures every Increment is aligned with a Product Goal by verifying
-        that each Increment has a valid (non-null) ProductGoal assigned.
+        This check ensures every Increment is aligned with a Product Goal.
     """.stripIndent().trim()
 
     def possibleRootCauses = [
@@ -28,6 +27,18 @@ def evaluate(teamData) {
 
     // We'll collect which increments fail this check.
     def symptoms = []
+
+    def consequences = []
+    consequences << "Loss of product focus – team delivers work that does not contribute to strategic goals."
+    consequences << "Loss of transparency – stakeholders struggle to understand how increments support the product vision."
+    consequences << "Increased risk of delivering low-value or non-essential functionality."
+    consequences << "Failure to maximize business value – time and resources spent on increments that do result in meaningful progress."
+    consequences << "Misalignment between the Development Team and Product Owner, leading to conflicting priorities."
+    consequences << "Loss of trust – unpredictable product evolution undermines confidence in the team."
+    consequences << "Longer time to market – efforts spent on unaligned increments delay delivery of high-impact features."
+    consequences << "Technical debt – work on irrelevant increments may cause unnecesary complexity."
+    consequences << "Scrum team dysfunction – ineffective Sprint Planning and Review due to unclear alignment with the Product Goal."
+    consequences << "Increment unbounded in iteration – team struggles to define when meaningful progress has been made."
     
     // ----------------------------------------------------------------------------
     // 2. Retrieve increments and check for ProductGoalID
@@ -40,7 +51,7 @@ def evaluate(teamData) {
     increments.each { inc ->
         if (inc.ProductGoalID == null) {
             // If increment is missing a ProductGoalID, we record that in symptoms
-            symptoms << "[Increment '${inc.Description}'] has no ProductGoal."
+            symptoms << "Increment with description '${inc.Description}' has no ProductGoal."
         }
     }
 
@@ -57,13 +68,14 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

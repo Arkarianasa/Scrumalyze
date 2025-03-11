@@ -106,7 +106,7 @@ const TeamDashboard = () => {
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         {teamData.evaluation?.evaluatedOn
-                                            ? new Date(teamData.evaluation.evaluatedOn).toLocaleString()
+                                            ? "Evaluation from: " + new Date(teamData.evaluation.evaluatedOn).toLocaleString()
                                             : "Not yet evaluated"}
                                     </Typography>
                                 </div>
@@ -151,7 +151,7 @@ const TeamDashboard = () => {
                             </Typography>
                             <Typography variant="body2" color="textSecondary" >
                             {teamData.evaluation?.evaluatedOn
-                                            ? new Date(teamData.evaluation.evaluatedOn).toLocaleString()
+                                            ? "Evaluation from: " + new Date(teamData.evaluation.evaluatedOn).toLocaleString()
                                             : "Not yet evaluated"}
                             </Typography>
                             <Box

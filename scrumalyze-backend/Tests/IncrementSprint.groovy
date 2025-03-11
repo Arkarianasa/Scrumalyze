@@ -22,8 +22,21 @@ def evaluate(teamData) {
 
     def possibleRootCauses = [
         "Related sprint is not correctly recorded in all or some of Increments.",
-        "todo"
+        "Increment was created outside of a sprint, indicating poor sprint planning.",
+        "The Scrum Team is producing work without a structured sprint goal.",
+        "Increments are being carried over across multiple sprints.",
+        "Increment delivery is chaotic, with no clear relation to a structured iteration."
     ]
+
+    def consequences = []
+    consequences << "Loss of sprint focus – increments may not align with planned sprint objectives."
+    consequences << "Reduced transparency – unclear tracking of work progress within sprints."
+    consequences << "Increased risk of scope creep – work might be introduced without proper sprint planning."
+    consequences << "Delivered work may lack proper context esp. for stakeholders."
+    consequences << "Failure to meet Sprint Goals – increments are not purposefully contributing to planned objectives."
+    consequences << "Decreased stakeholder confidence – unpredictable delivery cycles make it hard to trust the process."
+    consequences << "Scrum Team inefficiency – poor sprint discipline leads to unstructured delivery and wasted time and resources."
+    consequences << "Increment unbounded in iteration."
 
     // We'll collect which increments fail this check.
     def symptoms = []
@@ -40,7 +53,7 @@ def evaluate(teamData) {
     increments.each { inc ->
         if (inc.SprintID == null) {
             // Record this increment as a failure
-            symptoms << "[Increment '${inc.Description ?: 'No Description'}'] has no Sprint assigned."
+            symptoms << "Increment with description '${inc.Description ?: 'No Description'}' has no Sprint assigned."
         }
     }
 
@@ -57,13 +70,14 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

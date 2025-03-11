@@ -21,10 +21,22 @@ def evaluate(teamData) {
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "The team has not defined any Product Goals (0 found).",
+        "The team has not defined any Product Goals.",
         "Multiple product goals have been created and not consolidated into a single overarching goal.",
-        "Data is duplicated or incorrectly recorded, resulting in multiple entries for the same goal."
+        "Data is duplicated or incorrectly recorded, resulting in multiple entries for the same goal.",
+        "The team is working on two separate projects without clear distinction.",
+        "Stakeholders or management have introduced multiple competing goals without proper alignment."
     ]
+
+    def consequences = []
+    consequences << "Loss of focus – without a single Product Goal, the team may work in multiple, conflicting directions."
+    consequences << "Reduced transparency – stakeholders and the team may struggle to understand the product's strategic direction."
+    consequences << "Misalignment – team efforts may become scattered, leading to inefficiencies and wasted resources."
+    consequences << "Inconsistent prioritization – unclear goals make it difficult to determine what work is most valuable."
+    consequences << "Stakeholder confusion – unclear or multiple goals may lead to miscommunication about the product’s vision."
+    consequences << "Scope creep – without a single guiding goal, uncontrolled feature additions may dilute product focus."
+    consequences << "Delays and inefficiencies – team may waste time debating priorities rather than making meaningful progress."
+    consequences << "Financial impact – misaligned development efforts may lead to increased costs with lower value delivery."
 
     // We'll use 'symptoms' to log specific conditions, e.g., zero or multiple goals
     def symptoms = []
@@ -49,29 +61,30 @@ def evaluate(teamData) {
         passed = false
         severity = "Critical"
         outcomeDescription = "No ProductGoals found."
-        symptoms << "Team has zero ProductGoals."
+        symptoms << "Team has zero Product Goals."
     } else if (productGoals.size() == 1) {
         passed = true
         severity = "None"
-        outcomeDescription = "Exactly one ProductGoal is present."
+        outcomeDescription = "Exactly one Product Goal is present."
     } else {
         passed = false
         severity = "Major"
         outcomeDescription = "Multiple ProductGoals found."
-        symptoms << "Team has ${productGoals.size()} ProductGoals."
+        symptoms << "Team has ${productGoals.size()} Product Goals."
     }
 
     // ----------------------------------------------------------------------------
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

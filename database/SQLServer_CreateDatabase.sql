@@ -243,6 +243,7 @@ CREATE TABLE ScrumEvaluationTest
     -- Arrays of strings stored as JSON text
     SymptomsJson NVARCHAR(MAX) NULL, 
     PossibleRootCausesJson NVARCHAR(MAX) NULL,
+	PossibleConsequencesJson NVARCHAR(MAX) NULL,
 
 	FOREIGN KEY (ScrumEvaluationID) REFERENCES ScrumEvaluation(ScrumEvaluationID)
 );

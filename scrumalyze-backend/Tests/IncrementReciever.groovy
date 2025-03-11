@@ -33,11 +33,24 @@ def evaluate(teamData) {
         This check verifies that each increment is received by a non-team member 'Stakeholder'.
     """.stripIndent().trim()
 
-    def possibleRootCauses = [
-        "Valid (non team member) person - stakeholder is not properly recorded as the increment reciever.",
-        "A scrum team member is incorectly recieving increment.",
-        "The 'Stakeholder' role is differently named or not configured properly in the system."
+        def possibleRootCauses = [
+        "The intended stakeholder is missing or incorrectly recorded as an increment receiver.",
+        "A Scrum Team member is incorrectly receiving the increment instead of a stakeholder.",
+        "Stakeholder engagement is weak, leading to increments being assigned internally.",
+        "Organizational processes do not enforce the correct handoff of increments to stakeholders.",
+        "Stakeholder role is differently named or not configured properly."
     ]
+
+    def consequences = []
+    consequences << "Loss of transparency – unclear accountability for delivered increments."
+    consequences << "Stakeholder disengagement – missing direct feedback from those impacted by the increment."
+    consequences << "Risk of internal bias – Scrum Team self-validates increments without external validation."
+    consequences << "Reduced product value – increments may not solve real stakeholder needs."
+    consequences << "Failure to achieve Sprint Review purpose – missing validation from external stakeholders."
+    consequences << "Decreased trust from stakeholders – lack of involvement may cause less satisfaction and resistance to accept the result."
+    consequences << "Scrum Team inefficiency – delivering increments without external feedback may lead to wasted effort."
+    consequences << "Increment unbounded in iteration – lack of a proper receiver may result in incomplete or unapproved work."
+
 
     // We'll record the severity as an integer internally, then map it to a final severity string.
     // Also, we'll store symptoms for each failing increment.
@@ -74,13 +87,14 @@ def evaluate(teamData) {
     if (increments.isEmpty()) {
         // No increments => no issues found
         return [
-            name               : name,
-            definition         : definition,
-            severity           : "None",
-            passed             : true,
-            outcomeDescription : "No increments found; skipping check.",
-            symptoms           : [],
-            possibleRootCauses : possibleRootCauses
+            name                : name,
+            definition          : definition,
+            severity            : "None",
+            passed              : true,
+            outcomeDescription  : "No increments found; skipping check.",
+            symptoms            : [],
+            possibleRootCauses  : [],
+            possibleConsequences: []
         ]
     }
 
@@ -93,20 +107,20 @@ def evaluate(teamData) {
         if (!inc.ReceivedBy) {
             // Critical
             severityLevel = Math.max(severityLevel, 3)
-            symptoms << "Increment '${incDesc}' has no receiver set."
+            symptoms << "Increment with description '${incDesc}' has no receiver set."
         } else {
             // Check if scrum team member
             if (inc.ReceivedBy.IsScrumTeamMember == true) {
                 // Major
                 severityLevel = Math.max(severityLevel, 2)
-                symptoms << "Increment '${incDesc}' is received by a scrum team member."
+                symptoms << "Increment with description '${incDesc}' is received by a scrum team member."
             } else {
                 // Check if 'Stakeholder'
                 def roleName = inc.ReceivedBy?.Role?.RoleName ?: ""
                 if (roleName != "Stakeholder") {
                     // Minor
                     severityLevel = Math.max(severityLevel, 1)
-                    symptoms << "Increment '${incDesc}' is received by a non-stakeholder role: '${roleName}'."
+                    symptoms << "Increment with description '${incDesc}' is received by a non-stakeholder role: '${roleName}'."
                 }
             }
         }
@@ -124,13 +138,14 @@ def evaluate(teamData) {
     // 5. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : finalSeverity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : finalSeverity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

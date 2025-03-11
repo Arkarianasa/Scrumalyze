@@ -28,10 +28,26 @@ def evaluate(teamData) {
         "Some individuals have specialized titles or responsibilities that deviate from Scrum roles.",
     ]
 
+    def possibleRootCauses = [
+        "Scrum roles are used correctly but named differently due to organizational conventions.",
+        "Some team members have specialized responsibilities (e.g., 'Tech Lead', 'QA Specialist') that do not align with Scrum roles.",
+        "Scrum Team lacks clarity on team roles definitions, leading to role variations.",
+        "The organization is using a hybrid non SCRUM only framework that incorporates non-Scrum roles into the team.",
+        "Team members are assigned multiple conflicting roles, making it unclear how they contribute to the Scrum Team."
+    ]
+
+    def consequences = []
+    consequences << "Deviation from Scrum framework – unclear roles may reduce team efficiency and agility."
+    consequences << "Role confusion – non-standard roles create ambiguity in responsibilities and decision-making."
+    consequences << "Reduced transparency – stakeholders and management may not understand who is accountable for what."
+    consequences << "Weakened self-organization – non-standard roles may introduce hierarchy or micromanagement."
+    consequences << "Disrupted team dynamics – additional roles may interfere with the collaborative nature of Scrum."
+    consequences << "Sprint inefficiencies – misaligned roles can lead to gaps or overlaps in responsibility."
+    consequences << "Failure in Scrum events – unclear roles may lead to ineffective Sprint Planning, Reviews, and Retrospectives."
+    consequences << "Loss of adaptability – additional roles may slow down decision-making and reduce agility."
+
     // We'll collect any team members who have a non-standard role
     def symptoms = []
-
-
 
     // ----------------------------------------------------------------------------
     // 2. Retrieve Persons and evaluate
@@ -68,13 +84,14 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

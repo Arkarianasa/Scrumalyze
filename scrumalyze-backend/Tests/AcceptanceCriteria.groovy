@@ -37,6 +37,14 @@ def evaluate(teamData) {
     def resultPass = "All work items have Acceptance Criteria."
     def resultFail = "Some or all work items are missing Acceptance Criteria."
 
+    def consequences = []
+    consequences << "Loss of trust."
+    consequences << "Loss of transparency."
+    consequences << "Increased risk of inconsistent quality across work items."
+    consequences << "Failure of the team to recognize that the work item can be delivered."
+    consequences << "Financial impact and time problems - by fixing things that haven't been delivered and because of wasting time on finished work items (gold plating)."
+    consequences << "Increment unbounded in iteration - increment may contain non delivered work items."
+
     // We'll collect symptoms for failed work items
     def symptoms = []
 
@@ -53,7 +61,7 @@ def evaluate(teamData) {
 
     // Fill in the symptoms array with a note on each failed WorkItem
     workItemsWithoutAC.each { workItem ->
-        symptoms << "[WorkItem with description '${workItem.description}]' is MISSING Acceptance Criteria."
+        symptoms << "WorkItem with description '${workItem.description}' is MISSING Acceptance Criteria."
     }
 
     // ----------------------------------------------------------------------------
@@ -67,13 +75,14 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses: possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

@@ -25,11 +25,23 @@ def evaluate(teamData) {
     """.stripIndent().trim()
 
     def possibleRootCauses = [
-        "Team has not defined a Product Goal, or hasn't linked it to the backlog.",
+        "The team has not defined a Product Goal.",
+        "Product Goal exists but is not correctly recorded or linked to the Product Backlog.",
+        "The team is working on backlog items without a clear overarching Product Goal.",
+        "Product Owner has failed and doesn't understand the importance of linking backlog items to a Product Goal."
     ]
 
-    // We'll collect details of any issues here
-    def symptoms = []
+    todo
+    def consequences = []
+    consequences << "Loss of strategic direction – backlog items may not contribute to long-term objectives."
+    consequences << "Reduced transparency – stakeholders cannot see how backlog items creates product value."
+    consequences << "Increased risk of misalignment – team may work on low-priority or irrelevant backlog items."
+    consequences << "Ineffective Sprint Planning – backlog lacks a clear vision, making prioritization difficult."
+    consequences << "Stakeholder dissatisfaction – unclear product vision may lead to misaligned expectations."
+    consequences << "Failure to deliver maximum value – backlog may include work that does not support business outcomes."
+    consequences << "Scrum Team inefficiency – team may waste time on tasks that do not advance the product."
+    consequences << "Potential scope creep – work expands without a structured vision to guide prioritization."
+    consequences << "Increment unbounded in iteration – team struggles to define what success looks like for each sprint."
 
     // ----------------------------------------------------------------------------
     // 2. Retrieve the ProductBacklog and evaluate
@@ -66,13 +78,14 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

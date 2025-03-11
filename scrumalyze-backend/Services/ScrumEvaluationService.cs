@@ -259,6 +259,7 @@ namespace Scrumalyze.Services
                                 // Arrays
                                 var symptomsArray = testResult["symptoms"] as Newtonsoft.Json.Linq.JArray;
                                 var rootCausesArray = testResult["possibleRootCauses"] as Newtonsoft.Json.Linq.JArray;
+                                var consequencesArray = testResult["possibleConsequences"] as Newtonsoft.Json.Linq.JArray;
 
                                 var symptoms = (symptomsArray != null)
                                     ? symptomsArray.ToObject<List<string>>()
@@ -266,6 +267,10 @@ namespace Scrumalyze.Services
 
                                 var rootCauses = (rootCausesArray != null)
                                     ? rootCausesArray.ToObject<List<string>>()
+                                    : new List<string>();
+
+                                var consequences = (consequencesArray != null)
+                                    ? consequencesArray.ToObject<List<string>>()
                                     : new List<string>();
 
                                 // Build child entity
@@ -279,7 +284,8 @@ namespace Scrumalyze.Services
                                     Passed = passed,
                                     OutcomeDescription = outcomeDescription,
                                     Symptoms = symptoms,
-                                    PossibleRootCauses = rootCauses
+                                    PossibleRootCauses = rootCauses,
+                                    PossibleConsequences = consequences,
                                 };
 
                                 // Insert into DB

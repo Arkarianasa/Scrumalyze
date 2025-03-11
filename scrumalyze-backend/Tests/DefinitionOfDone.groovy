@@ -7,7 +7,7 @@ import groovy.json.JsonOutput
  * 
  * Rules:
  * 1) Major failure if any Work Item has zero DefinitionsOfDone or all are null/empty.
- * 2) Minor failure if DoD sets differ among Work Items.
+ * 2) Critical failure if DoD sets differ among Work Items.
  * 3) Otherwise, pass with severity = "None".
  *
  * Usage: groovy DefinitionOfDone.groovy <path_to_json_file>
@@ -38,30 +38,33 @@ def evaluate(teamData) {
     possibleRootCauses << "Definition of Done exists, but they are not properly recorded in the system."
     possibleRootCauses << "Team does not use Definitions of Done for all or some of their work items."
     possibleRootCauses << "Definitions of Done exist only as part of the item-specific 'Acceptance Criteria'."
-    
+    possibleRootCauses << "Team is not consistent in using of Definitions Of Done or does not understand them."
 
     // We’ll store ‘symptoms’ of each failure here
     def symptoms = []
 
     // We have two potential failure severities:
     // - Major if some items have zero or all-empty DoDs
-    // - Minor if DoDs differ among items (assuming no Major issues)
+    // - Critical if DoDs differ among items (assuming no Major issues)
     // We track them separately and decide final severity after the checks.
     def majorFailures = false
-    def minorFailures = false
+    def criticalFailures = false
+
+    def majorOutcomeDescription = "One or more work items have missing or null/empty Definitions of Done."
+    def criticalOutcomeDescription = "Definitions of Done differ among one or more work items."
 
     // Helper messages
     def resultPass = "All work items have consistent, non-empty Definitions of Done."
-    // We’ll refine final fail message once we know if it’s Major or Minor.
+    // We’ll refine final fail message once we know if it’s Major or Critical.
 
     def consequences = []
-    consequences << "Neschopnost týmu rozpoznat, že WI je done."
-    consequences << "Ztrata transparentnosti."
-    consequences << "Problemy s casem, hrozi gold plating - moc prace zbytecne."
-    consequences << "Ztrata duvery."
-    consequences << "Hrozi kumulace technickeho dluhu. V DoD muzou byt prvky ktere zamezuji tvorbe dluhu."
-    consequences << "Financni vliv, drazsi reseni."
-    consequences << "Neohranicenost inkrementu v iteraci - muze obsahovat non done work items."
+    consequences << "Loss of trust."
+    consequences << "Loss of transparency."
+    consequences << "Increased risk of inconsistent quality across work items."
+    consequences << "Failure of the team to recognize that the work item is done."
+    consequences << "Technical debt threatens to accumulate. There may be definitions of done that would prevent it."
+    consequences << "Increment unbounded in iteration - increment may contain non done work items."
+    consequences << "Financial impact and time problems - because of fixing things that weren’t truly done and by wasting time on done work items (gold plating)."
 
     // ----------------------------------------------------------------------------
     // 2. Evaluation Logic
@@ -93,7 +96,7 @@ def evaluate(teamData) {
 
         if (!definitions || definitions.isEmpty()) {
             majorFailures = true
-            symptoms << "[WorkItem ${wi.WorkItemID}] has no Definitions of Done."
+            symptoms << "WorkItem with description '${wi.description}' has no Definitions of Done."
             // Even though we found a major failure, we continue checking others
             // to gather full list of failing items
         } else {
@@ -104,7 +107,7 @@ def evaluate(teamData) {
 
             if (descSet.isEmpty()) {
                 majorFailures = true
-                symptoms << "[WorkItem ${wi.WorkItemID}] has only null or empty DoD descriptions."
+                symptoms << "WorkItem with description '${wi.description}' has only null or empty DoD descriptions."
             } else {
                 // Keep track for consistency check
                 listOfDoDSets << descSet
@@ -112,16 +115,11 @@ def evaluate(teamData) {
         }
     }
 
-    // If we already have major failures, we do NOT need to check DoD consistency
-    // because major overrides minor. But let's still do the consistency check
-    // for items that had valid sets, in case you want a complete picture.
-    // If majorFailures is true, we won't override it with minor, but we’ll
-    // still detect if sets differ.
     if (!majorFailures && listOfDoDSets.size() > 1) {
         // Convert the list of sets into a Set of sets to see if there's more than 1 distinct entry
-        def distinctSets = listOfDoDSets.toSet()
+        def distinctSets = listOfDoDSets.collect { new TreeSet(it) }.toSet()
         if (distinctSets.size() > 1) {
-            minorFailures = true
+            criticalFailures = true
             symptoms << "Definitions of Done differ across multiple work items."
         }
     }
@@ -129,32 +127,34 @@ def evaluate(teamData) {
     // ----------------------------------------------------------------------------
     // 3. Determine pass/fail
     // ----------------------------------------------------------------------------
-    def passed = !(majorFailures || minorFailures)
+    def passed = !(majorFailures || criticalFailures)
     def severity = 'None'
     def outcomeDescription = resultPass
 
     if (majorFailures) {
         severity = 'Major'
-        outcomeDescription = "One or more work items have missing or null/empty Definitions of Done."
+        outcomeDescription = majorOutcomeDescription
 
-    } else if (minorFailures) {
+    }
+    if (criticalFailures) {
         severity = 'Critical'
-        possibleRootCauses = []
-        possibleRootCauses << "Team is not consistent in using of Definitions Of Done or does not understand them."
-        outcomeDescription = "Definitions of Done differ among one or more work items."
+        outcomeDescription = criticalOutcomeDescription
+        if (majorFailures)
+            outcomeDescription += " And " + majorOutcomeDescription
     }
 
     // ----------------------------------------------------------------------------
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

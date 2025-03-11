@@ -34,12 +34,20 @@ def evaluate(teamData) {
 
     // Possible root causes (when the check fails):
     def possibleRootCauses = []
-    possibleRootCauses << "Team members might not be aware of the mandatory policy items."
-    possibleRootCauses << "Policy DoDs are not correctly recorded to each Work Item."
+    possibleRootCauses << "Team members might not be aware of the mandatory policy DoDs."
+    possibleRootCauses << "Policy DoDs are not correctly linked to each Work Item."
     possibleRootCauses << "Company policy requirements have changed, but not all items are updated."
 
     // We'll collect which items are missing mandatory policy DoDs here
     def symptoms = []
+
+    def consequences = []
+    consequences << "Loss of compliance with company standards and regulatory requirements."
+    consequences << "Increased risk of inconsistent quality across work items."
+    consequences << "Reduced clarity on when a work item is actually done."
+    consequences << "Time problems – additional rework required to bring work items in line with policy."
+    consequences << "Financial impact, more expensive solution because of wasted time and resources."
+    consequences << "Increment unbounded in iteration - increment may contain non done work items."
 
     // ----------------------------------------------------------------------------
     // 2. Identify the required company policy DoDs
@@ -57,13 +65,14 @@ def evaluate(teamData) {
     // If there are no company-policy items at all, we can pass with a note
     if (policyDescriptions.isEmpty()) {
         return [
-            name               : name,
-            definition         : definition,
-            severity           : "None",
-            passed             : true,
-            outcomeDescription : "No company policy DoDs found; skipping check.",
-            symptoms           : [],
-            possibleRootCauses : possibleRootCauses
+            name                : name,
+            definition          : definition,
+            severity            : "None",
+            passed              : true,
+            outcomeDescription  : "No company policy DoDs found; skipping check.",
+            symptoms            : [],
+            possibleRootCauses  : [],
+            possibleConsequences: []
         ]
     }
 
@@ -75,13 +84,14 @@ def evaluate(teamData) {
         // If there are required policy DoDs but no work items to check, 
         // we pass by default or treat it as no failures found.
         return [
-            name               : name,
-            definition         : definition,
-            severity           : "None",
-            passed             : true,
-            outcomeDescription : "No WorkItems provided; skipping check.",
-            symptoms           : [],
-            possibleRootCauses : possibleRootCauses
+            name                : name,
+            definition          : definition,
+            severity            : "None",
+            passed              : true,
+            outcomeDescription  : "No WorkItems provided; skipping check.",
+            symptoms            : [],
+            possibleRootCauses  : [],
+            possibleConsequences: []
         ]
     }
 
@@ -96,7 +106,7 @@ def evaluate(teamData) {
         // If the assigned set does NOT contain all policy-required constraints, we fail
         def missing = policyDescriptions - assignedPolicy
         if (!missing.isEmpty()) {
-            symptoms << "[WorkItem ${wi.WorkItemID}] is missing the following company-policy DoDs: " +
+            symptoms << "[WorkItem with description '${wi.description}' is missing the following company-policy DoDs: " +
                        missing.join(", ")
         }
     }
@@ -114,13 +124,14 @@ def evaluate(teamData) {
     // 5. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

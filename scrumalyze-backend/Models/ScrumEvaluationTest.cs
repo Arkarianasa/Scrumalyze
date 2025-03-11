@@ -23,6 +23,7 @@
             // JSON-stored arrays
             public string SymptomsJson { get; set; } = string.Empty;
             public string PossibleRootCausesJson { get; set; } = string.Empty;
+            public string PossibleConsequencesJson { get; set; } = string.Empty;
 
             [JsonIgnore]
             public required ScrumEvaluation ScrumEvaluation { get; set; }
@@ -55,6 +56,21 @@
                 set
                 {
                     PossibleRootCausesJson = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+                }
+            }
+
+            [NotMapped]
+            public List<string> PossibleConsequences
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(PossibleConsequencesJson))
+                        return new List<string>();
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(PossibleConsequencesJson);
+                }
+                set
+                {
+                    PossibleConsequencesJson = Newtonsoft.Json.JsonConvert.SerializeObject(value);
                 }
             }
         }
