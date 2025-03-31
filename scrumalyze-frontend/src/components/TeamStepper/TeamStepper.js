@@ -279,9 +279,9 @@ const AddTeamStepper = () => {
   };
 
   return (
-    <Card style={{ textAlign: 'center', padding: '16px', height: '700px', display: 'flex', flexDirection: 'column' }}>
+    <Card style={{ textAlign: 'center', padding: '16px', height: '750px', display: 'flex', flexDirection: 'column' }}>
       <CardContent style={{ flexGrow: 1, overflow: 'auto' }}>
-        <Typography style={{ paddingBottom: '16px' }} variant="h4" color='primary'>New Team Page</Typography>
+        {/*<Typography style={{ paddingBottom: '16px' }} variant="h4" color='primary'>New Team Page</Typography>*/}
         <Stepper activeStep={activeStep}>
           {steps.map((label, index) => (
             <Step key={index}>

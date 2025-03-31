@@ -26,15 +26,29 @@ def evaluate(teamData) {
     def severityFail = "Major"
     def definition = """
         This check ensures that each Sprint is assigned a non-null and non-empty 
-        Sprint Backlog. A missing or empty backlog indicates improper planning 
-        or incomplete configuration for the sprint, and is treated as a 'Major' issue.
+        Sprint Backlog.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     def possibleRootCauses = [
-        "Team has not created or assigned a Sprint Backlog for each sprint.",
-        "Automation or integration failed to add backlog items to the sprint record.",
-        "Sprint Backlog is documented elsewhere and not linked in the current system."
+        "Sprint Backlog might exist but is not correctly recorded in the system for one or more Sprints.",
+        "Sprint Planning was incomplete or not properly executed, leading to an empty backlog.",
+        "Work items are being tracked outside the Scrum framework, bypassing the Sprint Backlog.",
+        "Sprint Goals and priorities were unclear, leading to a lack of planned work items.",
+        "The team is not using Sprint Backlogs and only works with the Product Backlog."
     ]
+
+    def consequences = []
+    consequences << "Loss of structure – without a Sprint Backlog, the team lacks a clear execution plan."
+    consequences << "Reduced transparency – stakeholders and the team may not have visibility into Sprint progress."
+    consequences << "Misalignment – unclear Sprint objectives may lead to confusion about what work is being delivered."
+    consequences << "Increased risk of Sprint failure – missing backlog items may result in an unproductive iteration."
+    consequences << "Difficulty in tracking progress – without a defined Sprint Backlog, velocity and forecasting accuracy suffer."
+    consequences << "Scrum Team inefficiency – lack of clear Sprint tasks can lead to idle time, misallocated efforts, or chaotic workflows."
+    consequences << "Potential scope creep – missing Sprint Backlogs may lead to ad-hoc work being introduced without proper prioritization."
+    consequences << "Loss of trust – stakeholders and management may question the team's ability to effectively manage work."
 
     // We'll record which sprints are missing or have empty backlogs
     def symptoms = []
@@ -85,13 +99,15 @@ def evaluate(teamData) {
     // 5. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

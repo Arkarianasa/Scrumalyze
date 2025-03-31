@@ -22,11 +22,26 @@ def evaluate(teamData) {
         is specifically a 'Product Owner'.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 2
+
     def possibleRootCauses = [
-        "ProductGoal was created without linking a responsible person.",
-        "'Product Owner' role is not set to the Product Owner that is responsible for this goal.",
-        "Whole team is responsible for Product Goal instead of 'Product Owner'."
+        "The Product Goal has not been created or linked properly in the system.",
+        "Whole team is responsible for the Product Goal instead of single 'Product Owner' person.",
+        "The assigned role is mislabeled or does not follow the standard 'Product Owner' role naming.",
+        "Team might not be aware of the need to explicitly mark a Product Owner as responsible person for Product Goal.", //todo
+        "Another role in team is responsible for product goal and not the Product Owner."
     ]
+
+    def consequences = []
+    consequences << "Loss of accountability – unclear ownership leads to inconsistent product goal management."
+    consequences << "Loss of trust – stakeholders and team members may lose confidence in the product’s direction due to unclear ownership."
+    consequences << "Reduced transparency – stakeholders and the team may struggle to understand who is responsible for the Product Goal."
+    consequences << "Stakeholder misalignment – unclear ownership may result in conflicting priorities and expectations."
+    consequences << "Risk of goal neglect – without a responsible Product Owner, the Product Goal may lose focus and direction."
+    consequences << "Scope creep – uncontrolled adjustments to the Product Goal may lead to unstructured product development."
+    consequences << "Delays and inefficiencies – time wasted on misaligned work due to unclear Product Goal ownership."
+    consequences << "Financial impact – mismanagement of Product Goals may lead to increased costs with reduced value delivery."
 
     // We'll track any ProductGoal that fails one of the conditions in 'symptoms'
     def symptoms = []
@@ -78,13 +93,15 @@ def evaluate(teamData) {
     // 5. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

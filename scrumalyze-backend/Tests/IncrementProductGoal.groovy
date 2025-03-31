@@ -19,6 +19,9 @@ def evaluate(teamData) {
         This check ensures every Increment is aligned with a Product Goal.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 3
+
     def possibleRootCauses = [
         "Team is producing increments that are not related to product goal and therefore non relevant.",
         "Team is not aware that increments needs to be linked to a product goal.",
@@ -38,7 +41,7 @@ def evaluate(teamData) {
     consequences << "Longer time to market – efforts spent on unaligned increments delay delivery of high-impact features."
     consequences << "Technical debt – work on irrelevant increments may cause unnecesary complexity."
     consequences << "Scrum team dysfunction – ineffective Sprint Planning and Review due to unclear alignment with the Product Goal."
-    consequences << "Increment unbounded in iteration – team struggles to define when meaningful progress has been made."
+    consequences << "Increment unbound in iteration – team struggles to define when meaningful progress has been made."
     
     // ----------------------------------------------------------------------------
     // 2. Retrieve increments and check for ProductGoalID
@@ -70,6 +73,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

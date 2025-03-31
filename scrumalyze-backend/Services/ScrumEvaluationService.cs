@@ -1,5 +1,4 @@
-﻿using Scrumalyze.Classes;
-using Scrumalyze.Data;
+﻿using Scrumalyze.Data;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using Scrumalyze.Dtos;
@@ -153,12 +152,13 @@ namespace Scrumalyze.Services
                 .Where(e => e.ScrumTeamID == teamID)
                 .OrderByDescending(e => e.EvaluatedOn)
                 .Include(e => e.Tests)
+                .ThenInclude(t => t.ScrumEvaluationTestCategory)
                 .FirstOrDefault();
         }
 
         public ScrumEvaluation? EvaluateScrumImplementation(int teamID)
         {
-            // 1) Load the Scrum Team
+            // Load the Scrum Team
             var team = _context.ScrumTeam
                 .Include(st => st.ScrumRoles)
                 .Include(st => st.Persons).ThenInclude(p => p.Role)
@@ -170,14 +170,15 @@ namespace Scrumalyze.Services
                 .Include(st => st.Sprints).ThenInclude(s => s.SprintGoal)
                 .Include(st => st.Sprints).ThenInclude(s => s.ProductGoal)
                 .Include(st => st.Increments)
+                .Include(st => st.ProcessSteps).ThenInclude(ps => ps.ProcessStepType)
                 .FirstOrDefault(t => t.ScrumTeamID == teamID);
 
             if (team == null)
                 return null;
 
-            // 2) Also load related WorkItems (if needed by Groovy scripts)
+            // Load WorkItems Data
             var workItems = _context.WorkItem
-                .Include(wi => wi.Persons)
+                .Include(wi => wi.Persons).ThenInclude(pw => pw.Person).ThenInclude(p => p.Role)
                 .Include(wi => wi.AcceptanceCriterias).ThenInclude(ac => ac.AcceptanceCriteria)
                 .Include(wi => wi.DefinitionsOfDone).ThenInclude(dods => dods.DefinitionOfDone)
                 .Include(wi => wi.WorkItemType)
@@ -186,7 +187,15 @@ namespace Scrumalyze.Services
                           && wi.BacklogItem.ProductBacklog.ScrumTeamID == teamID)
                 .ToList();
 
-            // 3) Create a new ScrumEvaluation (parent)
+            // Load Communication Data
+            var communication = _context.Communication
+                .Include(c => c.SourcePerson).ThenInclude(p => p.Role)
+                .Include(c => c.TargetPerson).ThenInclude(p => p.Role)
+                .Where(c => team.Persons.Select(p => p.PersonID).Contains(c.SourcePersonID)
+                         && team.Persons.Select(p => p.PersonID).Contains(c.TargetPersonID))
+                .ToList();
+
+            // Create a new ScrumEvaluation (parent)
             //    so we keep a record of this run (the "date for all tests")
             var newEvaluation = new ScrumEvaluation
             {
@@ -197,14 +206,15 @@ namespace Scrumalyze.Services
             _context.ScrumEvaluation.Add(newEvaluation);
             _context.SaveChanges(); // get the ID
 
-            // 4) Build an object to pass to Groovy scripts
+            // Build an object to pass to Groovy scripts
             var teamData = new
             {
                 team,
-                WorkItems = workItems
+                WorkItems = workItems,
+                Communication = communication,
             };
 
-            // 5) Serialize to JSON file
+            // Serialize to JSON file
             var jsonSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
@@ -216,7 +226,7 @@ namespace Scrumalyze.Services
             // Prepare to store test results in a local list, for computing final score
             var allTestResults = new List<ScrumEvaluationTest>();
 
-            // 6) Run each Groovy script
+            // Run each Groovy script
             string testDirectory = "Tests";
             if (Directory.Exists(testDirectory))
             {
@@ -252,9 +262,12 @@ namespace Scrumalyze.Services
                             {
                                 bool passed = (bool)testResult["passed"];
                                 string name = (string)testResult["name"];
+                                int categoryID = (int)testResult["categoryID"];
                                 string definition = (string)testResult["definition"];
                                 string severity = passed ? "None" : (string)testResult["severity"];
                                 string outcomeDescription = (string)testResult["outcomeDescription"];
+
+                                var category = _context.ScrumEvaluationTestCategory.First(c => c.ScrumEvaluationTestCategoryID == categoryID);
 
                                 // Arrays
                                 var symptomsArray = testResult["symptoms"] as Newtonsoft.Json.Linq.JArray;
@@ -277,6 +290,8 @@ namespace Scrumalyze.Services
                                 var childTest = new ScrumEvaluationTest
                                 {
                                     ScrumEvaluationID = newEvaluation.ScrumEvaluationID,
+                                    ScrumEvaluationTestCategoryID = categoryID,
+                                    ScrumEvaluationTestCategory = category,
                                     ScrumEvaluation = newEvaluation,
                                     Name = name,
                                     Definition = definition,
@@ -285,7 +300,7 @@ namespace Scrumalyze.Services
                                     OutcomeDescription = outcomeDescription,
                                     Symptoms = symptoms,
                                     PossibleRootCauses = rootCauses,
-                                    PossibleConsequences = consequences,
+                                    PossibleConsequences = consequences
                                 };
 
                                 // Insert into DB
@@ -316,7 +331,7 @@ namespace Scrumalyze.Services
                 Console.WriteLine($"Test directory '{testDirectory}' does not exist.");
             }
 
-            // 7) Compute final ScorePercentage from how many tests passed
+            // Compute final ScorePercentage from how many tests passed
             if (allTestResults.Count > 0)
             {
                 int passedCount = allTestResults.Count(tr => tr.Passed);
@@ -331,7 +346,7 @@ namespace Scrumalyze.Services
             // Update DB with final score
             _context.SaveChanges();
 
-            // 8) Return the new parent record with final data
+            // Return the new parent record with final data
             return newEvaluation;
         }
 

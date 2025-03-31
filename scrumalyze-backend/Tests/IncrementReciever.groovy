@@ -33,6 +33,9 @@ def evaluate(teamData) {
         This check verifies that each increment is received by a non-team member 'Stakeholder'.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 2
+
         def possibleRootCauses = [
         "The intended stakeholder is missing or incorrectly recorded as an increment receiver.",
         "A Scrum Team member is incorrectly receiving the increment instead of a stakeholder.",
@@ -49,7 +52,7 @@ def evaluate(teamData) {
     consequences << "Failure to achieve Sprint Review purpose – missing validation from external stakeholders."
     consequences << "Decreased trust from stakeholders – lack of involvement may cause less satisfaction and resistance to accept the result."
     consequences << "Scrum Team inefficiency – delivering increments without external feedback may lead to wasted effort."
-    consequences << "Increment unbounded in iteration – lack of a proper receiver may result in incomplete or unapproved work."
+    consequences << "Increment unbound in iteration – lack of a proper receiver may result in incomplete or unapproved work."
 
 
     // We'll record the severity as an integer internally, then map it to a final severity string.
@@ -89,6 +92,7 @@ def evaluate(teamData) {
         return [
             name                : name,
             definition          : definition,
+            categoryID          : categoryID,
             severity            : "None",
             passed              : true,
             outcomeDescription  : "No increments found; skipping check.",
@@ -140,6 +144,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : finalSeverity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

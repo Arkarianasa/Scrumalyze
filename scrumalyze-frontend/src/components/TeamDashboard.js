@@ -147,7 +147,7 @@ const TeamDashboard = () => {
                     <Card style={{ height: '100%' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
-                                Pathological Behaviours
+                                Detected Pathological Behaviours
                             </Typography>
                             <Typography variant="body2" color="textSecondary" >
                             {teamData.evaluation?.evaluatedOn
@@ -183,7 +183,7 @@ const TeamDashboard = () => {
                 </Grid>
 
                 {/* Product Backlog */}
-                <Grid item xs={12} sm={6} md={4} style={{ height: '500px' }}>
+                <Grid item xs={12} sm={6} md={4} style={{ height: '550px' }}>
                     <Card style={{ height: '100%', flexGrow: 1, overflow: 'auto' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
@@ -291,7 +291,7 @@ const TeamDashboard = () => {
                 </Grid>
 
                 {/* Sprints */}
-                <Grid item xs={12} sm={6} md={4} style={{ height: '500px' }}>
+                <Grid item xs={12} sm={6} md={4} style={{ height: '550px' }}>
                     <Card style={{ height: '100%', flexGrow: 1, overflow: 'auto' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>
@@ -335,7 +335,7 @@ const TeamDashboard = () => {
 
 
                 {/* Team Members */}
-                <Grid item xs={12} sm={6} md={4} style={{ height: '500px' }}>
+                <Grid item xs={12} sm={6} md={4} style={{ height: '550px' }}>
                     <Card style={{ height: '100%', flexGrow: 1, overflow: 'auto' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom>

@@ -17,6 +17,7 @@ namespace Scrumalyze.Data
         public DbSet<ScrumTeam> ScrumTeam { get; set; }
 
         public DbSet<ScrumEvaluation> ScrumEvaluation { get; set; }
+        public DbSet<ScrumEvaluationTestCategory> ScrumEvaluationTestCategory { get; set; }
         public DbSet<ScrumEvaluationTest> ScrumEvaluationTest { get; set; }
 
         public DbSet<Timebox> Timebox { get; set; }
@@ -66,6 +67,11 @@ namespace Scrumalyze.Data
                       .HasDefaultValueSql("SYSUTCDATETIME()");
             });
 
+            modelBuilder.Entity<ScrumEvaluationTestCategory>(entity =>
+            {
+                entity.HasKey(e => e.ScrumEvaluationTestCategoryID);
+            });
+
             modelBuilder.Entity<ScrumEvaluationTest>(entity =>
             {
                 entity.HasKey(e => e.ScrumEvaluationTestID);
@@ -74,6 +80,11 @@ namespace Scrumalyze.Data
                       .WithMany(se => se.Tests)
                       .HasForeignKey(e => e.ScrumEvaluationID)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.ScrumEvaluationTestCategory)
+                    .WithMany(c => c.Tests)
+                    .HasForeignKey(e => e.ScrumEvaluationTestCategoryID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // PrioritizationScheme Primary Key

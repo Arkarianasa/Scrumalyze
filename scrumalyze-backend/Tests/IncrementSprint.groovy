@@ -20,6 +20,9 @@ def evaluate(teamData) {
         a lack of clear linkage between the planned work and the current sprint timeline.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 3
+
     def possibleRootCauses = [
         "Related sprint is not correctly recorded in all or some of Increments.",
         "Increment was created outside of a sprint, indicating poor sprint planning.",
@@ -36,7 +39,7 @@ def evaluate(teamData) {
     consequences << "Failure to meet Sprint Goals – increments are not purposefully contributing to planned objectives."
     consequences << "Decreased stakeholder confidence – unpredictable delivery cycles make it hard to trust the process."
     consequences << "Scrum Team inefficiency – poor sprint discipline leads to unstructured delivery and wasted time and resources."
-    consequences << "Increment unbounded in iteration."
+    consequences << "Increment unbound in iteration."
 
     // We'll collect which increments fail this check.
     def symptoms = []
@@ -72,6 +75,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

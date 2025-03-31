@@ -24,9 +24,28 @@ def evaluate(teamData) {
         The entire team should share responsibility for the Sprint Goal.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 2
+
     def possibleRootCauses = [
-        "A single individual was set as 'ResponsiblePerson' to track accountability for sprint goals, which counters scrum principles."
+        "A single individual was set as 'ResponsiblePerson' to track accountability for Sprint Goals, which counters Scrum principles.",
+        "The organization or management requires assigning a specific owner for goals instead of fostering team accountability.",
+        "Misinterpretation of Scrum principles led to incorrectly designating an individual as the Sprint Goal owner.",
+        "The team is not fully self-organizing and relies on a designated leader to drive Sprint Goals.",
+        "Legacy processes from traditional project management approaches influenced the practice of assigning individual accountability."
     ]
+
+    def consequences = []
+    consequences << "Loss of team accountability – assigning Sprint Goal responsibility to one person reduces collective ownership."
+    consequences << "Weakened self-organization – a single point of responsibility discourages the team from collaboratively driving Sprint success."
+    consequences << "Decreased motivation – other team members may disengage, assuming the responsible person will ensure goal completion."
+    consequences << "Risk of bottlenecks – having only one person accountable increases dependency and reduces adaptability to challenges."
+    consequences << "Stakeholder misalignment – incorrect role expectations may lead stakeholders to communicate only with the assigned individual instead of the full team."
+    consequences << "Reduced transparency – focusing responsibility on one individual may obscure the team's collective progress and accountability."
+    consequences << "Scrum framework deviation – violating the principle of shared responsibility undermines the effectiveness of Sprint execution."
+    consequences << "Loss of trust – management and stakeholders may question the team’s ability to work autonomously and collaboratively."
+    consequences << "Financial impact – ineffective Sprint Goal execution due to misaligned ownership can lead to wasted resources, rework, and decreased return on investment."
+
 
     // We'll collect specific sprints that have a single responsible person
     def symptoms = []
@@ -43,11 +62,10 @@ def evaluate(teamData) {
     // 3. Check each sprint's SprintGoal for a ResponsiblePerson
     // ----------------------------------------------------------------------------
     sprints.each { sprint ->
-        def sprintName = sprint.SprintGoal.Description ?: "that started on " + sprint.StartDate
         def sprintGoal = sprint.SprintGoal
 
         if (sprintGoal && (sprintGoal.ResponsiblePerson || sprintGoal.ResponsiblePersonID)) {
-            symptoms << "Sprint '${sprintName}' has a responsible person assigned to its SprintGoal."
+            symptoms << "Sprint that started '${sprint.StartDate}' has a responsible person assigned to its SprintGoal."
         }
     }
 
@@ -64,13 +82,15 @@ def evaluate(teamData) {
     // 5. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences:consequences
     ]
 }
 

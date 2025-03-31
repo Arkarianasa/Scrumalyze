@@ -16,7 +16,8 @@ namespace Scrumalyze.Models
         public int? ReceivedByID { get; set; }
         public required string Description { get; set; }
         public DateTime? Deadline { get; set; }
-        
+        public bool Done { get; set; }
+
         [JsonIgnore] // Prevent circular reference
         public required ScrumTeam ScrumTeam { get; set; }
         public Sprint? Sprint { get; set; }

@@ -32,11 +32,16 @@ def evaluate(teamData) {
         are present in every Work Item.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     // Possible root causes (when the check fails):
     def possibleRootCauses = []
     possibleRootCauses << "Team members might not be aware of the mandatory policy DoDs."
-    possibleRootCauses << "Policy DoDs are not correctly linked to each Work Item."
-    possibleRootCauses << "Company policy requirements have changed, but not all items are updated."
+    possibleRootCauses << "Policy DoDs are not correctly linked to each Work Item in the system."
+    possibleRootCauses << "Company policy requirements have changed, but not all work items are updated."
+    possibleRootCauses << "Company policy doesn't exist at all."
+    possibleRootCauses << "Company policy is recorded in acceptance criteria instead of in DoDs."
 
     // We'll collect which items are missing mandatory policy DoDs here
     def symptoms = []
@@ -45,9 +50,9 @@ def evaluate(teamData) {
     consequences << "Loss of compliance with company standards and regulatory requirements."
     consequences << "Increased risk of inconsistent quality across work items."
     consequences << "Reduced clarity on when a work item is actually done."
-    consequences << "Time problems – additional rework required to bring work items in line with policy."
+    consequences << "Time problems – additional rework required to bring work items in line with company policy."
     consequences << "Financial impact, more expensive solution because of wasted time and resources."
-    consequences << "Increment unbounded in iteration - increment may contain non done work items."
+    consequences << "Increment unbound in iteration - increment may contain non done work items."
 
     // ----------------------------------------------------------------------------
     // 2. Identify the required company policy DoDs
@@ -67,6 +72,7 @@ def evaluate(teamData) {
         return [
             name                : name,
             definition          : definition,
+            categoryID          : categoryID,
             severity            : "None",
             passed              : true,
             outcomeDescription  : "No company policy DoDs found; skipping check.",
@@ -86,6 +92,7 @@ def evaluate(teamData) {
         return [
             name                : name,
             definition          : definition,
+            categoryID          : categoryID,
             severity            : "None",
             passed              : true,
             outcomeDescription  : "No WorkItems provided; skipping check.",
@@ -126,6 +133,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

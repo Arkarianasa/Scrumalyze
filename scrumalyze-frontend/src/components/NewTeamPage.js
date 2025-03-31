@@ -4,7 +4,7 @@ import AddTeamStepper from '../components/TeamStepper/TeamStepper';
 
 const NewTeamPage = () => {
     return (
-        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '80px' }}>
+        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '80px', paddingLeft: '16px', paddingRight: '16px' }}>
             <AddTeamStepper />
         </Box>
     );

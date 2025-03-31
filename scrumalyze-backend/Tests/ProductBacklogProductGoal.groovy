@@ -24,6 +24,9 @@ def evaluate(teamData) {
         a Product Goal.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     def possibleRootCauses = [
         "The team has not defined a Product Goal.",
         "Product Goal exists but is not correctly recorded or linked to the Product Backlog.",
@@ -31,17 +34,16 @@ def evaluate(teamData) {
         "Product Owner has failed and doesn't understand the importance of linking backlog items to a Product Goal."
     ]
 
-    todo
     def consequences = []
     consequences << "Loss of strategic direction – backlog items may not contribute to long-term objectives."
     consequences << "Reduced transparency – stakeholders cannot see how backlog items creates product value."
-    consequences << "Increased risk of misalignment – team may work on low-priority or irrelevant backlog items."
+    consequences << "Increased risk of misalignment – team may work on irrelevant backlog items."
     consequences << "Ineffective Sprint Planning – backlog lacks a clear vision, making prioritization difficult."
     consequences << "Stakeholder dissatisfaction – unclear product vision may lead to misaligned expectations."
     consequences << "Failure to deliver maximum value – backlog may include work that does not support business outcomes."
-    consequences << "Scrum Team inefficiency – team may waste time on tasks that do not advance the product."
-    consequences << "Potential scope creep – work expands without a structured vision to guide prioritization."
-    consequences << "Increment unbounded in iteration – team struggles to define what success looks like for each sprint."
+    consequences << "Increment unbound in iteration – team struggles to define what success looks like for each sprint."
+
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
     // 2. Retrieve the ProductBacklog and evaluate
@@ -80,6 +82,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

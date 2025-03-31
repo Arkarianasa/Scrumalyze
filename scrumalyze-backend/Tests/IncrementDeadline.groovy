@@ -16,10 +16,25 @@ def evaluate(teamData) {
     def severityFail = "Minor"
     def definition = "This check ensures that increments do not have a deadline set."
 
+    // Test Category ID
+    categoryID = 4
+
     def possibleRootCauses = [
-        "Team might be confusing SCRUM increments with traditional methods that require explicit deadlines.",
-        "One or more deadlines were unintentionally recorded."
+        "Team members are using deadlines.",
+        "Requirement or contractual obligations led to explicit deadlines on work items.",
+        "Deadline for one or more increments has been incorectly recorded in the system."
     ]
+
+    def consequences = []
+    consequences << "Loss of agility – fixed deadlines reduce the team's ability to adapt to changing priorities."
+    consequences << "Increased stress – team members may feel pressured to meet increment deadline instead of focusing on iterative progress."
+    consequences << "Reduced collaboration – deadlines on specific increments may encourage individual-focused work rather than team-based effort."
+    consequences << "Misalignment with Scrum principles – work should be planned within Sprints rather than through fixed deadlines."
+    consequences << "Risk of cutting corners – rushing to meet arbitrary deadlines may lead to lower-quality deliverables."
+    consequences << "Potential for scope creep – individual deadlines may introduce unplanned work outside of Sprint boundaries."
+    consequences << "Confusion in Sprint Planning – increments with external deadlines may conflict with Sprint commitments."
+    consequences << "Reduced transparency – stakeholders may misunderstand the nature of deadlines, expecting rigid delivery dates instead of iterative progress."
+    consequences << "Loss of trust – reliance on deadlines for icrements may indicate a lack of confidence in Scrum’s iterative planning process."
 
     // We'll collect increments that violate the policy (i.e., have a deadline).
     def symptoms = []
@@ -53,13 +68,15 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

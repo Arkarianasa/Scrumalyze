@@ -34,6 +34,9 @@ def evaluate(teamData) {
         Done (DoD). A DoD ensures a clear and shared understanding when work item is done.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     def possibleRootCauses = []
     possibleRootCauses << "Definition of Done exists, but they are not properly recorded in the system."
     possibleRootCauses << "Team does not use Definitions of Done for all or some of their work items."
@@ -58,13 +61,13 @@ def evaluate(teamData) {
     // We’ll refine final fail message once we know if it’s Major or Critical.
 
     def consequences = []
-    consequences << "Loss of trust."
-    consequences << "Loss of transparency."
+    consequences << "Loss of trust – stakeholders may doubt whether items are truly complete."
+    consequences << "Loss of transparency – without shared DoDs, expectations are unclear and progress is hard to measure."
     consequences << "Increased risk of inconsistent quality across work items."
     consequences << "Failure of the team to recognize that the work item is done."
     consequences << "Technical debt threatens to accumulate. There may be definitions of done that would prevent it."
-    consequences << "Increment unbounded in iteration - increment may contain non done work items."
-    consequences << "Financial impact and time problems - because of fixing things that weren’t truly done and by wasting time on done work items (gold plating)."
+    consequences << "Increment unbound in iteration - increment may contain non done work items."
+    consequences << "Financial impact and time to market - because of fixing things that weren’t truly done and by wasting time on done work items (gold plating)."
 
     // ----------------------------------------------------------------------------
     // 2. Evaluation Logic
@@ -149,6 +152,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

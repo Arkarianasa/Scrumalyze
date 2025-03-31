@@ -22,10 +22,24 @@ def evaluate(teamData) {
         This check ensures that only 'Spike' work items are placed under a Timebox.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 4
+
     def possibleRootCauses = [
-        "The team may be adding timeboxes to regular stories or tasks un/intentionally.",
-        "Work items that need additional research (spikes) are not being labeled properly."
+        "The team may be adding Timeboxes to regular stories or tasks unintentionally.",
+        "Work items requiring additional research (Spikes) are not being labeled correctly.",
+        "The team does not have a clear understanding of what a Spike is and when it should be used.",
+        "Lack of proper guidelines for when to assign a Timebox to a work item."
     ]
+
+    def consequences = []
+    consequences << "Loss of process consistency – incorrect use of Timeboxes can disrupt the intended Scrum framework."
+    consequences << "Reduced transparency – stakeholders and the team may misunderstand why certain work items are time-limited."
+    consequences << "Potential delays – using Timeboxes improperly may limit flexibility in addressing work items."
+    consequences << "Misallocation of resources – development efforts may be incorrectly prioritized based on artificial constraints."
+    consequences << "Stakeholder misalignment – incorrect use of Timeboxes may cause confusion about research efforts versus regular development."
+    consequences << "Loss of trust – stakeholders and management may lose confidence in the team's ability to structure work effectively."
+
 
     // Collect any non-Spike items that have a Timebox
     def symptoms = []
@@ -61,13 +75,15 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

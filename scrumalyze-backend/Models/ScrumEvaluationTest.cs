@@ -13,6 +13,9 @@
             // Foreign key to the parent "ScrumEvaluation"
             public int ScrumEvaluationID { get; set; }
 
+            // Foreign key to the category
+            public int ScrumEvaluationTestCategoryID { get; set; }
+
             // Fields from Groovy
             public string Name { get; set; } = string.Empty;
             public string Definition { get; set; } = string.Empty;
@@ -27,6 +30,8 @@
 
             [JsonIgnore]
             public required ScrumEvaluation ScrumEvaluation { get; set; }
+
+            public ScrumEvaluationTestCategory ScrumEvaluationTestCategory { get; set; } = default!;
 
             // Optional convenience
             [NotMapped]

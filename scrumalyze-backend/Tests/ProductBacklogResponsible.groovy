@@ -28,20 +28,23 @@ def evaluate(teamData) {
         responsible person, and that this individual is a Product Owner.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 2
+
     def possibleRootCauses = [
         "The Product Backlog has not been created or linked properly in the system.",
         "Whole team is responsible for the Product Backlog instead of single 'Product Owner' person.",
         "The assigned role is mislabeled or does not follow the standard 'Product Owner' role naming.",
-        "Team might not be aware of the need to explicitly mark a Product Owner as responsible.",
-        "Another role in team is responsible for backlog and not the Product Owner."
+        "Product Owner has failed to become the sole owner of Product Backlog.",
+        "Another role in team is responsible for product backlog and not the Product Owner.",
+        "Product Owner has delegated ownership of product backlog."
     ]
 
     def consequences = []
-    consequences << "Loss of accountability – unclear ownership leads to inconsistent backlog management."
-    consequences << "Reduced transparency – stakeholders and the team lack clarity on backlog priorities."
-    consequences << "Weakened Scrum implementation – lack of a Product Owner disrupts the balance of Scrum roles."
+    consequences << "Loss of accountability – unclear ownership leads to inconsistent product backlog management."
+    consequences << "Reduced transparency – stakeholders and the team lack clarity on product backlog priorities."
     consequences << "Lack of clear ownership may lead to misalignment with business goals."
-    consequences << "Financial impact and time problems - inefficient backlog management might result in wasted development time and increased costs."
+    consequences << "Financial impact and time problems - inefficient product backlog management might result in wasted development time and increased costs."
 
     // We'll collect issues in 'symptoms' to provide detailed info on failures.
     def symptoms = []
@@ -86,6 +89,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

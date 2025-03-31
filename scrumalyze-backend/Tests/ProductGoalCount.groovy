@@ -20,11 +20,14 @@ def evaluate(teamData) {
         This check ensures the team has exactly one ProductGoal.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     def possibleRootCauses = [
-        "The team has not defined any Product Goals.",
-        "Multiple product goals have been created and not consolidated into a single overarching goal.",
+        "There is not defined any Product Goal.",
+        "Multiple product goals have been defined and not consolidated into a single overarching goal.",
         "Data is duplicated or incorrectly recorded, resulting in multiple entries for the same goal.",
-        "The team is working on two separate projects without clear distinction.",
+        "The team is working on two or more separate product goals without clear distinction.",
         "Stakeholders or management have introduced multiple competing goals without proper alignment."
     ]
 
@@ -79,6 +82,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

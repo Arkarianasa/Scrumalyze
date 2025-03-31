@@ -23,10 +23,8 @@ def evaluate(teamData) {
         'Scrum Master', 'Product Owner', or 'Developer'.
     """.stripIndent().trim()
 
-    def possibleRootCauses = [
-        "Team is using standard Scrum roles but they are named differently.",
-        "Some individuals have specialized titles or responsibilities that deviate from Scrum roles.",
-    ]
+    // Test Category ID
+    categoryID = 2
 
     def possibleRootCauses = [
         "Scrum roles are used correctly but named differently due to organizational conventions.",
@@ -86,6 +84,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

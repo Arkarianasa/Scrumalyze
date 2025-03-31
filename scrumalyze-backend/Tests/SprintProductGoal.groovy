@@ -19,13 +19,28 @@ def evaluate(teamData) {
     def severityFail = "Major"
     def definition = """
         This check ensures that each sprint is aligned with a Product Goal by verifying
-        that every Sprint has a valid ProductGoalID. If any sprint lacks a ProductGoalID.
+        that every Sprint has a valid ProductGoalID.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 3
+
     def possibleRootCauses = [
-        "Sprints were created without specifying alligned Product Goal.",
-        "Team is not using Product Goal."
+        "Some Sprints were created in the system without specifying an aligned Product Goal.",
+        "Product Goal is not set in the system for some reason.",
+        "The Product Owner has not clearly communicated or defined that the Product Goal is alligned with each Sprint.",
+        "The team lacks awareness of the importance of linking each Sprint to a Product Goal."
     ]
+
+    def consequences = []
+    consequences << "Loss of strategic focus – without a Product Goal, the team may work on tasks that do not contribute to the overall product vision."
+    consequences << "Reduced transparency – stakeholders and team members may struggle to understand the Sprint’s purpose and expected outcomes."
+    consequences << "Misalignment – Sprints without a clear Product Goal may result in fragmented work with little overall impact."
+    consequences << "Decreased motivation – team members may feel disconnected from the bigger picture, affecting engagement and productivity."
+    consequences << "Stakeholder dissatisfaction – unclear Sprint objectives make it harder for stakeholders to understand product progress."
+    consequences << "Potential scope creep – work may be introduced arbitrarily without a guiding objective, leading to uncontrolled expansion."
+    consequences << "Loss of trust – failure to align Sprints with clear goals may undermine confidence in the team's ability to deliver meaningful value."
+    consequences << "Financial impact – disorganized or misaligned development efforts can lead to inefficient use of resources, missed deadlines, and reduced ROI."
 
     // We'll record details on any sprints missing a ProductGoalID
     def symptoms = []
@@ -58,13 +73,15 @@ def evaluate(teamData) {
     // 4. Return the result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences:consequences
     ]
 }
 

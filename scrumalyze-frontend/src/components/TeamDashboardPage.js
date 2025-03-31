@@ -67,6 +67,7 @@ const TeamDashboardPage = () => {
                 }}
             >
                 {/* Fixed Header */}
+{/*
                 <Typography
                     variant="h4"
                     color="primary"
@@ -82,9 +83,9 @@ const TeamDashboardPage = () => {
                 >
                     Team {selectedTeam.teamName}
                 </Typography>
-
+*/}
                 {/* Content Area with Padding Offset for Header */}
-                <Box sx={{ paddingTop: '120px', marginLeft: '260px', marginRight: '16px', paddingBottom: '16px' }}>
+                <Box sx={{ /*paddingTop: '120px',*/ paddingTop: '70px', marginLeft: '260px', marginRight: '16px', paddingBottom: '16px' }}>
                     {renderContent()}
                 </Box>
             </Box>

@@ -25,6 +25,9 @@ def evaluate(teamData) {
         providing clarity on understanding that work item has been delivered.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     // Root causes to consider if the evaluation fails
     def possibleRootCauses = []
     possibleRootCauses << "Acceptance Criteria might exist, but they are not properly recorded in the system or are just unspoken."
@@ -38,12 +41,12 @@ def evaluate(teamData) {
     def resultFail = "Some or all work items are missing Acceptance Criteria."
 
     def consequences = []
-    consequences << "Loss of trust."
-    consequences << "Loss of transparency."
+    consequences << "Loss of trust – stakeholders may doubt whether items are truly complete."
+    consequences << "Loss of transparency – unclear completion conditions make progress harder to track."
     consequences << "Increased risk of inconsistent quality across work items."
     consequences << "Failure of the team to recognize that the work item can be delivered."
-    consequences << "Financial impact and time problems - by fixing things that haven't been delivered and because of wasting time on finished work items (gold plating)."
-    consequences << "Increment unbounded in iteration - increment may contain non delivered work items."
+    consequences << "Financial impact and time to market - by fixing things that haven't been delivered and because of wasting time on finished work items (gold plating)."
+    consequences << "Increment unbound in iteration - increment may contain non delivered work items."
 
     // We'll collect symptoms for failed work items
     def symptoms = []
@@ -77,6 +80,7 @@ def evaluate(teamData) {
     return [
         name                : name,
         definition          : definition,
+        categoryID          : categoryID,
         severity            : severity,
         passed              : passed,
         outcomeDescription  : outcomeDescription,

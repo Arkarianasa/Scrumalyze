@@ -42,13 +42,30 @@ def evaluate(teamData) {
         Timebox's allocated duration.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 4
+
     // Potential reasons for missing or exceeding timeboxes
     def possibleRootCauses = [
-        "Sprints were set up without linking to a timebox.",
-        "Team does not use any timebox for their Sprints.",
-        "Timebox duration was underestimated or the Sprint ran longer than planned.",
-        "Dates for the Sprint (start/end) or the timebox are entered incorrectly."
+        "Sprints were created without properly linking a timebox.",
+        "The team does not enforce or use timeboxes for their Sprints.",
+        "Timebox duration was underestimated, or the Sprint ran longer than planned due to scope mismanagement.",
+        "Sprint start or end dates were incorrectly recorded, leading to a mismatch with the assigned timebox.",
+        "Work exceeded the planned timebox duration due to poor Sprint Planning or unexpected delays.",
+        "Stakeholders or management extended the Sprint duration, overriding the defined timebox."
     ]
+
+    def consequences = []
+    consequences << "Loss of iteration discipline – without a defined timebox, Sprints may lack clear boundaries and planning constraints."
+    consequences << "Reduced predictability – exceeding timebox durations disrupts forecasting and delivery expectations."
+    consequences << "Sprint goal misalignment – extended Sprints may indicate unclear goals or ineffective Sprint Planning."
+    consequences << "Decreased efficiency – exceeding a timebox can lead to wasted effort or work that should have been reprioritized in future Sprints."
+    consequences << "Weakened Scrum framework – failing to enforce timeboxes undermines the core principle of timeboxed iterations."
+    consequences << "Risk of scope creep – longer Sprints may allow uncontrolled work expansion beyond the original commitment."
+    consequences << "Stakeholder frustration – unexpected changes to Sprint length reduce trust in the team’s ability to deliver predictably."
+    consequences << "Burnout risk – extended Sprints may lead to overwork and decreased morale within the team."
+    consequences << "Difficulty in measuring velocity – inconsistent Sprint durations make it harder to track and estimate team performance."
+    consequences << "Loss of trust – failure to respect timebox constraints may signal process instability to stakeholders and management."
 
     // We'll gather info about which sprints fail each condition
     def symptoms = []
@@ -128,13 +145,15 @@ def evaluate(teamData) {
     // 5. Return the result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences:consequences
     ]
 }
 

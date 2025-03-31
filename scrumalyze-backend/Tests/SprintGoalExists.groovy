@@ -15,33 +15,34 @@ def evaluate(teamData) {
     // ----------------------------------------------------------------------------
     // 1. Metadata
     // ----------------------------------------------------------------------------
-    def name = "Sprint Goal Exists Check"
+    def name = "Sprint Goal Existence Check"
     def severityFail = "Critical"
     def definition = """
-        This check ensures that each Sprint has a clearly defined, 
-        non-empty Sprint Goal. A missing or empty goal indicates a 
-        lack of focus or clarity for that sprint.
+        This check verifies that each Sprint has a clearly defined, non-empty Sprint Goal.
+        A missing or empty goal suggests a lack of focus or clarity for the Sprint.
     """.stripIndent().trim()
 
-    // Potential explanations for why a SprintGoal might be empty or missing
+    // Test Category ID
+    categoryID = 3
+
     def possibleRootCauses = [
-        "Sprint Goal was not recorded by the team.",
-        "Team does not define Sprint Goals for all or some of their Sprints.",
-        "Team does not know how to use Sprint Goals.",
-        "Team is using kanban instead of proper SCRUM hence no sprint goal."
+        "The Sprint Goal was not recorded by the team.",
+        "The team does not define Sprint Goals for all or some Sprints.",
+        "The team lacks knowledge on how to use Sprint Goals effectively.",
+        "The team is using Kanban instead of proper Scrum, hence missing Sprint Goals."
     ]
 
-    // We'll collect any sprints that have missing or empty goals
-    def symptoms = []
+    def consequences = [
+        "The team cannot recognize whether the Sprint has been successfully completed.",
+        "The Sprint cannot be properly linked to an Increment.",
+        "The team cannot determine if the customer is satisfied.",
+        "Loss of transparency in the Sprint process.",
+        "Risk that all work done during the Sprint is unnecessary or misaligned.",
+        "Loss of trust within the team and with stakeholders.",
+        "Financial impact due to inefficiencies and higher costs."
+    ]
 
-    def consequences = []
-    consequences << "Neschopnost týmu rozpoznat, že Sprint je dodán."
-    consequences << "Sprint nemuze byt propojen na Increment."
-    consequences << "Neschopnost týmu rozpoznat, že zákazník je spokojen."
-    consequences << "Ztrata transparentnosti."
-    consequences << "Hrozi ze veskera prace v ramci Sprintu je zbytecna / nepotrebna."
-    consequences << "Ztrata duvery."
-    consequences << "Financni vliv, drazsi reseni."
+    def symptoms = []
 
     // ----------------------------------------------------------------------------
     // 2. Gather Sprints and evaluate
@@ -89,13 +90,15 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences:consequences
     ]
 }
 

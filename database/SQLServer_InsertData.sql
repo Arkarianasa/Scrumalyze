@@ -12,6 +12,14 @@ DECLARE @DeveloperID INT = SCOPE_IDENTITY();
 INSERT INTO ScrumRole (RoleName, RoleDescription) VALUES ('Stakeholder', 'Interested in the product and is outside of SCRUM team.');
 DECLARE @StakeholderID INT = SCOPE_IDENTITY();
 
+-- SCRUM Evaluation Test Categories
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in Artifact Management');
+INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in roles and communication');
+INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in iterative planning and increments');
+INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in time management (timeboxing)');
+
+Translated with DeepL.com (free version)
 -- WorkItemType Data
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 INSERT INTO WorkItemType (TypeName) VALUES ('User Story');
@@ -29,11 +37,17 @@ INSERT INTO ProcessStepType(ProcessStepName) VALUES ('Sprint Retrospective');
 
 -- Prioratization
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- Numerical Ranking
+-- Numerical Ranking ASC
 INSERT INTO PrioritizationScheme (SchemeName)
-VALUES ('Numerical Ranking');
+VALUES ('Numerical Ranking ASC');
 
-DECLARE @NumericalSchemeID INT = SCOPE_IDENTITY();
+DECLARE @NumericalSchemeAscID INT = SCOPE_IDENTITY();
+
+-- Numerical Ranking DESC
+INSERT INTO PrioritizationScheme (SchemeName)
+VALUES ('Numerical Ranking DESC');
+
+DECLARE @NumericalSchemeDescID INT = SCOPE_IDENTITY();
 
 -- Common Priority Levels
 INSERT INTO PrioritizationScheme (SchemeName)
@@ -224,7 +238,7 @@ INSERT INTO Increment (ScrumTeamID, SprintID, ProductGoalID, Description) VALUES
 
 -- ProductBacklog
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-INSERT INTO ProductBacklog (ScrumTeamID, ProductGoalID, PrimaryPrioritizationSchemeID) VALUES (@AtomicTeamID, 1, @NumericalSchemeID);
+INSERT INTO ProductBacklog (ScrumTeamID, ProductGoalID, PrimaryPrioritizationSchemeID) VALUES (@AtomicTeamID, 1, @NumericalSchemeAscID);
 INSERT INTO ProductBacklog (ScrumTeamID, ProductGoalID, ResponsiblePersonID, PrimaryPrioritizationSchemeID) VALUES (@BionicTeamID, 2, 8, @CommonSchemeID);
 INSERT INTO ProductBacklog (ScrumTeamID, ProductGoalID, ResponsiblePersonID, PrimaryPrioritizationSchemeID, SecondaryPrioritizationSchemeID) VALUES (@CosmicTeamID, 3, 14, @MoSCoWSchemeID, @BusinessValueSchemeID);
 

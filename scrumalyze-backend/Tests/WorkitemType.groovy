@@ -24,11 +24,24 @@ def evaluate(teamData) {
         nature and intended handling of the item.
     """.stripIndent().trim()
 
+    // Test Category ID
+    categoryID = 1
+
     def possibleRootCauses = [
-        "Work items were created without specifying a type.",
-        "Team members are not aware of the requirement to set a work item type.",
-        "Team members are not using work item types."
+        "Work items were unintenionally created without specifying its type.",
+        "Some team members are not aware of the requirement to set a work item type.",
+        "Team lacks a standardized system for work item types, leading to inconsistent categorization.",
+        "Work item types are not well understood inside of the team, leading to misclassification."
     ]
+
+    def consequences = []
+    consequences << "Loss of clarity – team members may struggle to understand the purpose and scope of work items."
+    consequences << "Reduced transparency – work tracking and reporting may be inaccurate or incomplete."
+    consequences << "Prioritization and estimation become more difficult without categorized work items."
+    consequences << "Loss of trust – inconsistent or missing work item types may reduce confidence in the team's ability to deliver reliably."
+    consequences << "Time problems – improperly classified work items may require later corrections."
+    consequences << "Financial impact – inefficiencies in work tracking and execution can lead to increased development costs."
+
 
     // We'll collect work items that lack a type
     def symptoms = []
@@ -61,13 +74,15 @@ def evaluate(teamData) {
     // 4. Return the evaluation result
     // ----------------------------------------------------------------------------
     return [
-        name               : name,
-        definition         : definition,
-        severity           : severity,
-        passed             : passed,
-        outcomeDescription : outcomeDescription,
-        symptoms           : symptoms,
-        possibleRootCauses : possibleRootCauses
+        name                : name,
+        definition          : definition,
+        categoryID          : categoryID,
+        severity            : severity,
+        passed              : passed,
+        outcomeDescription  : outcomeDescription,
+        symptoms            : symptoms,
+        possibleRootCauses  : possibleRootCauses,
+        possibleConsequences: consequences
     ]
 }
 

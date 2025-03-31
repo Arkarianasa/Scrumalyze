@@ -81,6 +81,7 @@ CREATE TABLE Sprint (
 CREATE TABLE Increment (
     IncrementID INT PRIMARY KEY IDENTITY(1,1),
 	Description NVARCHAR(255) NOT NULL,
+	Done BIT NOT NULL DEFAULT 0, -- 0 for NOT FINISHED, 1 for DONE Increment
 	Deadline  DATETIME NULL,
 	ScrumTeamID INT NOT NULL,
     SprintID INT NULL,
@@ -133,7 +134,7 @@ CREATE TABLE BacklogItem (
 	ItemDescription NVARCHAR(255) NOT NULL,
 	ProductBacklogID INT NOT NULL,
     SprintBacklogID INT NULL,
-    Done BIT NOT NULL DEFAULT 0, -- 0 for NOT ACTIVE, 1 for ACTIVE
+    Done BIT NOT NULL DEFAULT 0, -- 0 for NOT FINISHED, 1 for DONE ITEM
 	PrimaryPriorityValue INT NULL,
 	SecondaryPriorityValue INT NULL,
 	FOREIGN KEY (ProductBacklogID) REFERENCES ProductBacklog(ProductBacklogID),
@@ -175,7 +176,7 @@ CREATE TABLE WorkItem (
 	IncrementID INT NULL,
 	WorkItemTypeID INT NULL,
 	TimeboxID INT NULL,
-	Done BIT NOT NULL DEFAULT 0,
+	Done BIT NOT NULL DEFAULT 0, -- 0 for NOT FINISHED, 1 for DONE ITEM
 	FOREIGN KEY (BacklogItemID) REFERENCES BacklogItem(BacklogItemID),
 	FOREIGN KEY (IncrementID) REFERENCES Increment(IncrementID),
     FOREIGN KEY (WorkItemTypeID) REFERENCES WorkItemType(WorkItemTypeID),
@@ -228,11 +229,19 @@ CREATE TABLE ScrumEvaluation
 	FOREIGN KEY (ScrumTeamID) REFERENCES ScrumTeam(ScrumTeamID)
 );
 
+CREATE TABLE ScrumEvaluationTestCategory (
+    ScrumEvaluationTestCategoryID INT PRIMARY KEY IDENTITY(1,1),
+    CategoryName NVARCHAR(100) NOT NULL,
+	CategoryDescription NVARCHAR(255) NULL
+);
+
 CREATE TABLE ScrumEvaluationTest
 (
     ScrumEvaluationTestID INT PRIMARY KEY IDENTITY(1,1),
 
 	ScrumEvaluationID INT NOT NULL,
+
+	ScrumEvaluationTestCategoryID INT NOT NULL,
 
     [Name] NVARCHAR(255) NOT NULL,
     [Definition] NVARCHAR(MAX) NOT NULL,
@@ -245,5 +254,6 @@ CREATE TABLE ScrumEvaluationTest
     PossibleRootCausesJson NVARCHAR(MAX) NULL,
 	PossibleConsequencesJson NVARCHAR(MAX) NULL,
 
-	FOREIGN KEY (ScrumEvaluationID) REFERENCES ScrumEvaluation(ScrumEvaluationID)
+	FOREIGN KEY (ScrumEvaluationID) REFERENCES ScrumEvaluation(ScrumEvaluationID),
+	FOREIGN KEY (ScrumEvaluationTestCategoryID) REFERENCES ScrumEvaluationTestCategory(ScrumEvaluationTestCategoryID)
 );

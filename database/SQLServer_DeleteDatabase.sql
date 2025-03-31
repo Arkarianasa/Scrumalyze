@@ -33,4 +33,5 @@ DROP TABLE IF EXISTS DefinitionOfDone;
 DROP TABLE IF EXISTS AcceptanceCriteria;
 DROP TABLE IF EXISTS Timebox;
 DROP TABLE IF EXISTS ScrumEvaluation;
+DROP TABLE IF EXISTS ScrumEvaluationTestCategory;
 DROP TABLE IF EXISTS ScrumEvaluationTest;
