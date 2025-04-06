@@ -20,6 +20,7 @@ namespace Scrumalyze.Models
 
         [JsonIgnore] // Prevent circular reference
         public required ScrumTeam ScrumTeam { get; set; }
+        [JsonIgnore] // Prevent circular reference
         public Sprint? Sprint { get; set; }
         public ProductGoal? ProductGoal { get; set; }
         public Person? ReceivedBy { get; set; }

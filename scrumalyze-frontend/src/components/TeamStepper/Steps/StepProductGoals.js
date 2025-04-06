@@ -15,7 +15,7 @@ const StepProductGoals = ({ formValues, handleChange }) => {
     const handleAddGoal = () => {
         handleChange('productGoals', [
             ...formValues.productGoals,
-            { description: '', responsiblePersonID: '' },
+            { description: '', responsiblePersonDtoID: '' },
         ]);
     };
 
@@ -44,8 +44,8 @@ const StepProductGoals = ({ formValues, handleChange }) => {
                             label="Responsible Person"
                             variant="outlined"
                             fullWidth
-                            value={goal.responsiblePersonID}
-                            onChange={(e) => handleProductGoalChange(index, 'responsiblePersonID', e.target.value)}
+                            value={goal.responsiblePersonDtoID}
+                            onChange={(e) => handleProductGoalChange(index, 'responsiblePersonDtoID', e.target.value)}
                             required
                         >
                             <MenuItem key="wholeTeam" value="The Whole Team">

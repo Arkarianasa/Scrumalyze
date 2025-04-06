@@ -166,6 +166,12 @@ namespace Scrumalyze.Data
                         .HasForeignKey(sb => sb.ResponsiblePersonID)
                         .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<SprintBacklog>()
+            .HasMany(sb => sb.BacklogItems)
+            .WithOne(bi => bi.SprintBacklog)
+            .HasForeignKey(bi => bi.SprintBacklogID)
+            .OnDelete(DeleteBehavior.Restrict);
+
             // Configure the relationship between Product Goal and ScrumTeam
             modelBuilder.Entity<ProductGoal>()
                 .HasOne(pg => pg.ScrumTeam)
@@ -287,13 +293,18 @@ namespace Scrumalyze.Data
             // Increment relationships
             modelBuilder.Entity<Increment>()
                 .HasOne(i => i.Sprint)
-                .WithMany()
+                .WithMany(s => s.Increments)
                 .HasForeignKey(i => i.SprintID);
 
             modelBuilder.Entity<Increment>()
                 .HasOne(i => i.ProductGoal)
                 .WithMany()
                 .HasForeignKey(i => i.ProductGoalID);
+
+            modelBuilder.Entity<Increment>()
+                .HasOne(i => i.ReceivedBy)
+                .WithMany()
+                .HasForeignKey(i => i.ReceivedByID);
 
             // Communication foreign key relationship
             modelBuilder.Entity<Communication>()

@@ -19,7 +19,6 @@ INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in roles
 INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in iterative planning and increments');
 INSERT INTO ScrumEvaluationTestCategory(CategoryName) VALUES ('Failures in time management (timeboxing)');
 
-Translated with DeepL.com (free version)
 -- WorkItemType Data
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 INSERT INTO WorkItemType (TypeName) VALUES ('User Story');
@@ -407,7 +406,7 @@ VALUES
 INSERT INTO Communication (SourcePersonID, TargetPersonID)
 VALUES (1, 17); -- Eve to Yara
 INSERT INTO Communication (SourcePersonID, TargetPersonID)
-VALUES (1, 18); -- Eve to Zane
+VALUES (2, 17); -- Eve to Zane
 
 -- Developer Consultation Communication
 INSERT INTO Communication (SourcePersonID, TargetPersonID)

@@ -39,11 +39,11 @@ const StepProductBacklog = ({ formValues, handleChange }) => {
                 label="Responsible Person"
                 variant="outlined"
                 fullWidth
-                value={formValues.productBacklog.responsiblePersonID}
+                value={formValues.productBacklog.responsiblePersonDtoID}
                 onChange={(e) =>
                     handleChange('productBacklog', {
                         ...formValues.productBacklog,
-                        responsiblePersonID: e.target.value,
+                        responsiblePersonDtoID: e.target.value,
                     })
                 }
                 required

@@ -49,6 +49,13 @@ namespace Scrumalyze.Controllers
             return Ok(productGoal);
         }
 
+        [HttpGet("productgoals/{teamId}")]
+        public ActionResult<ProductGoal> GetProductGoalList(int teamId)
+        {
+            var productGoalList = _teamService.GetProductGoalList(teamId);
+            return Ok(productGoalList);
+        }
+
         [HttpGet("dod/{teamId}")]
         public ActionResult<List<DefinitionOfDone>> GetDoDList(int teamId)
         {
@@ -110,6 +117,13 @@ namespace Scrumalyze.Controllers
         {
             var increments = _teamService.GetIncrementList(teamId);
             return Ok(increments);
+        }
+
+        [HttpGet("communication/{teamId}")]
+        public ActionResult<List<Increment>> GetCommunicationList(int teamId)
+        {
+            var communication = _teamService.GetCommunicationList(teamId);
+            return Ok(communication);
         }
     }
 }

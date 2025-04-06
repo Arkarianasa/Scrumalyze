@@ -15,7 +15,7 @@ namespace Scrumalyze.Services
 
         public List<ScrumTeam> GetAllScrumTeams()
         {
-            return [.. _context.ScrumTeam]; // Fetch all ScrumTeams
+            return [.. _context.ScrumTeam.Include(t => t.ScrumRoles)]; // Fetch all ScrumTeams
         }
 
         public List<WorkItemType> GetAllWorkItemTypes()

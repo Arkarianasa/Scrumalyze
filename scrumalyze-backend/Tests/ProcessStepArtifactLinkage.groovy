@@ -3,27 +3,29 @@ import groovy.json.JsonSlurper
 import groovy.json.JsonOutput
 
 /**
- * Ensures that each Process Step fulfills only the behaviors expected from its type.
- * Any deviation—either missing an expected behavior or performing an unintended one—is flagged.
+ * Ensures that each Process Step is linked to the one (and only one) expected artifact.
+ * Any deviation—either missing the correct linkage or linking to unintended artifacts—is flagged.
  *
- * Usage: groovy ProcessStepBehavior.groovy <path_to_json_file>
+ * Usage: groovy ProcessStepArtifactLinkage.groovy <path_to_json_file>
  */
 def evaluate(teamData) {
     // ----------------------------------------------------------------------------
     // 1. Metadata
     // ----------------------------------------------------------------------------
-    def name = "Process Step Behavioral Expectation Check"
+    def name = "Process Step Artifact Linkage Check"
     def definition = """
-        This check ensures that each process step fulfills only and exactly the behaviors
-        expected for its type. Any extra or missing behavior is considered a deviation.
+        This check ensures that each process step is linked to exactly the artifact
+        that is expected for its type. Any extra or missing linkage is considered a deviation.
     """.stripIndent().trim()
 
     // Test Category ID
     categoryID = 1
 
     def possibleRootCauses = [
-        "Bbehavioral flags for process steps are incorrectly set in the system.",
-        "Misunderstanding of Scrum process step purposes."
+        "Artifact linkage incorrectly set in the system.",
+        "Misunderstanding of Scrum process step purposes.",
+        "Legacy processes from traditional project management approaches influenced the process steps and their linkages to artifacts.",
+        "Vertical development instead of horizontal - process steps are used instead of individual tasks."
     ]
 
     def possibleConsequences = [
@@ -63,9 +65,9 @@ def evaluate(teamData) {
 
             if (actualValue != expectedValue) {
                 if (expectedValue) {
-                    symptoms << "${stepName} step is missing expected behavior: '${flagName}'."
+                    symptoms << "${stepName} step is missing artifact linkage: '${flagName}'."
                 } else {
-                    symptoms << "${stepName} step has unexpected behavior set: '${flagName}'."
+                    symptoms << "${stepName} step has unexpected artifact linkage set: '${flagName}'."
                 }
             }
         }
@@ -73,8 +75,8 @@ def evaluate(teamData) {
 
     def severity = symptoms.isEmpty() ? "None" : "Major"
     def outcomeDescription = symptoms.isEmpty()
-        ? "All process steps fulfill only their expected behaviors."
-        : "One or more process steps have missing or unexpected behaviors."
+        ? "All process steps are linked to their expected artifacts."
+        : "One or more process steps have missing or unexpected artifact linkage."
 
     return [
         name                 : name,
@@ -95,7 +97,7 @@ def evaluate(teamData) {
 System.err.println "Script started..."
 
 if (args.length < 1) {
-    System.err.println "Usage: groovy ProcessStepBehavior.groovy <path_to_json_file>"
+    System.err.println "Usage: groovy ProcessStepArtifactLinkage.groovy <path_to_json_file>"
     System.exit(1)
 }
 

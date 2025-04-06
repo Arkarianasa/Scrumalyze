@@ -8,7 +8,8 @@ import TeamDashboard from './TeamDashboard';
 import TestsOverview from './TestsOverview';
 import ProblemsOverview from './ProblemsOverview';
 import WorkItems from './WorkItems';
-import SprintsDashboard from './SprintsDashboard';
+import Increments from './Increments';
+import TeamMetadata from './TeamMetadata';
 
 const TeamDashboardPage = () => {
     const { selectedTeam } = useContext(GlobalContext);
@@ -29,7 +30,9 @@ const TeamDashboardPage = () => {
             case 3:
                 return <WorkItems />;
             case 4:
-                return <SprintsDashboard />;
+                return <Increments />;
+            case 5:
+                return <TeamMetadata />;
             default:
                 return <TeamDashboard />;
         }

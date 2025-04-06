@@ -22,5 +22,6 @@ namespace Scrumalyze.Models
         public SprintGoal? SprintGoal { get; set; }
         public ProductGoal? ProductGoal { get; set; }
         public Timebox? Timebox { get; set; }
+        public ICollection<Increment>? Increments { get; set; }
     }
 }

@@ -7,6 +7,8 @@ const MainPage = () => {
     const { scrumTeams, setCurrentPage, setSelectedTeam } = useContext(GlobalContext);
     const [selectedTeamID, setSelectedTeamID] = useState('');
 
+    console.log(scrumTeams);
+
     const handleOpenTeam = () => {
         if (selectedTeamID !== '') {
             setSelectedTeam(scrumTeams.find((element) => {

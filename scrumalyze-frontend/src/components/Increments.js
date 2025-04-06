@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { TeamContext } from '../context/TeamContext';
 
-const SprintsDashboard = () => {
+const Increments = () => {
     const { teamData, loading } = useContext(TeamContext);
 
     if (loading) {
@@ -21,4 +21,4 @@ const SprintsDashboard = () => {
     );
 };
 
-export default SprintsDashboard;
+export default Increments;

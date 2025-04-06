@@ -12,6 +12,7 @@ export const TeamProvider = ({ children }) => {
     const [teamData, setTeamData] = useState({
         persons: [],
         productGoal: null,
+        productGoals: [],
         dodList: [],
         acceptanceCriteria: [],
         timeboxes: [],
@@ -21,7 +22,8 @@ export const TeamProvider = ({ children }) => {
         sprintBacklogs: [],
         processSteps: [],
         increments: [],
-        evaluation: null,
+        communication: [],
+        evaluation: null
     });
     const [loading, setLoading] = useState(true);
 
@@ -30,6 +32,7 @@ export const TeamProvider = ({ children }) => {
             const endpoints = [
                 `https://localhost:52765/api/team/persons/${teamId}`,
                 `https://localhost:52765/api/team/productgoal/${teamId}`,
+                `https://localhost:52765/api/team/productgoals/${teamId}`,
                 `https://localhost:52765/api/team/dod/${teamId}`,
                 `https://localhost:52765/api/team/acceptancecriteria/${teamId}`,
                 `https://localhost:52765/api/team/timeboxes/${teamId}`,
@@ -39,6 +42,7 @@ export const TeamProvider = ({ children }) => {
                 `https://localhost:52765/api/team/sprintbacklogs/${teamId}`,
                 `https://localhost:52765/api/team/processsteps/${teamId}`,
                 `https://localhost:52765/api/team/increments/${teamId}`,
+                `https://localhost:52765/api/team/communication/${teamId}`,
                 `https://localhost:52765/api/evaluation/${teamId}/latest`
             ];
     
@@ -58,6 +62,7 @@ export const TeamProvider = ({ children }) => {
             const [
                 persons = [],
                 productGoal = null,
+                productGoals = [],
                 dodList = [],
                 acceptanceCriteria = [],
                 timeboxes = [],
@@ -67,6 +72,7 @@ export const TeamProvider = ({ children }) => {
                 sprintBacklogs = [],
                 processSteps = [],
                 increments = [],
+                communication = [],
                 evaluation = null
             ] = responses;
 
@@ -74,6 +80,7 @@ export const TeamProvider = ({ children }) => {
             setTeamData({
                 persons,
                 productGoal,
+                productGoals,
                 dodList,
                 acceptanceCriteria,
                 timeboxes,
@@ -83,7 +90,8 @@ export const TeamProvider = ({ children }) => {
                 sprintBacklogs,
                 processSteps,
                 increments,
-                evaluation,
+                communication,
+                evaluation
             });
         } catch (error) {
             //console.error('Failed to fetch team data:', error);

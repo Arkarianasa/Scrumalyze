@@ -22,6 +22,12 @@ namespace Scrumalyze.Services
         {
             return _context.ProductGoal.Include(pg => pg.ResponsiblePerson).FirstOrDefault(pg => pg.ScrumTeamID == teamID);
         }
+        public List<ProductGoal> GetProductGoalList(int teamID)
+        {
+            return [.. _context.ProductGoal
+                .Include(pg => pg.ResponsiblePerson)
+                .Where(pg => pg.ScrumTeamID == teamID)];
+        }
         public List<DefinitionOfDone> GetDoDList(int teamID)
         {
             return [.. _context.DefinitionOfDone.Where(dod => dod.ScrumTeamID == teamID)];
@@ -57,20 +63,40 @@ namespace Scrumalyze.Services
         {
             return [.. _context.Sprint
                 .Include(s => s.SprintGoal)
+                .ThenInclude(sg => sg.ResponsiblePerson)
+                .Include(s => s.Increments)
+                .ThenInclude(i => i.ReceivedBy)
                 .Where(s => s.ScrumTeamID == teamID)];
         }
         public List<SprintBacklog> GetSprintBacklogList(int teamID)
         {
-            return [.. _context.SprintBacklog.Where(sb => sb.Sprint.ScrumTeamID == teamID)];
+            return [.. _context.SprintBacklog
+                .Where(sb => sb.Sprint.ScrumTeamID == teamID)
+                .Include(sb => sb.BacklogItems)
+                .Include(sb => sb.ResponsiblePerson)];
         }
         public List<ProcessStep> GetProcessStepList(int teamID)
         {
-            return [.. _context.ProcessStep.Where(ps => ps.ScrumTeamID == teamID)];
+            return [.. _context.ProcessStep
+                .Include(ps => ps.GuidedByPerson)
+                .ThenInclude(p => p.Role)
+                .Where(ps => ps.ScrumTeamID == teamID)];
         }
         public List<Increment> GetIncrementList(int teamID)
         {
             return [.. _context.Increment
+                .Include(i => i.ReceivedBy)
                 .Where(i => i.ScrumTeamID == teamID)];
+        }
+
+        public List<Communication> GetCommunicationList(int teamID)
+        {
+            return [.. _context.Communication
+                .Where(c => c.TargetPerson.ScrumTeamID == teamID && c.SourcePerson.ScrumTeamID == teamID)
+                .Include(c => c.TargetPerson)
+                .ThenInclude(p => p.Role)
+                .Include(c => c.SourcePerson)
+                .ThenInclude(p => p.Role)];
         }
 
         public async Task<bool> CreateTeamAsync(ScrumTeamDto teamDto)
@@ -436,9 +462,9 @@ namespace Scrumalyze.Services
                 }
 
                 // Map Related ProductGoal
-                if (incrementDto.RelatedProductGoalID != null)
+                if (incrementDto.RelatedProductGoalDtoID != null)
                 {
-                    increment.ProductGoal = productGoals.FirstOrDefault(pg => pg.ProductGoalID == incrementDto.RelatedProductGoalID);
+                    increment.ProductGoal = productGoals.FirstOrDefault(pg => pg.ProductGoalID == incrementDto.RelatedProductGoalDtoID);
                     increment.ProductGoalID = increment.ProductGoal?.ProductGoalID;
                 }
 
