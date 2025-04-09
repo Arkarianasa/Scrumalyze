@@ -80,12 +80,14 @@ namespace Scrumalyze.Services
             return [.. _context.ProcessStep
                 .Include(ps => ps.GuidedByPerson)
                 .ThenInclude(p => p.Role)
+                .Include(ps => ps.Timebox)
                 .Where(ps => ps.ScrumTeamID == teamID)];
         }
         public List<Increment> GetIncrementList(int teamID)
         {
             return [.. _context.Increment
                 .Include(i => i.ReceivedBy)
+                .Include(i => i.Sprint)
                 .Where(i => i.ScrumTeamID == teamID)];
         }
 
@@ -118,7 +120,7 @@ namespace Scrumalyze.Services
                 var newRole = new ScrumRole
                 {
                     RoleName = roleDto.RoleName,
-                    RoleDescription = roleDto.RoleDescription ?? "Team-specific role",
+                    RoleDescription = roleDto.RoleDescription,
                     ScrumTeam = scrumTeam
                 };
                 teamSpecificRoles.Add(newRole);
@@ -229,11 +231,20 @@ namespace Scrumalyze.Services
             }
 
             // Map Timeboxes
-            List<Timebox> timeboxes = _mapper.Map<List<Timebox>>(teamDto.Timeboxes);
-
-            foreach (var timebox in timeboxes)
+            List<Timebox> timeboxes = new List<Timebox>();
+            foreach (var tbDto in teamDto.Timeboxes)
             {
-                timebox.ScrumTeam = scrumTeam;
+                // Calculate total hours: days * workDayHours + hours + minutes as fraction of an hour
+                double totalDuration = tbDto.Days * teamDto.WorkDayHours + tbDto.Hours + (tbDto.Minutes / 60.0);
+
+                Timebox timebox = new Timebox
+                {
+                    TimeboxDescription = tbDto.TimeboxDescription,
+                    Duration = totalDuration,
+                    ScrumTeam = scrumTeam
+                };
+                timeboxes.Add(timebox);
+                scrumTeam.Timeboxes.Add(timebox);
             }
 
             // Map Sprints and associate with ScrumTeam, Timeboxes, and other entities
@@ -544,7 +555,7 @@ namespace Scrumalyze.Services
                         ScrumTeam = scrumTeam,
                         ScrumTeamID = scrumTeam.ScrumTeamID,
 
-                        AverageDuration = stepDto.AverageDuration,
+                        AverageDuration = (double)(stepDto.Days * teamDto.WorkDayHours + stepDto.Hours + (stepDto.Minutes / 60.0)),
                         ReviewsIncrement = stepDto.ReviewsIncrement,
                         UpdatesProductBacklog = stepDto.UpdatesProductBacklog,
                         AdjustsProductGoal = stepDto.AdjustsProductGoal,

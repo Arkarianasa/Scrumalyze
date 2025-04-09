@@ -455,3 +455,80 @@ INSERT INTO Communication (SourcePersonID, TargetPersonID)
 VALUES (12, 14); -- Maya to Quinn
 INSERT INTO Communication (SourcePersonID, TargetPersonID)
 VALUES (12, 15); -- Maya to Rachel
+
+-- Process Step Data
+-- ------------------
+-- Process Step Data for Team Atomic (TeamID = 1)
+INSERT INTO ProcessStep (
+    ScrumTeamID,
+    ProcessStepTypeID,
+    TimeboxID,
+    AverageDuration,
+    GuidedByPersonID,
+    ReviewsIncrement,
+    UpdatesProductBacklog,
+    AdjustsProductGoal,
+    CreatesSprintGoal,
+    ImprovesSprint
+)
+VALUES
+    -- Daily SCRUM: ReviewsIncrement true, guided by whole team
+    (@AtomicTeamID, 1, 3, 0.25, NULL, 1, 0, 0, 0, 0),
+    -- Backlog Refinement: UpdatesProductBacklog true, guided by whole team
+    (@AtomicTeamID, 2, NULL, 2.0, NULL, 0, 1, 0, 0, 0),
+    -- Sprint Review: AdjustsProductGoal true, guided by Scrum Master (PersonID 1)
+    (@AtomicTeamID, 3, 4, 2.0, 1, 0, 0, 1, 0, 0),
+    -- Sprint Planning: CreatesSprintGoal true, guided by Scrum Master (PersonID 1)
+    (@AtomicTeamID, 4, 2, 2.0, 1, 0, 0, 0, 1, 0),
+    -- Sprint Retrospective: ImprovesSprint true, guided by Scrum Master (PersonID 1)
+    (@AtomicTeamID, 5, 5, 1.0, 1, 0, 0, 0, 0, 1);
+
+-- Process Step Data for Team Bionic (TeamID = 2)
+INSERT INTO ProcessStep (
+    ScrumTeamID,
+    ProcessStepTypeID,
+    TimeboxID,
+    AverageDuration,
+    GuidedByPersonID,
+    ReviewsIncrement,
+    UpdatesProductBacklog,
+    AdjustsProductGoal,
+    CreatesSprintGoal,
+    ImprovesSprint
+)
+VALUES
+    -- Daily SCRUM: ReviewsIncrement true, guided by whole team
+    (@BionicTeamID, 1, 10, 0.25, NULL, 1, 0, 0, 0, 0),
+    -- Backlog Refinement: UpdatesProductBacklog true, guided by whole team
+    (@BionicTeamID, 2, NULL, 2.0, NULL, 0, 1, 0, 0, 0),
+    -- Sprint Review: AdjustsProductGoal true, guided by Scrum Master (PersonID 7)
+    (@BionicTeamID, 3, 11, 2.0, 7, 0, 0, 1, 0, 0),
+    -- Sprint Planning: CreatesSprintGoal true, guided by Scrum Master (PersonID 7)
+    (@BionicTeamID, 4, 9, 2.0, 7, 0, 0, 0, 1, 0),
+    -- Sprint Retrospective: ImprovesSprint true, guided by Scrum Master (PersonID 7)
+    (@BionicTeamID, 5, 12, 1.0, 7, 0, 0, 0, 0, 1);
+
+-- Process Step Data for Team Cosmic (TeamID = 3)
+INSERT INTO ProcessStep (
+    ScrumTeamID,
+    ProcessStepTypeID,
+    TimeboxID,
+    AverageDuration,
+    GuidedByPersonID,
+    ReviewsIncrement,
+    UpdatesProductBacklog,
+    AdjustsProductGoal,
+    CreatesSprintGoal,
+    ImprovesSprint
+)
+VALUES
+    -- Daily SCRUM: ReviewsIncrement true, guided by whole team
+    (@CosmicTeamID, 1, 17, 0.25, NULL, 1, 0, 0, 0, 0),
+    -- Backlog Refinement: UpdatesProductBacklog true, guided by whole team
+    (@CosmicTeamID, 2, NULL, 2.0, NULL, 0, 1, 0, 0, 0),
+    -- Sprint Review: AdjustsProductGoal true, guided by Scrum Master (PersonID 12)
+    (@CosmicTeamID, 3, 18, 2.0, 12, 0, 0, 1, 0, 0),
+    -- Sprint Planning: CreatesSprintGoal true, guided by Scrum Master (PersonID 12)
+    (@CosmicTeamID, 4, 16, 2.0, 12, 0, 0, 0, 1, 0),
+    -- Sprint Retrospective: ImprovesSprint true, guided by Scrum Master (PersonID 12)
+    (@CosmicTeamID, 5, 19, 1.0, 12, 0, 0, 0, 0, 1);

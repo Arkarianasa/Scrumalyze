@@ -49,7 +49,7 @@ const StepProductBacklog = ({ formValues, handleChange }) => {
                 required
             >
                 <MenuItem key="wholeTeam" value={"The Whole Team"}>
-                    Whole Team
+                    The Whole Team
                 </MenuItem>
                 {formValues.persons.map((person, index) => (
                     <MenuItem key={index} value={index}>

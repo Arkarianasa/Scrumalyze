@@ -23,11 +23,11 @@ const TeamTab = ({ selectedTab, handleTabChange }) => {
       }}
     >
       <Tab label="Team Dashboard" />
+      <Tab label="Team Metadata" />
       <Tab label="SCRUM Overview" disabled={!isEvaluationAvailable} />
       <Tab label="Pathological Behaviors" disabled={!isEvaluationAvailable}  />
       <Tab label="Work Items" />
-      <Tab label="Increments" />
-      <Tab label="Team Metadata" />
+      <Tab label="Evaulation History" />
     </Tabs>
   );
 };
