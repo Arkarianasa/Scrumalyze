@@ -43,6 +43,8 @@ namespace Scrumalyze.Services
                 .Include(st => st.Sprints).ThenInclude(s => s.Timebox)
                 .Include(st => st.Sprints).ThenInclude(s => s.SprintGoal)
                 .Include(st => st.Sprints).ThenInclude(s => s.ProductGoal)
+                .Include(st => st.Sprints).ThenInclude(s => s.SprintBacklogs).ThenInclude(sb => sb.BacklogItems)
+                .Include(st => st.Sprints).ThenInclude(s => s.SprintBacklogs).ThenInclude(sb => sb.ResponsiblePerson)
                 .Include(st => st.Increments)
                 .Include(st => st.ProcessSteps).ThenInclude(ps => ps.ProcessStepType)
                 .FirstOrDefault(t => t.ScrumTeamID == teamID);

@@ -63,9 +63,9 @@ def evaluate(teamData) {
     // ----------------------------------------------------------------------------
     sprints.each { sprint ->
         def sprintGoal = sprint.SprintGoal
-
+        def sprintName = sprint.SprintGoal?.Description ? "Sprint starting on '${sprint.StartDate}' with goal '${sprint.SprintGoal.Description}'": "Sprint starting on '${sprint.StartDate}'"
         if (sprintGoal && (sprintGoal.ResponsiblePerson || sprintGoal.ResponsiblePersonID)) {
-            symptoms << "Sprint that started '${sprint.StartDate}' has a responsible person assigned to its SprintGoal."
+            symptoms << "${sprintName} has a responsible person assigned to its SprintGoal."
         }
     }
 

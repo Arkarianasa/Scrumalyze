@@ -19,8 +19,8 @@ public static class Program
                 policy =>
                 {
                     policy.WithOrigins("http://localhost:3000") // React dev server
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
                 });
         });
 
@@ -38,32 +38,13 @@ public static class Program
 
         var app = builder.Build();
 
-        // Enable CORS
+        app.UseRouting();
+
         app.UseCors("AllowReactApp");
 
-        app.MapControllers();  // Map controllers for API endpoints
+        app.UseAuthorization();
 
-        // Additional setup and running the service
-        using (var scope = app.Services.CreateScope())
-        {
-            var context = scope.ServiceProvider.GetRequiredService<ScrumalyzeContext>();
-            var evaluationService = scope.ServiceProvider.GetRequiredService<ScrumEvaluationService>();
-
-            /*
-            var evaluationResult = evaluationService.EvaluateScrumImplementation(1);
-            evaluationResult?.PrettyPrint();
-
-            evaluationResult?.NullResult();
-
-            evaluationResult = evaluationService.EvaluateScrumImplementation(2);
-            evaluationResult?.PrettyPrint();
-
-            evaluationResult?.NullResult();
-
-            evaluationResult = evaluationService.EvaluateScrumImplementation(3);
-            evaluationResult?.PrettyPrint();
-            */
-        }
+        app.MapControllers();
 
         app.Run();
     }

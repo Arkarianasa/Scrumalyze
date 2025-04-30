@@ -65,25 +65,22 @@ def evaluate(teamData) {
     // 3. Check each sprint's SprintBacklog
     // ----------------------------------------------------------------------------
     sprints.each { sprint ->
-        def sprintName = sprint.SprintName ?: "Unnamed Sprint"
-        def sprintBacklog = sprint.SprintBacklog
+        def sprintName = sprint.SprintGoal?.Description 
+            ? "Sprint starting on '${sprint.StartDate}' with goal '${sprint.SprintGoal.Description}'"
+            : "Sprint starting on '${sprint.StartDate}'"
 
-        // If backlog is null or empty (if list/map), record a symptom
-        if (!sprintBacklog) {
-            symptoms << "Sprint '${sprintName}' has no SprintBacklog."
-        } else if (sprintBacklog instanceof List) {
-            // If it's a list, check if it's empty
-            if (sprintBacklog.isEmpty()) {
-                symptoms << "Sprint '${sprintName}' has an empty SprintBacklog (list)."
-            }
-        } else if (sprintBacklog instanceof Map && sprintBacklog.containsKey("Items")) {
-            // If it's a map with an 'Items' key, check that those items exist
-            def items = sprintBacklog.Items
-            if (!items || items.isEmpty()) {
-                symptoms << "Sprint '${sprintName}' has an empty 'Items' backlog."
+        def sprintBacklogs = sprint.SprintBacklogs ?: []
+
+        if (sprintBacklogs.isEmpty()) {
+            symptoms << "${sprintName} has no SprintBacklogs."
+        } else {
+            sprintBacklogs.eachWithIndex { sb, i ->
+                def items = sb.BacklogItems ?: []
+                if (items.isEmpty()) {
+                    symptoms << "${sprintName} has a SprintBacklog with no BacklogItems."
+                }
             }
         }
-        // If there's another data structure for sprintBacklog, add handling as needed.
     }
 
     // ----------------------------------------------------------------------------

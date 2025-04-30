@@ -172,6 +172,13 @@ namespace Scrumalyze.Data
             .HasForeignKey(bi => bi.SprintBacklogID)
             .OnDelete(DeleteBehavior.Restrict);
 
+            // Configure the relationship between SprintBacklog and Sprint
+            modelBuilder.Entity<SprintBacklog>()
+                        .HasOne(sb => sb.Sprint)
+                        .WithMany(s => s.SprintBacklogs)
+                        .HasForeignKey(sb => sb.SprintID)
+                        .OnDelete(DeleteBehavior.Restrict);
+
             // Configure the relationship between Product Goal and ScrumTeam
             modelBuilder.Entity<ProductGoal>()
                 .HasOne(pg => pg.ScrumTeam)

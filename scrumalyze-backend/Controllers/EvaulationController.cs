@@ -46,6 +46,7 @@ namespace Scrumalyze.Controllers
                 return NotFound($"Team '{teamID}' not found or cannot be evaluated.");
             }
 
+            newEval.ScrumTeam = null;
             return Ok(newEval);
         }
     }

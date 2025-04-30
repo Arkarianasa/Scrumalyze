@@ -55,7 +55,7 @@ def evaluate(teamData) {
 
     sprints.each { sprint ->
         if (sprint.ProductGoalID == null) {
-            def sprintName = sprint.SprintGoal.Description ?: "that started on " + sprint.StartDate
+            def sprintName = sprint.SprintGoal?.Description ? "Sprint starting on '${sprint.StartDate}' with goal '${sprint.SprintGoal.Description}'": "Sprint starting on '${sprint.StartDate}'"
             symptoms << "Sprint '${sprintName}' is missing a ProductGoal."
         }
     }

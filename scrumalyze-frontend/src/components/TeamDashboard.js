@@ -86,7 +86,7 @@ const TeamDashboard = () => {
 
     const handleRetakeTest = async () => {
         setLoading(true);
-        try {    
+        try {
             const response = await fetch(`https://localhost:52765/api/evaluation/${selectedTeam.scrumTeamID}`, {
                 method: 'GET',
                 headers: {
@@ -100,16 +100,17 @@ const TeamDashboard = () => {
     
             const updatedEvaluation = await response.json();
     
-            setTeamData(prevState => ({
-                ...prevState,
+            setTeamData(prev => ({
+                ...prev,
                 evaluation: updatedEvaluation
             }));
         } catch (error) {
+            console.error('Retake test fetch error:', error);
             alert(error.message);
         } finally {
             setLoading(false);
         }
-    };    
+    };
 
     return (
         <Grid container spacing={1} alignItems="stretch">

@@ -64,12 +64,18 @@ def evaluate(teamData) {
     def symptoms = []
 
     sprints.each { sprint ->
-        def sprintName = sprint.SprintGoal?.Description ?: "Sprint starting on ${sprint.StartDate}"
-        def sprintBacklog = sprint.SprintBacklog
-        def backlogResponsible = sprintBacklog?.ResponsiblePerson
+        def sprintName = sprint.SprintGoal?.Description
+            ? "Sprint starting on '${sprint.StartDate}' with goal '${sprint.SprintGoal.Description}'"
+            : "Sprint starting on '${sprint.StartDate}'"
 
-        if (backlogResponsible) {
-            symptoms << "Sprint '${sprintName}' has an individual ('${backlogResponsible.Name}') assigned as responsible for the Sprint Backlog, violating Scrum principles."
+        def sprintBacklogs = sprint.SprintBacklogs ?: []
+
+        sprintBacklogs.eachWithIndex { sb, i ->
+            def responsible = sb?.ResponsiblePerson
+            if (responsible) {
+                def personName = responsible.FirstName + " " + responsible.LastName
+                symptoms << "${sprintName} has an individual ('${personName}') assigned as responsible for the Sprint Backlog, violating Scrum principles."
+            }
         }
     }
 

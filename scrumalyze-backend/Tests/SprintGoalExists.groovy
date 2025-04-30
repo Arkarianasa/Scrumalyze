@@ -54,26 +54,23 @@ def evaluate(teamData) {
 
     sprints.each { sprint ->
         def sprintGoal = sprint.SprintGoal
-
+        def sprintName = sprint.SprintGoal?.Description ? "Sprint starting on '${sprint.StartDate}' with goal '${sprint.SprintGoal.Description}'": "Sprint starting on '${sprint.StartDate}'"
+        
         // Check if sprintGoal is missing or empty 
         if (!sprintGoal) {
             // Null or falsy
-            symptoms << "Sprint that started '${sprint.StartDate}' has a null or missing SprintGoal."
+            symptoms << "${sprintName} has a null or missing SprintGoal."
         } else if (sprintGoal instanceof String) {
             // If it's a string, check if it's empty or whitespace
             if (sprintGoal.trim().isEmpty()) {
-                symptoms << "Sprint that started '${sprint.StartDate}' has an empty SprintGoal (string)."
+                symptoms << "${sprintName} has an empty SprintGoal (string)."
             }
         } else if (sprintGoal instanceof Map && sprintGoal.containsKey("GoalDescription")) {
             // If it's a map with a "GoalDescription" key
             def goalDesc = sprintGoal.GoalDescription
             if (!goalDesc || goalDesc.trim().isEmpty()) {
-                symptoms << "Sprint that started '${sprint.StartDate}' has an empty 'GoalDescription' in SprintGoal."
+                symptoms << "${sprintName} has an empty 'GoalDescription' in SprintGoal."
             }
-        } else {
-            // If it's some other structure we can't verify, mark as questionable
-            // Adjust as needed for your data model
-            // symptoms << "Sprint '${sprintName}' has a SprintGoal in an unknown format."
         }
     }
 
