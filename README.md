@@ -15,9 +15,15 @@
 
 <h2>NuGet Dependencies (Backend)</h2>
 <ul>
-  <li>Microsoft.EntityFrameworkCore.SqlServer</li>
-  <li>Microsoft.EntityFrameworkCore.Tools</li>
-  <li>Microsoft.Extensions.Configuration.*</li>
+  <li><strong>AutoMapper.Extensions.Microsoft.DependencyInjection</strong> – AutoMapper support for dependency injection</li>
+  <li><strong>Microsoft.AspNetCore.Cors</strong> – CORS middleware for cross-origin requests</li>
+  <li><strong>Microsoft.AspNetCore.Mvc.Cors</strong> – MVC integration for CORS</li>
+  <li><strong>Microsoft.EntityFrameworkCore.SqlServer</strong> – EF Core provider for SQL Server</li>
+  <li><strong>Microsoft.EntityFrameworkCore.Tools</strong> – EF Core command-line tools</li>
+  <li><strong>Microsoft.Extensions.Configuration</strong> – Core configuration abstractions</li>
+  <li><strong>Microsoft.Extensions.Configuration.FileExtensions</strong> – File-based configuration support</li>
+  <li><strong>Microsoft.Extensions.Configuration.Json</strong> – JSON file configuration provider</li>
+  <li><strong>Newtonsoft.Json</strong> – High-performance JSON framework for .NET</li>
 </ul>
 
 <h2>Requirements</h2>
@@ -56,4 +62,4 @@
 <p>Visit <a href="http://localhost:3000">http://localhost:3000</a> in your browser.</p>
 
 <h2>Evaluation Logic</h2>
-<p>Evaluation logic is handled via Groovy scripts. Each script is independent and returns a JSON result based on team data (serialized on the backend). New checks can be added without touching application logic – simply by placing new scripts in the evaluation directory.</p>
+<p>Evaluation logic is handled via Groovy scripts. Each script is independent and returns a JSON result based on team data (serialized on the backend). New checks can be added without touching application logic – simply by placing new scripts in the Tests directory.</p>
