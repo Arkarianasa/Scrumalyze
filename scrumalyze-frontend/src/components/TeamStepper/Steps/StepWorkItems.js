@@ -15,19 +15,18 @@ import { GlobalContext } from '../../../context/GlobalContext';
 
 const StepWorkItems = ({ formValues, handleChange }) => {
   const { scrumRoles, workItemTypes } = useContext(GlobalContext);
-
   const [acceptanceCriteriaInputs, setAcceptanceCriteriaInputs] = useState({});
 
   const handleWorkItemChange = (index, field, value) => {
-    const updatedWorkItems = formValues.workItems.map((item, i) =>
+    const updated = formValues.workItems.map((item, i) =>
       i === index ? { ...item, [field]: value } : item
     );
-    handleChange('workItems', updatedWorkItems);
+    handleChange('workItems', updated);
   };
 
   const handleDeleteWorkItem = (index) => {
-    const updatedWorkItems = formValues.workItems.filter((_, i) => i !== index);
-    handleChange('workItems', updatedWorkItems);
+    const filtered = formValues.workItems.filter((_, i) => i !== index);
+    handleChange('workItems', filtered);
   };
 
   const addWorkItem = () => {
@@ -35,229 +34,188 @@ const StepWorkItems = ({ formValues, handleChange }) => {
       description: '',
       BacklogItemDtoID: null,
       workItemTypeID: null,
-      definitionOfDoneIDs: [], // Multiple definitions of done
-      acceptanceCriterias: [], // Initialize as an empty array
+      definitionOfDoneIDs: [],
+      acceptanceCriterias: [],
       done: false,
-      workingPersons: [],
+      workingPersonIds: [],  // only store IDs (indices) here
       TimeboxDtoID: null,
-      deadline: '',
+      deadline: ''
     };
     handleChange('workItems', [...formValues.workItems, newItem]);
   };
 
-  const handleAddAcceptanceCriteria = (index, newCriteria) => {
-    const updatedWorkItems = formValues.workItems.map((item, i) =>
-      i === index
-        ? {
-            ...item,
-            acceptanceCriterias: [...(item.acceptanceCriterias || []), newCriteria], // Ensure it's always an array
-          }
+  const formatTimeboxDuration = (tb) => {
+    const { days = 0, hours = 0, minutes = 0 } = tb;
+    const parts = [];
+    if (days) parts.push(`${days} work day${days > 1 ? 's' : ''}`);
+    if (hours) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+    if (minutes) parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+    return parts.length ? parts.join(', ') : '0 hours';
+  };
+
+  const handleAddAcceptanceCriteria = (idx, criteria) => {
+    const updated = formValues.workItems.map((item, i) =>
+      i === idx
+        ? { ...item, acceptanceCriterias: [...(item.acceptanceCriterias || []), criteria] }
         : item
     );
-    setAcceptanceCriteriaInputs((prev) => ({
-      ...prev,
-      [index]: '', // Reset the input field for this index
-    }));
-    handleChange('workItems', updatedWorkItems);
+    setAcceptanceCriteriaInputs(prev => ({ ...prev, [idx]: '' }));
+    handleChange('workItems', updated);
   };
-  
-  const handleInputChange = (index, value) => {
-    setAcceptanceCriteriaInputs((prev) => ({
-      ...prev,
-      [index]: value, // Update the input value for this index
-    }));
+
+  const handleInputChange = (idx, value) => {
+    setAcceptanceCriteriaInputs(prev => ({ ...prev, [idx]: value }));
   };
-  
-  const handleDeleteAcceptanceCriteria = (index, criteria) => {
-    const updatedWorkItems = formValues.workItems.map((item, i) =>
-      i === index
-        ? {
-            ...item,
-            acceptanceCriterias: item.acceptanceCriterias.filter((c) => c !== criteria),
-          }
+
+  const handleDeleteAcceptanceCriteria = (idx, crit) => {
+    const updated = formValues.workItems.map((item, i) =>
+      i === idx
+        ? { ...item, acceptanceCriterias: item.acceptanceCriterias.filter(c => c !== crit) }
         : item
     );
-    handleChange('workItems', updatedWorkItems);
+    handleChange('workItems', updated);
   };
 
   return (
     <Box>
       {formValues.workItems.map((item, index) => (
-        <Box key={index} style={{ marginBottom: '40px' }}>
+        <Box key={index} mb={4}>
+          {/* Row 1: Description, Backlog, Type, Delete */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <TextField
                 label="Description"
-                value={item.description || ''}
-                onChange={(e) => handleWorkItemChange(index, 'description', e.target.value)}
-                fullWidth
-                required
+                value={item.description}
+                onChange={e => handleWorkItemChange(index, 'description', e.target.value)}
+                fullWidth required
               />
             </Grid>
             <Grid item xs={3}>
               <TextField
-                select
-                label="Backlog Item"
+                select label="Backlog Item"
                 value={item.BacklogItemDtoID}
-                onChange={(e) => handleWorkItemChange(index, 'BacklogItemDtoID', e.target.value)}
+                onChange={e => handleWorkItemChange(index, 'BacklogItemDtoID', e.target.value)}
                 fullWidth
               >
-                <MenuItem value={null}>
-                  None
-                </MenuItem>
-
-                {formValues.backlogItems.map((backlog, i) => (
-                  
-                  <MenuItem key={i} value={i}>
-                    {backlog.itemName}
-                  </MenuItem>
+                <MenuItem value={null}>None</MenuItem>
+                {formValues.backlogItems.map((b, i) => (
+                  <MenuItem key={i} value={i}>{b.itemName}</MenuItem>
                 ))}
               </TextField>
             </Grid>
             <Grid item xs={2}>
               <TextField
-                select
-                label="Work Item Type"
+                select label="Work Item Type"
                 value={item.workItemTypeID}
-                onChange={(e) => handleWorkItemChange(index, 'workItemTypeID', e.target.value)}
+                onChange={e => handleWorkItemChange(index, 'workItemTypeID', e.target.value)}
                 fullWidth
               >
-                <MenuItem value={null}>
-                  None
-                </MenuItem>
-                {workItemTypes.map((type) => (
-                  <MenuItem key={type.workItemTypeID} value={type.workItemTypeID}>
-                    {type.typeName}
-                  </MenuItem>
+                <MenuItem value={null}>None</MenuItem>
+                {workItemTypes.map(type => (
+                  <MenuItem key={type.workItemTypeID} value={type.workItemTypeID}>{type.typeName}</MenuItem>
                 ))}
               </TextField>
             </Grid>
             <Grid item xs={1}>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => handleDeleteWorkItem(index)}
-              >
-                Delete
-              </Button>
+              <Button color="error" onClick={() => handleDeleteWorkItem(index)}>Delete</Button>
             </Grid>
           </Grid>
 
-          <Grid container spacing={2} style={{ marginTop: '-5px' }}>
+          {/* Row 2: DoD & Acceptance Criteria */}
+          <Grid container spacing={2} mt={-1}>
             <Grid item xs={5}>
               <Autocomplete
                 multiple
                 options={formValues.definitionsOfDone}
-                getOptionLabel={(DoD) => DoD.constraintDescription}
-                value={item.definitionOfDoneIDs.map((index) => formValues.definitionsOfDone[index])} 
-                onChange={(e, newValue) => {
-                  const selectedIndices = newValue.map((selectedDoD) =>
-                    formValues.definitionsOfDone.indexOf(selectedDoD)
-                  );
-                  handleWorkItemChange(index, 'definitionOfDoneIDs', selectedIndices);
+                getOptionLabel={dod => dod.constraintDescription}
+                value={item.definitionOfDoneIDs.map(i => formValues.definitionsOfDone[i])}
+                onChange={(_, newVals) => {
+                  const ids = newVals.map(d => formValues.definitionsOfDone.indexOf(d));
+                  handleWorkItemChange(index, 'definitionOfDoneIDs', ids);
                 }}
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" label="Definitions of Done" fullWidth />
-                )}
+                renderInput={params => <TextField {...params} label="Definitions of Done" fullWidth />}
               />
             </Grid>
-            <Grid item xs={5} key={index}>
+            <Grid item xs={5}>
               <TextField
                 label="Acceptance Criteria"
-                value={acceptanceCriteriaInputs[index] || ''} // Use the separate state to track input
-                onChange={(e) => handleInputChange(index, e.target.value)} // Update the input field
+                value={acceptanceCriteriaInputs[index] || ''}
+                onChange={e => handleInputChange(index, e.target.value)}
                 fullWidth
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.target.value.trim() !== '') {
-                    handleAddAcceptanceCriteria(index, e.target.value.trim()); // Add the criteria
-                  }
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && e.target.value.trim()) handleAddAcceptanceCriteria(index, e.target.value.trim());
                 }}
-                placeholder="Write new acceptance criteria and press Enter to add it"
+                placeholder="Type and press Enter"
                 InputProps={{
-                  startAdornment: item.acceptanceCriterias && item.acceptanceCriterias.length > 0 ? (
-                    <div className="flex gap-x-2" style={{ marginTop: '6px' }}>
-                      {item.acceptanceCriterias.map((criteria, i) => (
-                        <Chip
-                          key={i}
-                          label={criteria}
-                          onDelete={() => handleDeleteAcceptanceCriteria(index, criteria)}
-                          style={{ marginRight: 4 }}
-                        />
+                  startAdornment: item.acceptanceCriterias.length ? (
+                    <Box sx={{ display: 'flex', gap: 1, mr: 1 }}>
+                      {item.acceptanceCriterias.map((c, i) => (
+                        <Chip key={i} label={c} onDelete={() => handleDeleteAcceptanceCriteria(index, c)} />
                       ))}
-                    </div>
-                  ) : null,
+                    </Box>
+                  ) : null
                 }}
               />
             </Grid>
             <Grid item xs={2}>
               <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={item.done || false}
-                    onChange={(e) => handleWorkItemChange(index, 'done', e.target.checked)}
-                    color="primary"
-                  />
-                }
+                control={<Checkbox checked={item.done} onChange={e => handleWorkItemChange(index, 'done', e.target.checked)} />}
                 label="Done"
               />
             </Grid>
           </Grid>
 
-          <Grid container spacing={2} style={{ marginTop: '-5px' }}>
+          {/* Row 3: Assigned Persons, Timebox, Deadline */}
+          <Grid container spacing={2} mt={-1}>
             <Grid item xs={6}>
               <Autocomplete
                 multiple
                 options={formValues.persons}
-                getOptionLabel={(person) => {
-                  const roleName = person.roleID - scrumRoles.length > 0
-                  ? formValues.scrumRoles[person.roleID - scrumRoles.length - 1].roleName
-                  : scrumRoles[person.roleID - 1].roleName;
-            
+                getOptionLabel={person => {
+                  const roleIndex = person.roleID - 1;
+                  const roleName = roleIndex < scrumRoles.length
+                    ? scrumRoles[roleIndex].roleName
+                    : formValues.scrumRoles[roleIndex - scrumRoles.length].roleName;
                   return `${person.firstName} ${person.lastName} (${roleName})`;
                 }}
-                value={item.workingPersons}
-                onChange={(e, newValue) => handleWorkItemChange(index, 'workingPersons', newValue)}
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" label="Working Persons" fullWidth />
-                )}
+                value={(item.workingPersonIds || [])
+                  .map(id => formValues.persons[id])
+                  .filter(Boolean)
+                }
+                onChange={(_, newVals) => {
+                  const indices = newVals.map(p => formValues.persons.indexOf(p));
+                  handleWorkItemChange(index, 'workingPersonIds', indices);
+                }}
+                renderInput={params => <TextField {...params} label="Assigned Persons" fullWidth />}
               />
             </Grid>
             <Grid item xs={4}>
               <TextField
-                select
-                label="Timebox"
+                select label="Timebox"
                 value={item.TimeboxDtoID}
-                onChange={(e) => handleWorkItemChange(index, 'TimeboxDtoID', e.target.value)}
+                onChange={e => handleWorkItemChange(index, 'TimeboxDtoID', e.target.value)}
                 fullWidth
               >
-                <MenuItem key="none" value={null}>
-                  None
-                </MenuItem>
-
-                {formValues.timeboxes.map((timebox, i) => (
-                  <MenuItem key={i} value={i}>
-                    {timebox.timeboxDescription} ({timebox.duration}h)
-                  </MenuItem>
+                <MenuItem value={null}>None</MenuItem>
+                {formValues.timeboxes.map((tb, i) => (
+                  <MenuItem key={i} value={i}>{`${tb.timeboxDescription} (${formatTimeboxDuration(tb)})`}</MenuItem>
                 ))}
               </TextField>
             </Grid>
             <Grid item xs={2}>
               <TextField
                 label="Deadline"
-                variant="outlined"
                 type="date"
-                value={item.deadline}
-                onChange={(e) => handleWorkItemChange(index, 'deadline', e.target.value)}
-                fullWidth
+                value={item.deadline || ''}
+                onChange={e => handleWorkItemChange(index, 'deadline', e.target.value)}
                 InputLabelProps={{ shrink: true }}
+                fullWidth
               />
             </Grid>
           </Grid>
         </Box>
       ))}
-      <Button variant="contained" color="primary" onClick={addWorkItem}>
-        Add Work Item
-      </Button>
+      <Button variant="contained" onClick={addWorkItem}>Add Work Item</Button>
     </Box>
   );
 };

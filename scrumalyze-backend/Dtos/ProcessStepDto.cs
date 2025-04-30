@@ -5,6 +5,8 @@
         public int? TimeboxID { get; set; }
         public int? GuidedByPersonID { get; set; }
 
+        public int Id { get; set; } // Process Step Type
+
         //public double AverageDuration { get; set; }
         public int Days { get; set; }
         public int Hours { get; set; }

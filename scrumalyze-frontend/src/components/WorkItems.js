@@ -33,7 +33,6 @@ const WorkItemCard = ({ workItem, workItemTypes, teamData, selectedTeam }) => {
     (tb) => tb.timeboxID === workItem.timeboxID
   );
 
-  // Format duration as "x work day(s), y hour(s), z minute(s)"
   function formatDuration(durationHours = 0) {
     const totalMinutes = Math.round(durationHours * 60);
     const days = Math.floor(totalMinutes / (selectedTeam.workDayHours * 60));
@@ -66,7 +65,8 @@ const WorkItemCard = ({ workItem, workItemTypes, teamData, selectedTeam }) => {
           {workItem.description}
         </Typography>
 
-        <Chip sx={{ marginBottom: '10px' }}
+        <Chip
+          sx={{ marginBottom: '10px' }}
           label={workItem.done ? 'Done' : 'In Progress'}
           color={workItem.done ? 'success' : 'warning'}
         />
@@ -82,49 +82,48 @@ const WorkItemCard = ({ workItem, workItemTypes, teamData, selectedTeam }) => {
         </Typography>
 
         <Typography variant="body2" color="textSecondary">
-        Timebox: {timebox
+          Timebox: {timebox
             ? `${timebox.timeboxDescription} (${formatDuration(timebox.duration)})`
             : 'None'}
         </Typography>
 
         {/* Acceptance Criteria Section */}
-        {Array.isArray(teamData.acceptanceCriteria) &&
-          teamData.acceptanceCriteria.length > 0 && (
-            <Box mt={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                onClick={() => setAcOpen((prev) => !prev)}
-                sx={{ cursor: 'pointer' }}
-              >
-                <Typography variant="subtitle2" color="textPrimary">
-                  Acceptance Criteria
-                </Typography>
-                <IconButton size="small">
-                  {acOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </IconButton>
-              </Box>
-              {acOpen && (
-                <List dense>
-                  {teamData.acceptanceCriteria.map((criteria) => (
-                    <ListItem
-                      key={criteria.acceptanceCriteriaID}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        borderRadius: 1,
-                        mb: 1,
-                      }}
-                    >
-                      <ListItemText primary={criteria.constraintDescription} />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
+        {Array.isArray(workItem.acceptanceCriterias) && workItem.acceptanceCriterias.length > 0 && (
+          <Box mt={2}>
+            <Box
+              display="flex"
+              alignItems="center"
+              onClick={() => setAcOpen((prev) => !prev)}
+              sx={{ cursor: 'pointer' }}
+            >
+              <Typography variant="subtitle2" color="textPrimary">
+                Acceptance Criteria
+              </Typography>
+              <IconButton size="small">
+                {acOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
             </Box>
-          )}
+            {acOpen && (
+              <List dense>
+                {workItem.acceptanceCriterias.map((ac) => (
+                  <ListItem
+                    key={ac.acceptanceCriteriaID}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      borderRadius: 1,
+                      mb: 1,
+                    }}
+                  >
+                    <ListItemText primary={ac.acceptanceCriteria.constraintDescription} />
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </Box>
+        )}
 
         {/* Definition of Done Section */}
-        {Array.isArray(teamData.dodList) && teamData.dodList.length > 0 && (
+        {Array.isArray(workItem.definitionsOfDone) && workItem.definitionsOfDone.length > 0 && (
           <Box mt={2}>
             <Box
               display="flex"
@@ -141,7 +140,7 @@ const WorkItemCard = ({ workItem, workItemTypes, teamData, selectedTeam }) => {
             </Box>
             {dodOpen && (
               <List dense>
-                {teamData.dodList.map((dod) => (
+                {workItem.definitionsOfDone.map((dod) => (
                   <ListItem
                     key={dod.definitionOfDoneID}
                     sx={{
@@ -150,13 +149,13 @@ const WorkItemCard = ({ workItem, workItemTypes, teamData, selectedTeam }) => {
                       mb: 1,
                     }}
                   >
-                    <ListItemText primary={dod.constraintDescription} />
-                    {dod.isCompanyPolicy && (
-                        <ListItemIcon>
-                            <Tooltip title="Company Policy">
-                            <VerifiedUserIcon />
-                            </Tooltip>
-                        </ListItemIcon>
+                    <ListItemText primary={dod.definitionOfDone.constraintDescription} />
+                    {dod.definitionOfDone.isCompanyPolicy && (
+                      <ListItemIcon>
+                        <Tooltip title="Company Policy">
+                          <VerifiedUserIcon />
+                        </Tooltip>
+                      </ListItemIcon>
                     )}
                   </ListItem>
                 ))}

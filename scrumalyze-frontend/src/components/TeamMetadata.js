@@ -42,6 +42,9 @@ const TeamMetadata = () => {
   // Combine team roles from global and team-specific sources.
   const combinedRoles = [...scrumRoles, ...selectedTeam.scrumRoles];
 
+  console.log(scrumRoles);
+  console.log(selectedTeam.scrumRoles);
+
   // Process Steps, Timeboxes, and Definitions of Done from teamData.
   const processSteps = teamData?.processSteps || [];
   const timeboxes = teamData?.timeboxes || [];

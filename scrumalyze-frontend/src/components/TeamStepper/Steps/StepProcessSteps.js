@@ -36,6 +36,15 @@ const StepProcessSteps = ({ formValues, handleChange }) => {
     }
   }, [processStepTypes, formValues.processSteps, handleChange]);
 
+  function formatTimeboxDuration(timebox) {
+    const { days = 0, hours = 0, minutes = 0 } = timebox;
+    const parts = [];
+    if (days) parts.push(`${days} work day${days > 1 ? 's' : ''}`);
+    if (hours) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+    if (minutes) parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+    return parts.length ? parts.join(', ') : '0 hours';
+  }
+
   // Helper to update a single field of a given process step.
   // The index will be derived from processStepTypeID - 1.
   const handleStepFieldChange = (index, field, value) => {
@@ -87,10 +96,7 @@ const StepProcessSteps = ({ formValues, handleChange }) => {
                   </MenuItem>
                   {formValues.timeboxes.map((timebox, idx) => (
                     <MenuItem key={idx} value={idx}>
-                      {timebox.timeboxDescription +
-                        " (" +
-                        timebox.duration +
-                        " work hours)"}
+                      {timebox.timeboxDescription + " (" + formatTimeboxDuration(timebox) + ")"}
                     </MenuItem>
                   ))}
                 </TextField>

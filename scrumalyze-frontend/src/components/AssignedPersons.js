@@ -8,9 +8,6 @@ const AssignedPersons = ({ workItemPersons, persons }) => {
 
     return (
         <Box mt={1}>
-            <Typography variant="subtitle2" color="textPrimary">
-                Assigned Persons
-            </Typography>
             <List>
                 {workItemPersons.map((item) => {
                     const person = persons.find(p => p.personID === item.personID);

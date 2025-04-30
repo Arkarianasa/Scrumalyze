@@ -30,6 +30,15 @@ const StepSprints = ({ formValues, handleChange }) => {
         handleChange('sprints', [...formValues.sprints, newSprint]);
     };
 
+    function formatTimeboxDuration(timebox) {
+        const { days = 0, hours = 0, minutes = 0 } = timebox;
+        const parts = [];
+        if (days) parts.push(`${days} work day${days > 1 ? 's' : ''}`);
+        if (hours) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+        if (minutes) parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+        return parts.length ? parts.join(', ') : '0 hours';
+    }
+
     return (
         <Box>
             {formValues.sprints.map((sprint, index) => (
@@ -69,7 +78,7 @@ const StepSprints = ({ formValues, handleChange }) => {
 
                                 {formValues.timeboxes.map((timebox, idx) => (
                                     <MenuItem key={idx} value={idx}>
-                                        {timebox.timeboxDescription + "(" + timebox.duration + " work hours)"}
+                                        {timebox.timeboxDescription + "(" + formatTimeboxDuration(timebox) + ")"}
                                     </MenuItem>
                                 ))}
                             </TextField>

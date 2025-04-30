@@ -10,6 +10,6 @@
         public required string Description { get; set; }
         public bool Done { get; set; }
         public int? WorkItemTypeID { get; set; }
-        public required List<PersonDto> WorkingPersons { get; set; }
+        public required List<int> WorkingPersonIds { get; set; }
     }
 }

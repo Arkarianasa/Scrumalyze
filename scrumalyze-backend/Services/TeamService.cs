@@ -53,7 +53,9 @@ namespace Scrumalyze.Services
             return [.. _context.WorkItem
                 .Include(wi => wi.Persons)
                 .Include(wi => wi.AcceptanceCriterias)
+                .ThenInclude(acs => acs.AcceptanceCriteria)
                 .Include(wi => wi.DefinitionsOfDone)
+                .ThenInclude(dods => dods.DefinitionOfDone)
                 .Where(wi => wi.BacklogItem != null
                              && wi.BacklogItem.ProductBacklog != null
                              && wi.BacklogItem.ProductBacklog.ProductGoal != null
@@ -103,64 +105,55 @@ namespace Scrumalyze.Services
 
         public async Task<bool> CreateTeamAsync(ScrumTeamDto teamDto)
         {
-            // Map ScrumTeam
+            // Map ScrumTeam and clear AutoMapper roles
             ScrumTeam scrumTeam = _mapper.Map<ScrumTeam>(teamDto);
+            scrumTeam.ScrumRoles.Clear();
 
             // Fetch general roles (IDs 1–4)
-            List<ScrumRole> generalRoles = await _context.ScrumRole
+            var generalRoles = await _context.ScrumRole
                 .Where(r => r.ScrumTeamID == null)
                 .ToListAsync();
 
             // Prepare team-specific roles
-            List<ScrumRole> teamSpecificRoles = new();
-
-            foreach (var roleDto in teamDto.ScrumRoles)
-            {
-                // Add team-specific roles to the context (they'll be saved with ScrumTeam)
-                var newRole = new ScrumRole
+            var teamSpecificRoles = teamDto.ScrumRoles
+                .Select(dto => new ScrumRole
                 {
-                    RoleName = roleDto.RoleName,
-                    RoleDescription = roleDto.RoleDescription,
+                    RoleName = dto.RoleName,
+                    RoleDescription = dto.RoleDescription,
                     ScrumTeam = scrumTeam
-                };
-                teamSpecificRoles.Add(newRole);
-            }
+                })
+                .ToList();
+            _context.ScrumRole.AddRange(teamSpecificRoles);
 
-            // Combine general and team-specific roles
-            List<ScrumRole> allRoles = generalRoles.Concat(teamSpecificRoles).ToList();
+            // Assign combined roles to team
+            scrumTeam.ScrumRoles = teamSpecificRoles;
 
             // Map Persons and associate them with ScrumTeam and Roles
             List<Person> persons = new();
-
             foreach (var personDto in teamDto.Persons)
             {
                 var person = _mapper.Map<Person>(personDto);
                 person.ScrumTeam = scrumTeam;
 
-                if (personDto.RoleID <= 4) // General roles (IDs 1–4)
+                if (personDto.RoleID <= 4)
                 {
-                    // Ensure the role exists in generalRoles
-                    var role = generalRoles.SingleOrDefault(r => r.RoleID == personDto.RoleID);
-                    person.Role = role ?? throw new InvalidOperationException($"Invalid RoleID: {personDto.RoleID}. No matching general role found.");
+                    // Lookup general role by primary key, not by ScrumTeamID
+                    var role = await _context.ScrumRole.FindAsync(personDto.RoleID)
+                        ?? throw new InvalidOperationException($"Invalid RoleID: {personDto.RoleID}. No matching general role found.");
+                    person.Role = role;
                 }
-                else // Team-specific roles
+                else
                 {
-                    int teamSpecificIndex = personDto.RoleID - 5; // Convert to zero-based index for team-specific roles
-                    if (teamSpecificIndex >= 0 && teamSpecificIndex < teamSpecificRoles.Count)
-                    {
-                        person.Role = teamSpecificRoles[teamSpecificIndex];
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Invalid RoleID: {personDto.RoleID}. Index does not match any team-specific role.");
-                    }
+                    int teamIndex = personDto.RoleID - 5; // zero-based into teamSpecificRoles
+                    if (teamIndex < 0 || teamIndex >= teamSpecificRoles.Count)
+                        throw new InvalidOperationException($"Invalid RoleID: {personDto.RoleID}. No matching team-specific role.");
+                    person.Role = teamSpecificRoles[teamIndex];
                 }
 
                 persons.Add(person);
             }
-
-            // Assign the mapped Persons to the ScrumTeam
             scrumTeam.Persons = persons;
+
 
             // Map ProductGoals and associate them with ScrumTeam and Persons
             List<ProductGoal> productGoals = new();
@@ -234,7 +227,7 @@ namespace Scrumalyze.Services
             List<Timebox> timeboxes = new List<Timebox>();
             foreach (var tbDto in teamDto.Timeboxes)
             {
-                // Calculate total hours: days * workDayHours + hours + minutes as fraction of an hour
+                // Calculate total hours
                 double totalDuration = tbDto.Days * teamDto.WorkDayHours + tbDto.Hours + (tbDto.Minutes / 60.0);
 
                 Timebox timebox = new Timebox
@@ -342,6 +335,11 @@ namespace Scrumalyze.Services
 
                 sprintBacklog.BacklogItems = sprintBacklogItems;
 
+                foreach (var backlogItem in sprintBacklogItems)
+                {
+                    backlogItem.SprintBacklog = sprintBacklog;
+                }
+
                 // Associate SprintBacklog and SprintGoal with Sprint
                 sprintBacklog.Sprint = sprint;
                 sprint.SprintGoal = sprintGoal;
@@ -416,33 +414,37 @@ namespace Scrumalyze.Services
                 // Map AcceptanceCriterias (if not null)
                 if (workItemDto.AcceptanceCriterias != null)
                 {
-                    var workItemAcceptanceCriterias = workItemDto.AcceptanceCriterias
-                        .Select((criteria, index) => new WorkItem_AcceptanceCriteria
+                    workItem.AcceptanceCriterias = workItemDto.AcceptanceCriterias
+                        .Select(text => new WorkItem_AcceptanceCriteria
                         {
                             WorkItem = workItem,
                             AcceptanceCriteria = new AcceptanceCriteria
                             {
-                                ConstraintDescription = criteria,
+                                ConstraintDescription = text,
                                 ScrumTeam = scrumTeam
                             }
                         })
                         .ToList();
-
-                    workItem.AcceptanceCriterias = workItemAcceptanceCriterias;
                 }
 
                 // Map Working Persons
-                var workingPersons = workItemDto.WorkingPersons
-                    .Select(personDto => persons.FirstOrDefault(p => p.PersonID == personDto.RoleID))
-                    .Where(person => person != null)
-                    .Select(person => new WorkItem_Person
-                    {
-                        WorkItem = workItem,
-                        Person = person!
-                    })
-                    .ToList();
-
-                workItem.Persons = workingPersons;
+                if (workItemDto.WorkingPersonIds != null)
+                {
+                    workItem.Persons = workItemDto.WorkingPersonIds
+                        .Select(idx =>
+                        {
+                            if (idx < 0 || idx >= persons.Count)
+                                throw new InvalidOperationException($"Invalid WorkingPerson index: {idx}");
+                            var person = persons[idx];
+                            return new WorkItem_Person
+                            {
+                                WorkItem = workItem,
+                                Person = person,
+                                PersonID = person.PersonID
+                            };
+                        })
+                        .ToList();
+                }
 
                 // Add work item to the list
                 workItems.Add(workItem);
@@ -545,12 +547,11 @@ namespace Scrumalyze.Services
             List<ProcessStep> processSteps = new();
             if (teamDto.ProcessSteps != null)
             {
-                int counter = 0;
                 foreach (var stepDto in teamDto.ProcessSteps)
                 {
                     var processStep = new ProcessStep
                     {
-                        ProcessStepTypeID = counter++,
+                        ProcessStepTypeID = stepDto.Id,
 
                         ScrumTeam = scrumTeam,
                         ScrumTeamID = scrumTeam.ScrumTeamID,
@@ -603,6 +604,7 @@ namespace Scrumalyze.Services
 
             // Add entities to context
             _context.ScrumTeam.Add(scrumTeam);
+            _context.ProductGoal.AddRange(productGoals);
             _context.DefinitionOfDone.AddRange(definitionsOfDone);
             _context.Timebox.AddRange(timeboxes);
             _context.BacklogItem.AddRange(backlogItems);

@@ -58,8 +58,9 @@ const AddTeamStepper = () => {
     timeboxes: [{ timeboxDescription: '', days: null, hours: null, minutes: null }],
     sprints: [{ sprintGoal: '', startDate: '', endDate: '', TimeboxDtoID: null, backlogItems: [], goalResponsiblePersonID: '', backlogResponsiblePersonID: '' }],
     definitionsOfDone: [{ constraintDescription: '', isCompanyPolicy: false }],
-    workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneIDs: [], acceptanceCriterias: [], workItemTypeID: null, deadline: '', done: false, workingPersons: [] }],
-    increments: [{ description: '', relatedSprintDtoID: null, receivedByPersonDtoID: null, relatedProductGoalDtoID: null, deadline: '' }]
+    workItems: [{ description: '', TimeboxDtoID: null, BacklogItemDtoID: null, definitionOfDoneIDs: [], acceptanceCriterias: [], workItemTypeID: null, deadline: '', done: false, workingPersonIds: [] }],
+    increments: [{ description: '', relatedSprintDtoID: null, receivedByPersonDtoID: null, relatedProductGoalDtoID: null, deadline: '' }],
+    communicationMatrix: []
   });
 
   const validateCurrentStep = () => {
