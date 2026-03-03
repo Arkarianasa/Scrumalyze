@@ -12,26 +12,14 @@
   <li>Context-based state management in React (GlobalContext, TeamContext)</li>
   <li>Dynamic dashboard with tabbed views (results, metadata, work items, issues)</li>
 </ul>
-
-<h2>NuGet Dependencies (Backend)</h2>
-<ul>
-  <li><strong>AutoMapper.Extensions.Microsoft.DependencyInjection</strong> – AutoMapper support for dependency injection</li>
-  <li><strong>Microsoft.AspNetCore.Cors</strong> – CORS middleware for cross-origin requests</li>
-  <li><strong>Microsoft.AspNetCore.Mvc.Cors</strong> – MVC integration for CORS</li>
-  <li><strong>Microsoft.EntityFrameworkCore.SqlServer</strong> – EF Core provider for SQL Server</li>
-  <li><strong>Microsoft.EntityFrameworkCore.Tools</strong> – EF Core command-line tools</li>
-  <li><strong>Microsoft.Extensions.Configuration</strong> – Core configuration abstractions</li>
-  <li><strong>Microsoft.Extensions.Configuration.FileExtensions</strong> – File-based configuration support</li>
-  <li><strong>Microsoft.Extensions.Configuration.Json</strong> – JSON file configuration provider</li>
-  <li><strong>Newtonsoft.Json</strong> – High-performance JSON framework for .NET</li>
-</ul>
-
 <h2>Requirements</h2>
 <ul>
   <li>.NET 8 SDK</li>
   <li>Node.js 18+ (for frontend)</li>
   <li>SQL Server instance (local or remote)</li>
   <li>Visual Studio 2022 (recommended for development)</li>
+  <li>Java</li>
+  <li>Groovy SDK</li>
 </ul>
 
 <h2>Configuration</h2>
@@ -48,7 +36,6 @@
 <h3>Backend (C#/.NET)</h3>
 <ol>
   <li>Open the solution in Visual Studio</li>
-  <li>Install required NuGet packages</li>
   <li>Run the API project</li>
 </ol>
 
